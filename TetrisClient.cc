@@ -1,23 +1,14 @@
-#include <boost/thread.hpp>
-#include <boost/chrono.hpp>
-#include <iostream>
+#include "TetrisClient.h"
 
-void wait(int seconds)
-{
-  boost::this_thread::sleep_for(boost::chrono::seconds{seconds});
+void start(){
+
 }
 
-void thread()
-{
-  for (int i = 0; i < 5; ++i)
-  {
-    wait(1);
-    std::cout << i << '\n';
-  }
+void update(){
+
 }
 
-int main()
-{
-  boost::thread t{thread};
-  t.join();
+
+int main(){
+	return 0;
 }

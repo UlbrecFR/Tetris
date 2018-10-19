@@ -5,17 +5,23 @@ project (Tetris CXX)
 
 set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -g")
 
-find_package(Boost REQUIRED regex thread chrono)
+find_package(Boost REQUIRED thread chrono)
 include_directories(${BOOST_INCLUDE_DIRS})
+
+find_package(gf REQUIRED)
+
+add_subdirectory(lib)
 
 add_executable(TetrisServer
   TetrisServer.cc
+  TetrisServer.h
 )
 
-target_link_libraries(TetrisServer ${Boost_LIBRARIES})
+target_link_libraries(TetrisServer ${Boost_LIBRARIES} Serial)
 
 add_executable(TetrisClient
   TetrisClient.cc
+  TetrisClient.h
 )
 
-target_link_libraries(TetrisClient ${Boost_LIBRARIES})
+target_link_libraries(TetrisClient ${Boost_LIBRARIES} Serial)

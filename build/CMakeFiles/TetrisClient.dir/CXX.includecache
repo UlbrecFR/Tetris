@@ -1,0 +1,16 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/alexdillon/Bureau/Google/Cours/L3/Tetris/TetrisClient.cc
+TetrisClient.h
+/home/alexdillon/Bureau/Google/Cours/L3/Tetris/TetrisClient.h
+
+/home/alexdillon/Bureau/Google/Cours/L3/Tetris/TetrisClient.h
+gf/Event.h
+-
+
