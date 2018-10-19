@@ -90,13 +90,13 @@ TetrisClient_EXTERNAL_OBJECTS =
 
 TetrisClient: CMakeFiles/TetrisClient.dir/TetrisClient.cc.o
 TetrisClient: CMakeFiles/TetrisClient.dir/build.make
+TetrisClient: /usr/lib/x86_64-linux-gnu/libboost_system.so
 TetrisClient: /usr/lib/x86_64-linux-gnu/libboost_thread.so
 TetrisClient: /usr/lib/x86_64-linux-gnu/libboost_chrono.so
-TetrisClient: /usr/lib/x86_64-linux-gnu/libboost_system.so
 TetrisClient: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
 TetrisClient: /usr/lib/x86_64-linux-gnu/libboost_atomic.so
 TetrisClient: /usr/lib/x86_64-linux-gnu/libpthread.so
-TetrisClient: lib/libSerial.so
+TetrisClient: lib/libTetromino.so
 TetrisClient: CMakeFiles/TetrisClient.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/alexdillon/Bureau/Google/Cours/L3/Tetris/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable TetrisClient"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/TetrisClient.dir/link.txt --verbose=$(VERBOSE)

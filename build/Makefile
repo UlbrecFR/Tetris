@@ -149,6 +149,19 @@ Serial/fast:
 	$(MAKE) -f lib/CMakeFiles/Serial.dir/build.make lib/CMakeFiles/Serial.dir/build
 .PHONY : Serial/fast
 
+#=============================================================================
+# Target rules for targets named Tetromino
+
+# Build rule for target.
+Tetromino: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 Tetromino
+.PHONY : Tetromino
+
+# fast build rule for target.
+Tetromino/fast:
+	$(MAKE) -f lib/CMakeFiles/Tetromino.dir/build.make lib/CMakeFiles/Tetromino.dir/build
+.PHONY : Tetromino/fast
+
 TetrisClient.o: TetrisClient.cc.o
 
 .PHONY : TetrisClient.o
@@ -214,6 +227,7 @@ help:
 	@echo "... TetrisServer"
 	@echo "... TetrisClient"
 	@echo "... Serial"
+	@echo "... Tetromino"
 	@echo "... TetrisClient.o"
 	@echo "... TetrisClient.i"
 	@echo "... TetrisClient.s"

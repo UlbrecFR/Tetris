@@ -3,4 +3,5 @@
 
 CMakeFiles/TetrisClient.dir/TetrisClient.cc.o: ../TetrisClient.cc
 CMakeFiles/TetrisClient.dir/TetrisClient.cc.o: ../TetrisClient.h
+CMakeFiles/TetrisClient.dir/TetrisClient.cc.o: ../lib/Tetromino.h
 

@@ -56,17 +56,6 @@ CMAKE_BINARY_DIR = /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "No interactive CMake dialog available..."
@@ -77,6 +66,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/usr/bin/cmake -H$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -125,6 +125,21 @@ Serial/fast:
 	cd /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build && $(MAKE) -f lib/CMakeFiles/Serial.dir/build.make lib/CMakeFiles/Serial.dir/build
 .PHONY : Serial/fast
 
+# Convenience name for target.
+lib/CMakeFiles/Tetromino.dir/rule:
+	cd /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build && $(MAKE) -f CMakeFiles/Makefile2 lib/CMakeFiles/Tetromino.dir/rule
+.PHONY : lib/CMakeFiles/Tetromino.dir/rule
+
+# Convenience name for target.
+Tetromino: lib/CMakeFiles/Tetromino.dir/rule
+
+.PHONY : Tetromino
+
+# fast build rule for target.
+Tetromino/fast:
+	cd /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build && $(MAKE) -f lib/CMakeFiles/Tetromino.dir/build.make lib/CMakeFiles/Tetromino.dir/build
+.PHONY : Tetromino/fast
+
 Serial.o: Serial.cc.o
 
 .PHONY : Serial.o
@@ -152,18 +167,49 @@ Serial.cc.s:
 	cd /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build && $(MAKE) -f lib/CMakeFiles/Serial.dir/build.make lib/CMakeFiles/Serial.dir/Serial.cc.s
 .PHONY : Serial.cc.s
 
+Tetromino.o: Tetromino.cc.o
+
+.PHONY : Tetromino.o
+
+# target to build an object file
+Tetromino.cc.o:
+	cd /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build && $(MAKE) -f lib/CMakeFiles/Tetromino.dir/build.make lib/CMakeFiles/Tetromino.dir/Tetromino.cc.o
+.PHONY : Tetromino.cc.o
+
+Tetromino.i: Tetromino.cc.i
+
+.PHONY : Tetromino.i
+
+# target to preprocess a source file
+Tetromino.cc.i:
+	cd /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build && $(MAKE) -f lib/CMakeFiles/Tetromino.dir/build.make lib/CMakeFiles/Tetromino.dir/Tetromino.cc.i
+.PHONY : Tetromino.cc.i
+
+Tetromino.s: Tetromino.cc.s
+
+.PHONY : Tetromino.s
+
+# target to generate assembly for a file
+Tetromino.cc.s:
+	cd /home/alexdillon/Bureau/Google/Cours/L3/Tetris/build && $(MAKE) -f lib/CMakeFiles/Tetromino.dir/build.make lib/CMakeFiles/Tetromino.dir/Tetromino.cc.s
+.PHONY : Tetromino.cc.s
+
 # Help Target
 help:
 	@echo "The following are some of the valid targets for this Makefile:"
 	@echo "... all (the default if no target is provided)"
 	@echo "... clean"
 	@echo "... depend"
-	@echo "... rebuild_cache"
-	@echo "... Serial"
 	@echo "... edit_cache"
+	@echo "... Serial"
+	@echo "... rebuild_cache"
+	@echo "... Tetromino"
 	@echo "... Serial.o"
 	@echo "... Serial.i"
 	@echo "... Serial.s"
+	@echo "... Tetromino.o"
+	@echo "... Tetromino.i"
+	@echo "... Tetromino.s"
 .PHONY : help
 
 

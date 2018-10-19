@@ -56,4 +56,5 @@ set(CMAKE_DEPEND_INFO_FILES
   "CMakeFiles/TetrisServer.dir/DependInfo.cmake"
   "CMakeFiles/TetrisClient.dir/DependInfo.cmake"
   "lib/CMakeFiles/Serial.dir/DependInfo.cmake"
+  "lib/CMakeFiles/Tetromino.dir/DependInfo.cmake"
   )

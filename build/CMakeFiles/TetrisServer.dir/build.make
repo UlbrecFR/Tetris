@@ -90,13 +90,12 @@ TetrisServer_EXTERNAL_OBJECTS =
 
 TetrisServer: CMakeFiles/TetrisServer.dir/TetrisServer.cc.o
 TetrisServer: CMakeFiles/TetrisServer.dir/build.make
+TetrisServer: /usr/lib/x86_64-linux-gnu/libboost_system.so
 TetrisServer: /usr/lib/x86_64-linux-gnu/libboost_thread.so
 TetrisServer: /usr/lib/x86_64-linux-gnu/libboost_chrono.so
-TetrisServer: /usr/lib/x86_64-linux-gnu/libboost_system.so
 TetrisServer: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
 TetrisServer: /usr/lib/x86_64-linux-gnu/libboost_atomic.so
 TetrisServer: /usr/lib/x86_64-linux-gnu/libpthread.so
-TetrisServer: lib/libSerial.so
 TetrisServer: CMakeFiles/TetrisServer.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/alexdillon/Bureau/Google/Cours/L3/Tetris/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable TetrisServer"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/TetrisServer.dir/link.txt --verbose=$(VERBOSE)

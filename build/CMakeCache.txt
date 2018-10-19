@@ -17,11 +17,23 @@
 //The threading library used by boost-thread
 BOOST_THREAD_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libpthread.so
 
+//Boost asio library (debug)
+Boost_ASIO_LIBRARY_DEBUG:FILEPATH=Boost_ASIO_LIBRARY_DEBUG-NOTFOUND
+
+//Boost asio library (release)
+Boost_ASIO_LIBRARY_RELEASE:FILEPATH=Boost_ASIO_LIBRARY_RELEASE-NOTFOUND
+
 //Boost atomic library (debug)
 Boost_ATOMIC_LIBRARY_DEBUG:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_atomic.so
 
 //Boost atomic library (release)
 Boost_ATOMIC_LIBRARY_RELEASE:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_atomic.so
+
+//Boost bind library (debug)
+Boost_BIND_LIBRARY_DEBUG:FILEPATH=Boost_BIND_LIBRARY_DEBUG-NOTFOUND
+
+//Boost bind library (release)
+Boost_BIND_LIBRARY_RELEASE:FILEPATH=Boost_BIND_LIBRARY_RELEASE-NOTFOUND
 
 //Boost chrono library (debug)
 Boost_CHRONO_LIBRARY_DEBUG:FILEPATH=/usr/lib/x86_64-linux-gnu/libboost_chrono.so
@@ -233,6 +245,12 @@ CMAKE_STRIP:FILEPATH=/usr/bin/strip
 CMAKE_VERBOSE_MAKEFILE:BOOL=FALSE
 
 //Value Computed by CMake
+Lib_BINARY_DIR:STATIC=/home/alexdillon/Bureau/Google/Cours/L3/Tetris/build/lib
+
+//Value Computed by CMake
+Lib_SOURCE_DIR:STATIC=/home/alexdillon/Bureau/Google/Cours/L3/Tetris/lib
+
+//Value Computed by CMake
 Project_BINARY_DIR:STATIC=/home/alexdillon/Bureau/Google/Cours/L3/Tetris/build
 
 //Value Computed by CMake
@@ -253,6 +271,9 @@ Tetris_BINARY_DIR:STATIC=/home/alexdillon/Bureau/Google/Cours/L3/Tetris/build
 //Value Computed by CMake
 Tetris_SOURCE_DIR:STATIC=/home/alexdillon/Bureau/Google/Cours/L3/Tetris
 
+//Dependencies for target
+Tetromino_LIB_DEPENDS:STATIC=
+
 //The directory containing a CMake configuration file for gf.
 gf_DIR:PATH=/usr/local/lib/cmake/gf
 
@@ -264,10 +285,18 @@ serial_LIB_DEPENDS:STATIC=
 # INTERNAL cache entries
 ########################
 
+//ADVANCED property for variable: Boost_ASIO_LIBRARY_DEBUG
+Boost_ASIO_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_ASIO_LIBRARY_RELEASE
+Boost_ASIO_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_ATOMIC_LIBRARY_DEBUG
 Boost_ATOMIC_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_ATOMIC_LIBRARY_RELEASE
 Boost_ATOMIC_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_BIND_LIBRARY_DEBUG
+Boost_BIND_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: Boost_BIND_LIBRARY_RELEASE
+Boost_BIND_LIBRARY_RELEASE-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_CHRONO_LIBRARY_DEBUG
 Boost_CHRONO_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: Boost_CHRONO_LIBRARY_RELEASE
@@ -442,7 +471,7 @@ CMAKE_VERBOSE_MAKEFILE-ADVANCED:INTERNAL=1
 //Details about finding Threads
 FIND_PACKAGE_MESSAGE_DETAILS_Threads:INTERNAL=[TRUE][v()]
 //Components requested for this build tree.
-_Boost_COMPONENTS_SEARCHED:INTERNAL=atomic;chrono;date_time;regex;system;thread
+_Boost_COMPONENTS_SEARCHED:INTERNAL=asio;atomic;bind;chrono;date_time;regex;system;thread
 //Last used Boost_INCLUDE_DIR value.
 _Boost_INCLUDE_DIR_LAST:INTERNAL=/usr/include
 //Last used Boost_LIBRARY_DIR_DEBUG value.
