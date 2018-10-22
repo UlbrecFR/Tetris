@@ -1,1 +1,0 @@
-/usr/bin/c++  -Wall -std=c++11 -O2 -g  -rdynamic CMakeFiles/TetrisClient.dir/TetrisClient.cc.o  -o TetrisClient -Wl,-rpath,/home/alexdillon/Bureau/Google/Cours/L3/Tetris/build/lib -lboost_system -lboost_thread -lboost_chrono -lboost_date_time -lboost_atomic -lpthread lib/libTetromino.so 

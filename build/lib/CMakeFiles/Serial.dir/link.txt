@@ -1,1 +1,0 @@
-/usr/bin/c++ -fPIC -Wall -std=c++11 -O2 -g  -shared -Wl,-soname,libSerial.so -o libSerial.so CMakeFiles/Serial.dir/Serial.cc.o 
