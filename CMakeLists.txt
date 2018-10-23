@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.0)
 
 project (Tetris CXX)
 
-set(CMAKE_CXX_FLAGS "-Wall -std=c++11 -O2 -g")
+set(CMAKE_CXX_FLAGS "-Wall -std=c++14 -O2 -g")
 
 find_package(Boost REQUIRED system thread)
 include_directories(${BOOST_INCLUDE_DIRS})
@@ -24,4 +24,4 @@ add_executable(TetrisClient
   TetrisClient.h
 )
 
-target_link_libraries(TetrisClient ${Boost_LIBRARIES} Tetromino)
+target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} Tetromino)
