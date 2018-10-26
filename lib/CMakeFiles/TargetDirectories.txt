@@ -1,3 +1,0 @@
-/home/alexdillon/Bureau/Google/Cours/L3/Tetris/lib/CMakeFiles/rebuild_cache.dir
-/home/alexdillon/Bureau/Google/Cours/L3/Tetris/lib/CMakeFiles/Serial.dir
-/home/alexdillon/Bureau/Google/Cours/L3/Tetris/lib/CMakeFiles/edit_cache.dir
