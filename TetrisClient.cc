@@ -83,15 +83,36 @@ void TetrisClient::do_write() {
 
 int main(int argc, char* argv[]){
 	try {
-		if (argc != 3) {
+		if (argc != 3 && argc != 2) {
 			std::cerr << "Usage: Tetris_client <host> <port>\n";
 			return 1;
+		}
+
+		char* adress;
+		char* port;
+
+		adress = argv[1];
+		port = argv[2];
+
+		if(argc == 2){
+
+			adress = "localhost";
+			port = argv[1];
+
+			pid_t pid = fork();
+			if(pid == -1){
+				perror("fork");
+				exit(1);
+			}
+			if(pid == 0){
+				execl("./TetrisServer", "TetrisServer", port, NULL);
+			}
 		}
 
 		boost::asio::io_service io_service;
 
 		tcp::resolver resolver(io_service);
-		auto endpoint_iterator = resolver.resolve({ argv[1], argv[2] });
+		auto endpoint_iterator = resolver.resolve({adress, port});
 		TetrisClient c(io_service, endpoint_iterator);
 
 		std::thread t([&io_service](){ io_service.run(); });
