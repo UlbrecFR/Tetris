@@ -17,11 +17,11 @@ add_executable(TetrisServer
   TetrisServer.h
 )
 
-target_link_libraries(TetrisServer ${Boost_LIBRARIES})
+target_link_libraries(TetrisServer ${Boost_LIBRARIES} Tetromino Serial)
 
 add_executable(TetrisClient
   TetrisClient.cc
   TetrisClient.h
 )
 
-target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} Tetromino)
+target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} Tetromino Serial)
