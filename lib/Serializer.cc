@@ -38,7 +38,7 @@ void Serializer::clear(){
 	setWritePos(0);
 }
 
-void Serializer::Serialize(const void* d, size_t Size){
+/*void Serialize(const void* d, size_t Size){
 
 	if((writePos + Size) > getSize()){
 		data.resize(writePos + Size);				
@@ -49,7 +49,42 @@ void Serializer::Serialize(const void* d, size_t Size){
     }
 
     writePos += Size;
+}*/
+
+
+template<typename T> 
+void Serializer::Serialize(const T* d, size_t Size){
+
+	if((writePos + Size) > getSize()){
+		data.resize(writePos + Size);				
+	}
+
+    for (size_t i = 0; i < Size; ++i) {
+      	data[writePos + Size - i -1] = static_cast<uint8_t>( *(char *)d >> (8 * i));
+    }
+
+    writePos += Size;
 }
+
+template<typename T> 
+void Serializer::Serialize(const T* d){
+	Serialize(d, sizeof(*d));
+}
+
+template<typename T> 
+void Serializer::Serialize(std::vector<T> tab){
+	for (size_t i = 0; i < tab.size(); ++i){
+		Serialize(&tab[i]);
+	}
+}
+
+template<typename T> 
+void Serializer::Serialize(std::vector<T> tab, size_t Size){
+	for (size_t i = 0; i < tab.size(); ++i){
+		Serialize(&tab[i], Size);
+	}
+}
+
 
 template<typename T> 
 T Serializer::Deserialize(T type, size_t Size){

@@ -28,9 +28,21 @@ class Serializer{
 
 		void clear();
 
-		void Serialize(const void* d, size_t Size);
+		//void Serialize(const void* d, size_t Size);
+
+		template<typename T> 
+		void Serialize(const T* d, size_t Size);
+
+		template<typename T> 
+		void Serialize(const T* d);
+
+		template<typename T> 
+		void Serialize(std::vector<T> tab);
+
+		template<typename T> 
+		void Serialize(std::vector<T> tab, size_t Size);
 
 		template<typename T> 
 		T Deserialize(T type, size_t Size);
-		
+				
 };
