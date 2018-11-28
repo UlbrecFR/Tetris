@@ -9,7 +9,7 @@
 
 using boost::asio::ip::tcp;
 
-static void client_listener(tcp::socket *socket_client, gf::Queue<Message> *queue_client) {
+static void clientListener(tcp::socket *socketClient, gf::Queue<Message> *queueClient) {
 
     for(;;) {
 
@@ -17,7 +17,7 @@ static void client_listener(tcp::socket *socket_client, gf::Queue<Message> *queu
         Message msg;
 
         boost::system::error_code error;
-        size_t length = socket_client->read_some(boost::asio::buffer(msg.msg), error);
+        size_t length = socketClient->read_some(boost::asio::buffer(msg.msg), error);
 
         msg.length = length;
         //on gère les erreurs
@@ -26,7 +26,7 @@ static void client_listener(tcp::socket *socket_client, gf::Queue<Message> *queu
         else if (error)
             throw boost::system::system_error(error); // Some other error.
 
-        queue_client->push(msg);
+        queueClient->push(msg);
     } 
 }
 
@@ -37,11 +37,11 @@ int main(int argc, char* argv[]){
             return 1;
         }
 
-        boost::asio::io_service io_service;
-        tcp::acceptor a(io_service, tcp::endpoint(tcp::v4(), std::atoi(argv[1])));
+        boost::asio::io_service ioService;
+        tcp::acceptor a(ioService, tcp::endpoint(tcp::v4(), std::atoi(argv[1])));
 
-        tcp::socket *sock1(new tcp::socket(io_service));
-        tcp::socket *sock2(new tcp::socket(io_service));
+        tcp::socket *sock1(new tcp::socket(ioService));
+        tcp::socket *sock2(new tcp::socket(ioService));
 
         a.accept(*sock1);
         a.accept(*sock2);
@@ -49,18 +49,18 @@ int main(int argc, char* argv[]){
         gf::Queue<Message> queueCli1;
         gf::Queue<Message> queueCli2;
 
-        std::thread(client_listener, sock1, &queueCli1).detach();
-        std::thread(client_listener, sock2, &queueCli2).detach();
+        std::thread(clientListener, sock1, &queueCli1).detach();
+        std::thread(clientListener, sock2, &queueCli2).detach();
 
-        Message voui;
+        Message msg;
 
         for(;;) {
-            if (queueCli1.poll(voui)) {
-                boost::asio::write(*sock2, boost::asio::buffer(voui.msg, voui.length));
+            if (queueCli1.poll(msg)) {
+                boost::asio::write(*sock2, boost::asio::buffer(msg.msg, msg.length));
             }
 
-            if (queueCli2.poll(voui)) {
-                boost::asio::write(*sock1, boost::asio::buffer(voui.msg, voui.length));
+            if (queueCli2.poll(msg)) {
+                boost::asio::write(*sock1, boost::asio::buffer(msg.msg, msg.length));
             }
 
         }

@@ -9,14 +9,14 @@
 using boost::asio::ip::tcp;
 
 
-static void server_listener(tcp::socket *socket_server, gf::Queue<Message> *queue_server) {
+static void serverListener(tcp::socket *socketServer, gf::Queue<Message> *queueServer) {
 
     for(;;) {
 
         Message msg;
 
         boost::system::error_code error;
-        size_t length = socket_server->read_some(boost::asio::buffer(msg.msg), error);
+        size_t length = socketServer->read_some(boost::asio::buffer(msg.msg), error);
 
         msg.length = length;
         //on gère les erreurs
@@ -25,7 +25,7 @@ static void server_listener(tcp::socket *socket_server, gf::Queue<Message> *queu
         else if (error)
             throw boost::system::system_error(error); // Some other error.
 
-        queue_server->push(msg);
+        queueServer->push(msg);
 
 
     }
@@ -46,20 +46,20 @@ int main(int argc, char* argv[]){
         tcp::resolver resolver(io_service);
         boost::asio::connect(*sock, resolver.resolve({argv[1], argv[2]}));
 
-        gf::Queue<Message> queue_server;
+        gf::Queue<Message> queueServer;
 
-        std::thread(server_listener, sock, &queue_server).detach();
+        std::thread(serverListener, sock, &queueServer).detach();
     
         for(;;) {
-            char request[max_length];
-            std::cin.getline(request, max_length);
-            size_t request_length = std::strlen(request);
-            boost::asio::write(*sock, boost::asio::buffer(request, request_length));
+            char request[maxLength];
+            std::cin.getline(request, maxLength);
+            size_t requestLength = std::strlen(request);
+            boost::asio::write(*sock, boost::asio::buffer(request, requestLength));
         
-            static Message voui;
+            Message msg;
 
-            if (queue_server.poll(voui)) {
-                std::cout << voui.msg << std::endl;
+            if (queueServer.poll(msg)) {
+                std::cout << msg.msg << std::endl;
             }
         }
 

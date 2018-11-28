@@ -10,7 +10,7 @@ using boost::asio::ip::tcp;
 
 class TetrisServer{
 	public:
-		static void client_listener(tcp::socket *socket_client, gf::Queue<Message> *queue_client);
+		static void clientListener(tcp::socket *socketClient, gf::Queue<Message> *queueClient);
 
 };
 
