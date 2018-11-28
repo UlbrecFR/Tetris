@@ -34,6 +34,8 @@ static void serverListener(tcp::socket *socketServer, gf::Queue<Message> *queueS
 
 int main(int argc, char* argv[]){
 
+    printf("%s\n", "Tetris Client : Le Vouitris");
+
     try {
         if (argc != 3) {
             std::cerr << "Usage: blocking_tcp_echo_client <host> <port>\n";
