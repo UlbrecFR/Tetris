@@ -1,12 +1,10 @@
 #include <iostream> 
 #include <vector>
 
-typedef uint8_t Int;
-
 class Serializer{
 
 	private:
-		std::vector<Int> data;
+		std::vector<uint8_t> data;
 		size_t readPos;
 		size_t writePos;
 
@@ -28,21 +26,18 @@ class Serializer{
 
 		void clear();
 
-		//void Serialize(const void* d, size_t Size);
+		void Serialize(const uint8_t d);
 
-		template<typename T> 
-		void Serialize(const T* d, size_t Size);
+		void Serialize(const uint8_t *d, size_t Size);
 
-		template<typename T> 
-		void Serialize(const T* d);
+		void getSerializedData(char *d);
 
-		template<typename T> 
-		void Serialize(std::vector<T> tab);
+		void append(char* d, size_t Size);
 
-		template<typename T> 
-		void Serialize(std::vector<T> tab, size_t Size);
+		void append(char* d);
 
-		template<typename T> 
-		T Deserialize(T type, size_t Size);
+		void Deserialize(uint8_t *d);
+
+		void Deserialize(uint8_t *d, size_t Size);
 				
 };
