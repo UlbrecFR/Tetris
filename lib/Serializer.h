@@ -34,13 +34,13 @@ class Serializer{
 
 		void Serialize(const Tetromino t);
 
-		void getSerializedData(char *d);
+		const void *getData();
 
 		void append(char* d, size_t Size);
 
 		void append(char* d);
 
-		void Deserialize(uint8_t *d);
+		void Deserialize(uint8_t &d);
 
 		void Deserialize(uint8_t *d, size_t Size);
 

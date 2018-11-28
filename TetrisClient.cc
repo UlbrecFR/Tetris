@@ -53,16 +53,15 @@ int main(int argc, char* argv[]){
         std::thread(serverListener, sock, &queueServer).detach();
     
         for(;;) {
-            char request[maxLength];
-            std::cin.getline(request, 0);
+            const void *request;
+            std::cin.getline(NULL, 0);
             Tetromino test;
             test.setRotation(2);
             test.setType(4);
             Serializer ser;
             ser.Serialize(test);
-            ser.getSerializedData(request);
-            size_t requestLength = std::strlen(request);
-            boost::asio::write(*sock, boost::asio::buffer(request, requestLength));
+            request = ser.getData();
+            boost::asio::write(*sock, boost::asio::buffer(request, 256));
         
             Message msg;
 

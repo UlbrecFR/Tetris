@@ -67,9 +67,8 @@
 		Serialize(t.getRotation());
 	}
 
-	void Serializer::getSerializedData(char *d){
-		std::memcpy(d, &data[readPos], writePos-readPos);
-		d[writePos] = '\0';
+	const void *Serializer::getData(){
+		return &data[0];
 	}
 
 	void Serializer::append(char* d, size_t Size){
@@ -84,16 +83,16 @@
 		append(d, std::strlen(d));
 	};
 
-	void Serializer::Deserialize(uint8_t *d){
-	    (*d) = data[readPos];
-	    readPos ++;
+	void Serializer::Deserialize(uint8_t &d){
+	    d = (uint8_t)data[readPos];
+	    readPos += sizeof(d);
 	}
 
 	void Serializer::Deserialize(uint8_t *d, size_t Size){
 		for (size_t i = 0; i < Size; ++i){
-			d[i] = data[readPos + Size - i -1];
+			d[i] = (uint8_t)data[readPos + Size - i -1];
 		}
-		readPos += Size;
+		readPos += Size*sizeof(d[0]);
 	}	
 
 	void Serializer::Deserialize(Tetromino *t){
