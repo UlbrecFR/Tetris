@@ -15,13 +15,15 @@ add_subdirectory(lib)
 add_executable(TetrisServer
   TetrisServer.cc
   TetrisServer.h
+  lib/Serial.h
 )
 
-target_link_libraries(TetrisServer ${Boost_LIBRARIES} Tetromino Serial)
+target_link_libraries(TetrisServer ${Boost_LIBRARIES} Tetromino)
 
 add_executable(TetrisClient
   TetrisClient.cc
   TetrisClient.h
+  lib/Serial.h
 )
 
-target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} Tetromino Serial)
+target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} Tetromino)
