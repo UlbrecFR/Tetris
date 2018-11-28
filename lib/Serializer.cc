@@ -62,6 +62,11 @@
 	    writePos += Size;
 	}
 
+	void Serializer::Serialize(const Tetromino t){
+		Serialize(t.getType());
+		Serialize(t.getRotation());
+	}
+
 	void Serializer::getSerializedData(char *d){
 		std::memcpy(d, &data[readPos], writePos-readPos);
 		d[writePos] = '\0';
@@ -90,3 +95,9 @@
 		}
 		readPos += Size;
 	}	
+
+	void Serializer::Deserialize(Tetromino *t){
+		t->setType(data[readPos]);
+		t->setRotation(data[readPos+1]);
+		readPos += 2;
+	}

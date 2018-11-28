@@ -1,6 +1,7 @@
 #include <iostream> 
 #include <vector>
 #include <cstring>
+#include "Serial.h"
 
 class Serializer{
 
@@ -31,6 +32,8 @@ class Serializer{
 
 		void Serialize(const uint8_t *d, size_t Size);
 
+		void Serialize(const Tetromino t);
+
 		void getSerializedData(char *d);
 
 		void append(char* d, size_t Size);
@@ -40,5 +43,7 @@ class Serializer{
 		void Deserialize(uint8_t *d);
 
 		void Deserialize(uint8_t *d, size_t Size);
+
+		void Deserialize(Tetromino *t);
 				
 };

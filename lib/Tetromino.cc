@@ -14,4 +14,19 @@
 			printf("\n");
 		}
 	}
-	
+
+	uint8_t Tetromino::getType() const{
+		return type;
+	}
+		
+	uint8_t Tetromino::getRotation() const{
+		return rotation;
+	}
+
+	void Tetromino::setType(uint8_t t){
+		type = t;
+	}
+
+	void Tetromino::setRotation(uint8_t r){
+		rotation = r;
+	}

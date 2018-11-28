@@ -1,22 +1,27 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
+#include <iostream> 
 
 class Tetromino{
 
 	private:
-		int type;
-		int rotation;
-		static const int shape[7][4][2];
+		uint8_t type;
+		uint8_t rotation;
+		static const uint8_t shape[7][4][2];
 
 	public:
 		Tetromino();
 		
 		void print();
 
+		uint8_t getType() const;
+		uint8_t getRotation() const;
+		void setType(uint8_t t);
+		void setRotation(uint8_t r);
 };
 
-const int Tetromino::shape[7][4][2] = {
+const uint8_t Tetromino::shape[7][4][2] = {
 			{
 				{2,0},
 				{1,0},

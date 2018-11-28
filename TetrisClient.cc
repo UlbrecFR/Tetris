@@ -54,14 +54,25 @@ int main(int argc, char* argv[]){
     
         for(;;) {
             char request[maxLength];
-            std::cin.getline(request, maxLength);
+            std::cin.getline(request, 0);
+            Tetromino test;
+            test.setRotation(2);
+            test.setType(4);
+            Serializer ser;
+            ser.Serialize(test);
+            ser.getSerializedData(request);
             size_t requestLength = std::strlen(request);
             boost::asio::write(*sock, boost::asio::buffer(request, requestLength));
         
             Message msg;
 
             if (queueServer.poll(msg)) {
-                std::cout << msg.msg << std::endl;
+                Serializer ser2;
+                ser2.append(msg.msg);
+                Tetromino test2;
+                ser2.Deserialize(&test2);
+                printf("%d\n", test2.getType());
+                printf("%d\n", test2.getRotation());
             }
         }
 
