@@ -1,131 +1,75 @@
 #include <cstdlib>
-#include <deque>
 #include <iostream>
-#include <list>
-#include <memory>
-#include <set>
+#include <thread>
 #include <utility>
 #include <boost/asio.hpp>
+#include <gf/Queue.h>
+
 #include "TetrisServer.h"
 
 using boost::asio::ip::tcp;
 
-//----------------------------------------------------------------------
-	void Lobby::join(Player_ptr player) {
-		players_.insert(player);
-		for (auto msg: recent_msgs_) player->deliver(msg);
-	}
+static void client_listener(tcp::socket *socket_client, gf::Queue<Message> *queue_client) {
 
-	void Lobby::leave(Player_ptr player) {
-		players_.erase(player);
-	}
+    for(;;) {
 
-	void Lobby::deliver(const Serial& msg) {
-		recent_msgs_.push_back(msg);
-		while (recent_msgs_.size() > max_recent_msgs)
-			recent_msgs_.pop_front();
+        //on lit le message envoyé par le client
+        Message msg;
 
-		for (auto player: players_)
-			player->deliver(msg);
-	}
+        boost::system::error_code error;
+        size_t length = socket_client->read_some(boost::asio::buffer(msg.msg), error);
 
+        msg.length = length;
+        //on gère les erreurs
+        if (error == boost::asio::error::eof)
+            break; // Connection closed cleanly by peer.
+        else if (error)
+            throw boost::system::system_error(error); // Some other error.
 
-
-//----------------------------------------------------------------------
-
-
-	void GameSession::start() {
-		room_.join(shared_from_this());
-		do_read_header();
-	}
-
-	void GameSession::deliver(const Serial& msg) {
-
-		bool write_in_progress = !write_msgs_.empty();
-		write_msgs_.push_back(msg);
-
-		if (!write_in_progress) {
-			do_write();
-		}
-	}
-
-	void GameSession::do_read_header() {
-		auto self(shared_from_this());
-		boost::asio::async_read(socket_,
-		boost::asio::buffer(read_msg_.data(), read_msg_.header_length),
-			[this, self](boost::system::error_code ec, std::size_t){
-			if (!ec && read_msg_.decode_header()){
-				do_read_body();
-			}else{
-				room_.leave(shared_from_this());
-			}
-		});
-	}
-
-	void GameSession::do_read_body(){
-		auto self(shared_from_this());
-		boost::asio::async_read(socket_,
-		boost::asio::buffer(read_msg_.body(), read_msg_.body_length()),
-			[this, self](boost::system::error_code ec, std::size_t) {
-			if (!ec){
-				room_.deliver(read_msg_);
-				do_read_header();
-			} else {
-				room_.leave(shared_from_this());
-			}
-		});
-	}
-
-	void GameSession::do_write(){
-		auto self(shared_from_this());
-		boost::asio::async_write(socket_,
-		boost::asio::buffer(write_msgs_.front().data(), write_msgs_.front().length()),
-			[this, self](boost::system::error_code ec, std::size_t /*length*/) {
-			if (!ec) {
-				write_msgs_.pop_front();
-				if (!write_msgs_.empty()){
-					do_write();
-				}
-			}else {
-				room_.leave(shared_from_this());
-			}
-		});
-	}
-
-
-//----------------------------------------------------------------------
-
-	void TetrisServer::do_accept() {
-		acceptor_.async_accept(socket_,[this](boost::system::error_code ec){
-			if (!ec){
-				std::make_shared<GameSession>(std::move(socket_), room_)->start();
-			}
-
-			do_accept();
-		});
-	}
-
-//----------------------------------------------------------------------
+        queue_client->push(msg);
+    } 
+}
 
 int main(int argc, char* argv[]){
-	try{
-		if (argc < 2){
-			std::cerr << "Usage:tetrisServer <port> [<port> ...]\n";
-			return 1;
-		}
+	try {
+       	if (argc != 2) {
+            std::cerr << "Usage: blocking_tcp_echo_server <port>\n";
+            return 1;
+        }
 
-		boost::asio::io_service io_service;
+        boost::asio::io_service io_service;
+        tcp::acceptor a(io_service, tcp::endpoint(tcp::v4(), std::atoi(argv[1])));
 
-		std::list<TetrisServer> servers;
-		for (int i = 1; i < argc; ++i){
-			tcp::endpoint endpoint(tcp::v4(), std::atoi(argv[i]));
-			servers.emplace_back(io_service, endpoint);
-		}
+        tcp::socket *sock1(new tcp::socket(io_service));
+        tcp::socket *sock2(new tcp::socket(io_service));
 
-		io_service.run();
-	} catch (std::exception& e){
-		std::cerr << "Exception: " << e.what() << "\n";
-	}
+        a.accept(*sock1);
+        a.accept(*sock2);
+
+        gf::Queue<Message> queueCli1;
+        gf::Queue<Message> queueCli2;
+
+        std::thread(client_listener, sock1, &queueCli1).detach();
+        std::thread(client_listener, sock2, &queueCli2).detach();
+
+        Message voui;
+
+        for(;;) {
+            if (queueCli1.poll(voui)) {
+                boost::asio::write(*sock2, boost::asio::buffer(voui.msg, voui.length));
+            }
+
+            if (queueCli2.poll(voui)) {
+                boost::asio::write(*sock1, boost::asio::buffer(voui.msg, voui.length));
+            }
+
+        }
+
+    } catch (std::exception& e) {
+        std::cerr << "Exception SERVER: " << e.what() << "\n";
+    }
+    
+
 
 	return 0;
 
