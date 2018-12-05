@@ -5,37 +5,37 @@
 
 const static size_t maxLength = 1024;
 
-typedef struct Message {
+struct Message {
 	char msg[maxLength];
 	size_t length;
-}Message;
+};
 
 
-typedef struct TetrominoPlaced {
+struct CTS_TetrominoPlaced {
 	Tetromino tetro;
 	int posX;
 	int posY;
-} CTS_TetrominoPlaced;
+};
 
 
-typedef struct ClientConnectionLost {
+struct CTS_ClientConnectionLost {
 	enum {
 		ClientQuit,
 		ClientCrash,
 		ClientDisconnected
 	} ErrorType;
-} CTS_ClientConnectionLost;
+};
 
 
-typedef struct NewTetromino {
+struct STC_NewTetromino {
 	Tetromino newTetro;
-} STC_NewTetromino;
+};
 
-typedef struct UpdateOtherPlayer {
-	int grid[8];
-} STC_UpdateOtherPlayer;
+struct STC_UpdateOtherPlayer {
+	int grid[12*17];
+};
 
-typedef struct RequestClientToServer{
+struct Request_CTS{
 	enum {
 		TYPE_TETROMINO_PLACED,
 		TYPE_CLIENT_LOST
@@ -44,9 +44,9 @@ typedef struct RequestClientToServer{
 		CTS_TetrominoPlaced tetroMsg;
 		CTS_ClientConnectionLost discoMsg;
 	} Content;
-} Request_CTS;
+};
 
-typedef struct RequestServerToClient{
+struct Request_STC{
 	enum {
 		TYPE_NEW_TETROMINO,
 		TYPE_UPDATE_OTHER
@@ -55,4 +55,4 @@ typedef struct RequestServerToClient{
 		STC_NewTetromino newTetroMsg;
 		STC_UpdateOtherPlayer updateOtherMsg;
 	} Content;
-} Request_STC;
+};

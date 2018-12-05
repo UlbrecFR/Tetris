@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
-#include <iostream> 
+#include <iostream>
+#include <set>
 
 class Tetromino{
 
@@ -19,6 +20,7 @@ class Tetromino{
 		uint8_t getRotation() const;
 		void setType(uint8_t t);
 		void setRotation(uint8_t r);
+		std::set<std::pair<int, int>> getCases(int x, int y);
 };
 
 const uint8_t Tetromino::shape[7][4][2] = {
