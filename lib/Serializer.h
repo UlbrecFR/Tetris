@@ -19,35 +19,21 @@ class Serializer{
 
 		void printData();
 
-		size_t getReadPos();
-
-		size_t getWritePos();
-
 		size_t getSize();
-
-		void setReadPos(size_t pos);
-
-		void setWritePos(size_t pos);
 
 		void clear();
 
-		void Serialize(const uint8_t d);
+		void serialize(const uint8_t d);
 
-		void Serialize(const uint8_t *d, size_t Size);
+		void serialize(const uint8_t *d, size_t Size);
 
-		void Serialize(const Tetromino t);
+		void serialize(const Tetromino t);
 
-		const void *getData();
+		std::vector<uint8_t> getData();
 
 		void append(char* d, size_t Size);
 
 		void append(char* d);
-
-		void Deserialize(uint8_t &d);
-
-		void Deserialize(uint8_t *d, size_t Size);
-
-		void Deserialize(Tetromino *t);
 };
 
 #endif // SERIALIZER_H

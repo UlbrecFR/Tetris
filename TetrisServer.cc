@@ -2,17 +2,25 @@
 
 using boost::asio::ip::tcp;
 
-static void clientListener(tcp::socket *socketClient, gf::Queue<Message> *queueClient) {
+static void clientListener(tcp::socket *socketClient, gf::Queue<std::vector<uint8_t>> *queueClient) {
 
     for(;;) {
 
         //on lit le message envoyé par le client
-        Message msg;
+        std::vector<uint8_t> length(sizeof(size_t));
 
         boost::system::error_code error;
-        size_t length = socketClient->read_some(boost::asio::buffer(msg.msg), error);
+        socketClient->read_some(boost::asio::buffer(length), error);
 
-        msg.length = length;
+        Deserializer ds(length);
+
+        size_t size;
+        ds.deserialize(size);
+
+        std::vector<uint8_t> msg(size);
+
+        socketClient->read_some(boost::asio::buffer(msg), error);
+
         //on gère les erreurs
         if (error == boost::asio::error::eof)
             break; // Connection closed cleanly by peer.
@@ -42,21 +50,44 @@ int main(int argc, char* argv[]){
         a.accept(*sock1);
         a.accept(*sock2);
 
-        gf::Queue<Message> queueCli1;
-        gf::Queue<Message> queueCli2;
+        gf::Queue<std::vector<uint8_t>> queueCli1;
+        gf::Queue<std::vector<uint8_t>> queueCli2;
 
         std::thread(clientListener, sock1, &queueCli1).detach();
         std::thread(clientListener, sock2, &queueCli2).detach();
 
-        Message msg;
+        std::vector<uint8_t> msg;
 
         for(;;) {
             if (queueCli1.poll(msg)) {
-                boost::asio::write(*sock2, boost::asio::buffer(msg.msg, msg.length));
+
+                Deserializer ds(msg);
+               
+                Tetromino t;
+                ds.deserialize(&t);
+
+                Serializer s;
+                s.serialize(t);
+
+                std::vector<uint8_t> request;
+                request = s.getData();
+
+                boost::asio::write(*sock2, boost::asio::buffer(request));
             }
 
             if (queueCli2.poll(msg)) {
-                boost::asio::write(*sock1, boost::asio::buffer(msg.msg, msg.length));
+                Deserializer ds(msg);
+               
+                Tetromino t;
+                ds.deserialize(&t);
+
+                Serializer s;
+                s.serialize(t);
+
+                std::vector<uint8_t> request;
+                request = s.getData();
+
+                boost::asio::write(*sock1, boost::asio::buffer(request));
             }
 
         }

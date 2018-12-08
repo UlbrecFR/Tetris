@@ -3,16 +3,23 @@
 using boost::asio::ip::tcp;
 
 
-static void serverListener(tcp::socket *socketServer, gf::Queue<Message> *queueServer) {
+static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint8_t>> *queueServer) {
 
     for(;;) {
 
-        Message msg;
+        std::vector<uint8_t> length(sizeof(size_t));
 
         boost::system::error_code error;
-        size_t length = socketServer->read_some(boost::asio::buffer(msg.msg), error);
+        socketServer->read_some(boost::asio::buffer(length), error);
 
-        msg.length = length;
+        Deserializer ds(length);
+        size_t size;
+        ds.deserialize(size);
+
+        std::vector<uint8_t> msg(size);
+
+        socketServer->read_some(boost::asio::buffer(msg), error);
+
         //on gère les erreurs
         if (error == boost::asio::error::eof)
             break; // Connection closed cleanly by peer.
@@ -20,7 +27,6 @@ static void serverListener(tcp::socket *socketServer, gf::Queue<Message> *queueS
             throw boost::system::system_error(error); // Some other error.
 
         queueServer->push(msg);
-
 
     }
 
@@ -42,30 +48,35 @@ int main(int argc, char* argv[]){
         tcp::resolver resolver(io_service);
         boost::asio::connect(*sock, resolver.resolve({argv[1], argv[2]}));
 
-        gf::Queue<Message> queueServer;
+        gf::Queue<std::vector<uint8_t>> queueServer;
 
         std::thread(serverListener, sock, &queueServer).detach();
     
         for(;;) {
-            const void *request;
             std::cin.getline(NULL, 0);
-            Tetromino test;
-            test.setRotation(2);
-            test.setType(4);
-            Serializer ser;
-            ser.Serialize(test);
-            request = ser.getData();
-            boost::asio::write(*sock, boost::asio::buffer(request, 256));
+            
+            Tetromino t;
+            t.setRotation(2);
+            t.setType(4);
+
+            Serializer s;
+            s.serialize(t);
+
+            std::vector<uint8_t> request;
+            request = s.getData();
+            
+            boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
         
-            Message msg;
+            std::vector<uint8_t> msg;
 
             if (queueServer.poll(msg)) {
-                Serializer ser2;
-                ser2.append(msg.msg);
-                Tetromino test2;
-                ser2.Deserialize(&test2);
-                printf("%d\n", test2.getType());
-                printf("%d\n", test2.getRotation());
+
+                Deserializer s(msg);
+               
+                Tetromino t;
+                s.deserialize(&t);
+                printf("%d\n", t.getType());
+                printf("%d\n", t.getRotation());
             }
         }
 

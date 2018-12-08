@@ -8,12 +8,6 @@
 
 const static size_t maxLength = 1024;
 
-struct Message {
-	char msg[maxLength];
-	size_t length;
-};
-
-
 struct CTS_TetrominoPlaced {
 	Tetromino tetro;
 	int posX;
