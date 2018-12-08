@@ -1,3 +1,6 @@
+#ifndef SERIAL_H
+#define SERIAL_H
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -56,3 +59,5 @@ struct Request_STC{
 		STC_UpdateOtherPlayer updateOtherMsg;
 	} Content;
 };
+
+#endif // SERIAL_H

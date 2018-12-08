@@ -1,9 +1,3 @@
-#include <cstdlib>
-#include <cstring>
-#include <iostream>
-#include <boost/asio.hpp>
-#include <gf/Queue.h>
-#include <thread>
 #include "TetrisClient.h"
 
 using boost::asio::ip::tcp;

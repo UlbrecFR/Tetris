@@ -1,3 +1,6 @@
+#ifndef TETROMINO_H
+#define TETROMINO_H
+
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
@@ -23,53 +26,6 @@ class Tetromino{
 		std::set<std::pair<int, int>> getCases(int x, int y);
 };
 
-const uint8_t Tetromino::shape[7][4][2] = {
-			{
-				{2,0},
-				{1,0},
-				{1,0},
-				{1,0}
-			},
 
-			{
-				{2,1},
-				{1,0},
-				{1,0},
-				{0,0}
-			},
 
-			{
-				{1,0},
-				{1,0},
-				{2,1},
-				{0,0}
-			},
-
-			{
-				{2,1},
-				{1,1},
-				{0,0},
-				{0,0}
-			},
-
-			{
-				{1,0},
-				{2,1},
-				{0,1},
-				{0,0}
-			},
-
-			{
-				{1,0},
-				{2,1},
-				{1,0},
-				{0,0}
-			},
-
-			{
-				{0,1},
-				{1,2},
-				{1,0},
-				{0,0}
-			}
-		};
+#endif // TETROMINO_H

@@ -4,7 +4,9 @@
 #include <boost/asio.hpp>
 #include <gf/Queue.h>
 #include <thread>
-#include "lib/Serializer.h"
+#include <Serial.h>
+#include <Serializer.h>
+#include <Tetromino.h>
 
 using boost::asio::ip::tcp;
 

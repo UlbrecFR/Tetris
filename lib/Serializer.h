@@ -1,3 +1,6 @@
+#ifndef SERIALIZER_H
+#define SERIALIZER_H
+
 #include <iostream> 
 #include <vector>
 #include <cstring>
@@ -45,5 +48,6 @@ class Serializer{
 		void Deserialize(uint8_t *d, size_t Size);
 
 		void Deserialize(Tetromino *t);
-				
 };
+
+#endif // SERIALIZER_H
