@@ -16,9 +16,9 @@
 			},
 
 			{
-				{1,0},
-				{1,0},
-				{2,1},
+				{1,2},
+				{0,1},
+				{0,1},
 				{0,0}
 			},
 
@@ -88,24 +88,40 @@
 		int xAnchor = 0;
 		int yAnchor = 0;
 
-		for (int i = 0; i < 4; ++i) {
-			for (int j = 0; j < 2; ++j) {
-				if (shape[type][i][j] != 0) {
-					if (shape[type][i][j] == 2) {
-						xAnchor = j;
-						yAnchor = i;
+		for (int j = 0; j < 4; ++j) {
+			for (int i = 0; i < 2; ++i) {
+				if (shape[type][j][i] == 2) {
+					xAnchor = i;
+					yAnchor = j;
+					break;
+				}
+			}
+		}
 
-						std::set<std::pair<int, int>> cases_n;
-						for (auto it = cases.begin(); it != cases.end(); it++) {
-							cases_n.insert(std::make_pair(it->first - xAnchor, it->second - yAnchor));
-						}
-						cases.swap(cases_n);
-						cases.insert(std::make_pair(x, y));
-					} else {
 
-						cases.insert(std::make_pair(j + x - xAnchor, i + y - yAnchor));
+		for (int j = 0; j < 4; ++j) {
+			for (int i = 0; i < 2; ++i) {
+				if (shape[type][j][i] != 0) {
+					switch(rotation) {
+						case 0 :
+							cases.insert(std::make_pair(x + (i - xAnchor), y + (j - yAnchor)));
+							break;
+
+						case 1 :
+							cases.insert(std::make_pair(x - (j - yAnchor), y + (i - xAnchor)));
+							break;
+
+						case 2 :
+							cases.insert(std::make_pair(x - (i - xAnchor), y - (j - yAnchor)));
+							break;
+
+						case 3 :
+							cases.insert(std::make_pair(x + (j - yAnchor), y - (i - xAnchor)));
+							break;
+
+						default :
+							break;
 					}
-
 				}
 			}
 		}
