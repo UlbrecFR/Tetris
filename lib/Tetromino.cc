@@ -129,3 +129,12 @@
 		return cases;
 	}
 
+	
+	void Tetromino::rotate() {
+		rotation++;
+
+		if(rotation == 4) {
+			rotation = 0;
+		}
+	}
+

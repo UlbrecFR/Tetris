@@ -24,6 +24,7 @@ class Tetromino{
 		void setType(uint8_t t);
 		void setRotation(uint8_t r);
 		std::set<std::pair<int, int>> getCases(int x, int y);
+		void rotate();
 };
 
 
