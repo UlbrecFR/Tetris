@@ -10,8 +10,10 @@ class Serializer{
 
 	private:
 		std::vector<uint8_t> data;
-		size_t readPos;
 		size_t writePos;
+
+		template <typename T>
+		void serializeAnyType(T d);
 
 
 	public:
@@ -25,15 +27,17 @@ class Serializer{
 
 		void serialize(const uint8_t d);
 
+		void serialize(const uint16_t d);
+
+		void serialize(const uint32_t d);
+
+		void serialize(const uint64_t d);
+
 		void serialize(const uint8_t *d, size_t Size);
 
 		void serialize(const Tetromino t);
 
 		std::vector<uint8_t> getData();
-
-		void append(char* d, size_t Size);
-
-		void append(char* d);
 };
 
 #endif // SERIALIZER_H

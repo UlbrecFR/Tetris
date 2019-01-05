@@ -20,15 +20,34 @@
 		writePos = sizeof(size_t);
 	}
 
-	void Serializer::serialize(const uint8_t d){
+	template <typename T>
+	void Serializer::serializeAnyType(T d){
 
 		if((writePos + 2) > getSize()){
 			data.resize((writePos+1)*2);				
 		}
 
-	    data[writePos] = d;
-	  
-	    writePos ++;
+		for (size_t i = 0; i < sizeof(T); ++i) {
+	    	data[writePos+i] = (d >> 8*i); 
+	    }
+	    writePos += sizeof(T);
+	}
+
+
+	void Serializer::serialize(const uint8_t d){
+		serializeAnyType(d);
+	}
+
+	void Serializer::serialize(const uint16_t d){
+		serializeAnyType(d);
+	}
+
+	void Serializer::serialize(const uint32_t d){
+		serializeAnyType(d);
+	}
+
+	void Serializer::serialize(const uint64_t d){
+		serializeAnyType(d);
 	}
 
 	void Serializer::serialize(const uint8_t *d, size_t Size){
@@ -56,18 +75,6 @@
 	    }
 		return data;
 	}
-
-	void Serializer::append(char* d, size_t Size){
-		if((writePos + Size) > getSize()){
-			data.resize(writePos+Size);				
-		}
-		std::memcpy(&data[writePos], d, Size);
-		writePos += Size;
-	};
-
-	void Serializer::append(char* d){
-		append(d, std::strlen(d));
-	};
 
 
 
