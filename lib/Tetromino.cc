@@ -56,8 +56,8 @@
 		srand(time(NULL));
 		rotation = 0;
 		type = rand()%7+1;
-		x = 6;
-		y = 0;
+		pos.x = 6;
+		pos.y = 0;
 
 	}
 
@@ -71,19 +71,19 @@
 	}
 
 	uint8_t Tetromino::getX() const{
-		return x;
+		return pos.x;
 	}
 
 	uint8_t Tetromino::getY() const{
-		return y;
+		return pos.y;
 	}
 
 	void Tetromino::setX(uint8_t newX){
-		x = newX;
+		pos.x = newX;
 	}
 
 	void Tetromino::setY(uint8_t newY){
-		y = newY;
+		pos.y = newY;
 	}
 
 	uint8_t Tetromino::getType() const{
@@ -102,6 +102,9 @@
 		rotation = r;
 	}
 
+	gf::Vector2u Tetromino::getPos() const{
+		return pos;
+	}
 
 	std::set<std::pair<int, int>> Tetromino::getCases() {
 
@@ -125,19 +128,19 @@
 				if (shape[type-1][j][i] != 0) {
 					switch(rotation) {
 						case 0 :
-							cases.insert(std::make_pair(x + (i - xAnchor), y + (j - yAnchor)));
+							cases.insert(std::make_pair(pos.x + (i - xAnchor), pos.y + (j - yAnchor)));
 							break;
 
 						case 1 :
-							cases.insert(std::make_pair(x - (j - yAnchor), y + (i - xAnchor)));
+							cases.insert(std::make_pair(pos.x - (j - yAnchor), pos.y + (i - xAnchor)));
 							break;
 
 						case 2 :
-							cases.insert(std::make_pair(x - (i - xAnchor), y - (j - yAnchor)));
+							cases.insert(std::make_pair(pos.x - (i - xAnchor), pos.y - (j - yAnchor)));
 							break;
 
 						case 3 :
-							cases.insert(std::make_pair(x + (j - yAnchor), y - (i - xAnchor)));
+							cases.insert(std::make_pair(pos.x + (j - yAnchor), pos.y - (i - xAnchor)));
 							break;
 
 						default :

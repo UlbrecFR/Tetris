@@ -4,6 +4,7 @@
 #include <iostream> 
 #include <vector>
 #include <cstring>
+#include <gf/VectorOps.h>
 #include "Serial.h"
 
 class Deserializer{
@@ -17,6 +18,8 @@ class Deserializer{
 		void deserializeAnyType(T & d);
 
 	public:
+		Deserializer();
+
 		Deserializer(std::vector<uint8_t> & d);
 
 		void printData();
@@ -24,6 +27,10 @@ class Deserializer{
 		size_t getSize();
 
 		void clear();
+
+		void setData(std::vector<uint8_t> & d);
+
+		void reset(std::vector<uint8_t> & d);
 
 		void deserialize(uint8_t & d);
 
@@ -34,6 +41,8 @@ class Deserializer{
 		void deserialize(uint64_t & d);
 
 		void deserialize(uint8_t *d, size_t Size);
+
+		void deserialize(const gf::Vector2i v);
 
 		void deserialize(Tetromino *t);
 };

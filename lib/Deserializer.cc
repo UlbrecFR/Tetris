@@ -1,5 +1,9 @@
 #include "Deserializer.h"
 
+	Deserializer::Deserializer(){
+		readPos = 0;
+	};
+
 	Deserializer::Deserializer(std::vector<uint8_t> & d){
 		data = d;
 		readPos = 0;
@@ -21,6 +25,17 @@
 		data.clear();
 		readPos = 0;
 	}
+
+
+	void Deserializer::setData(std::vector<uint8_t> & d){
+		data = d;
+	}
+
+	void Deserializer::reset(std::vector<uint8_t> & d){
+		clear();
+		setData(d);
+	}
+
 
 	template <typename T>
 	void Deserializer::deserializeAnyType(T & d){

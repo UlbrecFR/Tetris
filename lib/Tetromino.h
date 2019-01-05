@@ -6,6 +6,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <set>
+#include <gf/VectorOps.h>
 
 class Tetromino{
 
@@ -13,8 +14,7 @@ class Tetromino{
 		uint8_t type; //enum
 		uint8_t rotation;
 		static const uint8_t shape[7][4][2];
-		uint8_t x;
-		uint8_t y;
+		gf::Vector2u pos;
 
 	public:
 		Tetromino();
@@ -31,11 +31,16 @@ class Tetromino{
 
 		uint8_t getType() const;
 
-
 		uint8_t getRotation() const;
+
 		void setType(uint8_t t);
+
 		void setRotation(uint8_t r);
+
+		gf::Vector2u getPos() const;
+
 		std::set<std::pair<int, int>> getCases(); //modifier avec Vector2i
+
 		void rotate();
 
 };

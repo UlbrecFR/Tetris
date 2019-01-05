@@ -4,6 +4,7 @@
 #include <iostream> 
 #include <vector>
 #include <cstring>
+#include <gf/VectorOps.h>
 #include "Serial.h"
 
 class Serializer{
@@ -34,6 +35,8 @@ class Serializer{
 		void serialize(const uint64_t d);
 
 		void serialize(const uint8_t *d, size_t Size);
+
+		void serialize(const gf::Vector2u v);
 
 		void serialize(const Tetromino t);
 

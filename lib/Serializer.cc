@@ -63,6 +63,11 @@
 	    writePos += Size;
 	}
 
+	void Serializer::serialize(const gf::Vector2u v){
+		serialize(v.x);
+		serialize(v.y);
+	}
+
 	void Serializer::serialize(const Tetromino t){
 		serialize(t.getType());
 		serialize(t.getRotation());
