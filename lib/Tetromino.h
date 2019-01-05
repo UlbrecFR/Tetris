@@ -10,23 +10,35 @@
 class Tetromino{
 
 	private:
-		uint8_t type;
+		uint8_t type; //enum
 		uint8_t rotation;
 		static const uint8_t shape[7][4][2];
+		uint8_t x;
+		uint8_t y;
 
 	public:
 		Tetromino();
 		
 		void print();
 
+		uint8_t getX() const;
+
+		uint8_t getY() const;
+
+		void setX(uint8_t newX);
+
+		void setY(uint8_t newY);
+
 		uint8_t getType() const;
+
+
 		uint8_t getRotation() const;
 		void setType(uint8_t t);
 		void setRotation(uint8_t r);
-		std::set<std::pair<int, int>> getCases(int x, int y);
+		std::set<std::pair<int, int>> getCases(); //modifier avec Vector2i
 		void rotate();
-};
 
+};
 
 
 #endif // TETROMINO_H

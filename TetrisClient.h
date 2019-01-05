@@ -1,9 +1,27 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
-#include <boost/asio.hpp>
-#include <gf/Queue.h>
 #include <thread>
+#include <stdlib.h>
+#include <time.h>
+#include <stdio.h>
+
+#include <boost/asio.hpp>
+
+#include <gf/Queue.h>
+#include <gf/VectorOps.h>
+
+#include <gf/RenderWindow.h>
+#include <gf/ViewContainer.h>
+#include <gf/Views.h>
+#include <gf/Window.h>
+#include <gf/Action.h>
+#include <gf/Sprite.h>
+#include <gf/Clock.h>
+#include <gf/Color.h>
+#include <gf/EntityContainer.h>
+#include <gf/Event.h>
+
 #include <Serial.h>
 #include <Serializer.h>
 #include <Deserializer.h>

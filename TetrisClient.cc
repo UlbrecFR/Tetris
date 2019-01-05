@@ -3,6 +3,160 @@
 using boost::asio::ip::tcp;
 
 
+void printZoneJeu(int tab[12][17], int height, int width){
+    for (int i = 0; i < height; ++i){
+        for(int j = 0; j < width; ++j){
+            printf("%d ", tab[j][i]);
+        }
+        printf("\n");
+    }
+    printf("\n");
+}
+
+void printEtatJeu(int tab[12][17], int height, int width, Tetromino p){
+    std::set<std::pair<int, int>> listeCase = p.getCases();
+    for (std::set<std::pair<int, int>>::const_iterator it = listeCase.begin(); it != listeCase.end(); it++){
+        if(it->second>0){
+            tab[it->first][it->second] = p.getType();
+        }
+        
+    }
+
+}
+
+void chuteLigneSuppr(int tab[12][17], int height, int width, int nLigne){
+    for (int i = nLigne; i>=0; --i){
+        for(int j = 0; j < width; ++j){
+            if(tab[j][i]>0){
+                tab[j][i+1] = tab[j][i];
+                tab[j][i] = 0;
+            }
+            
+        }
+       
+    }
+}
+
+void supprLigne(int tab[12][17], int height, int width){
+    bool plein = true;
+    for (int i = height-1; i>=0; --i){
+        for(int j = 0; j < width; ++j){
+            if(tab[j][i]==0){
+                plein = false;
+            }
+        }
+        if(plein){
+            printf("La ligne %d est pleine !\n", i);
+            for(int h = 0; h < width; ++h){
+                tab[h][i] = 0;
+            }
+            chuteLigneSuppr(tab, height, width, i);
+        }else{
+            plein=true;
+        }  
+    }
+    
+}
+
+
+
+bool chutePossible(int tab[12][17], int height, int width, Tetromino p){ 
+    
+    bool chutePossible = false;
+
+
+    //recupération des coordonnée des autres case du tetromino
+    std::set<std::pair<int, int>> listeCase = p.getCases();
+
+    for (auto it = listeCase.begin(); it != listeCase.end(); it++){
+        if(it->second < height-1){
+            //printf("%d\n", it->second);
+            if(tab[it->first][it->second+1] > 0){
+                for(std::set<std::pair<int, int>>::const_iterator iter = listeCase.begin(); iter != listeCase.end(); iter++){
+                    if(iter->second == it->second+1 && iter->first == it->first){
+                        chutePossible = true;
+                    }
+                    
+                }
+
+                if(!chutePossible){
+                    return false;
+                }
+                chutePossible = false;
+            }
+        }else{
+            return false;
+        }
+    }
+    
+    
+    return true;
+}
+
+bool droitePossible(int tab[12][17], int height, int width, Tetromino p){
+    bool possible = false;
+
+
+    //recupération des coordonnée des autres case du tetromino
+    std::set<std::pair<int, int>> listeCase = p.getCases();
+
+    for (auto it = listeCase.begin(); it != listeCase.end(); it++){
+        if(it->first < width-1){
+            //printf("%d\n", it->second);
+            if(tab[it->first+1][it->second] > 0){
+                for(std::set<std::pair<int, int>>::const_iterator iter = listeCase.begin(); iter != listeCase.end(); iter++){
+                    if(iter->second == it->second && iter->first == it->first+1){
+                        possible = true;
+                    }
+                    
+                }
+
+                if(!possible){
+                    return false;
+                }
+                possible = false;
+            }
+        }else{
+            return false;
+        }
+    }
+    
+    
+    return true;
+}
+
+bool gauchePossible(int tab[12][17], int height, int width, Tetromino p){
+    bool possible = false;
+
+
+    //recupération des coordonnée des autres case du tetromino
+    std::set<std::pair<int, int>> listeCase = p.getCases();
+
+    for (auto it = listeCase.begin(); it != listeCase.end(); it++){
+        if(it->first >0){
+            //printf("%d\n", it->second);
+            if(tab[it->first-1][it->second] > 0){
+                for(std::set<std::pair<int, int>>::const_iterator iter = listeCase.begin(); iter != listeCase.end(); iter++){
+                    if(iter->second == it->second && iter->first == it->first-1){
+                        possible = true;
+                    }
+                    
+                }
+
+                if(!possible){
+                    return false;
+                }
+                possible = false;
+            }
+        }else{
+            return false;
+        }
+    }
+    
+    
+    return true;
+}
+
 static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint8_t>> *queueServer) {
 
     for(;;) {
@@ -32,6 +186,7 @@ static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint
 
 }
 
+
 int main(int argc, char* argv[]){
 
     printf("%s\n", "Tetris Client : Le Vouitris");
@@ -52,9 +207,198 @@ int main(int argc, char* argv[]){
 
         std::thread(serverListener, sock, &queueServer).detach();
     
-        for(;;) {
-            std::cin.getline(NULL, 0);
+///////////////////////////////////////////
+
+    // initialization
+        static constexpr int width = 12;
+        static constexpr int height = 17;
+        static constexpr int sizeCase = 40;
+
+        static constexpr gf::Vector2u ScreenSize(1024, 576);
+        static constexpr gf::Vector2f ViewSize(2 * width * sizeCase + sizeCase, height * sizeCase); // dummy values
+        static constexpr gf::Vector2f ViewCenter = ViewSize / 2; // dummy values
+
+
+
+        gf::Window window("Testris", ScreenSize);
+        window.setVerticalSyncEnabled(true);
+        window.setFramerateLimit(60);
+        gf::RenderWindow renderer(window);
+
+        
+        int tabJeu[width][height];
+        //init tab
+        for (int i = 0; i < height; ++i){
+            for (int j = 0; j < width; ++j){
+                tabJeu[j][i]=0;
+            }
             
+        }
+
+        ///////////////////////////////////////////////////////////////
+        gf::Image imageVide;
+        imageVide.create({ sizeCase, sizeCase }, gf::Color4u{0xFF, 0xFF, 0xFF, 0xFF});
+
+        gf::Texture textureVide;
+        if (!textureVide.loadFromImage(imageVide)) {
+        return EXIT_FAILURE;
+        }
+
+        gf::Texture tabTexturePiece[7];
+
+        gf::Image imagePiece;
+        imagePiece.create({ sizeCase, sizeCase }, gf::Color4u{0x00, 0x13, 0x52, 0x58});
+
+        gf::Texture texturePiece1;
+        if (!texturePiece1.loadFromImage(imagePiece)) {
+        return EXIT_FAILURE;
+        }
+        tabTexturePiece[0] = std::move(texturePiece1);
+
+        gf::Image imagePiece2;
+        imagePiece2.create({ sizeCase, sizeCase }, gf::Color4u{0xFF, 0x62, 0x52, 0xFF});
+
+        gf::Texture texturePiece2;
+        if (!texturePiece2.loadFromImage(imagePiece2)) {
+        return EXIT_FAILURE;
+        }
+        tabTexturePiece[1] = std::move(texturePiece2);
+
+        gf::Image imagePiece3;
+        imagePiece3.create({ sizeCase, sizeCase }, gf::Color4u{0x00, 0x13, 0x52, 0x58});
+
+        gf::Texture texturePiece3;
+        if (!texturePiece3.loadFromImage(imagePiece3)) {
+        return EXIT_FAILURE;
+        }
+        tabTexturePiece[2] = std::move(texturePiece3);
+
+        gf::Image imagePiece4;
+        imagePiece4.create({ sizeCase, sizeCase }, gf::Color4u{0x12, 0x13, 0xFF, 0x30});
+
+        gf::Texture texturePiece4;
+        if (!texturePiece4.loadFromImage(imagePiece4)) {
+        return EXIT_FAILURE;
+        }
+        tabTexturePiece[3] = std::move(texturePiece4);
+
+        gf::Image imagePiece5;
+        imagePiece5.create({ sizeCase, sizeCase }, gf::Color4u{0x30, 0x44, 0xFF, 0x30});
+
+        gf::Texture texturePiece5;
+        if (!texturePiece5.loadFromImage(imagePiece5)) {
+        return EXIT_FAILURE;
+        }
+        tabTexturePiece[4] = std::move(texturePiece5);
+
+        gf::Image imagePiece6;
+        imagePiece6.create({ sizeCase, sizeCase }, gf::Color4u{0x02, 0x13, 0xFF, 0x78});
+
+        gf::Texture texturePiece6;
+        if (!texturePiece6.loadFromImage(imagePiece6)) {
+        return EXIT_FAILURE;
+        }
+
+        tabTexturePiece[5] = std::move(texturePiece6);
+
+        gf::Image imagePiece7;
+        imagePiece7.create({ sizeCase, sizeCase }, gf::Color4u{0x12, 0xFF, 0x1F, 0x50});
+
+        gf::Texture texturePiece7;
+        if (!texturePiece7.loadFromImage(imagePiece7)) {
+        return EXIT_FAILURE;
+        }
+
+        tabTexturePiece[6] = std::move(texturePiece7);
+        
+
+        //tableau zone de jeu de sprite
+        gf::Sprite tabSprite[width][height];
+
+        for (int i = 0; i < height; ++i){
+            for (int j = 0; j < width; ++j){
+                gf::Sprite sprite(textureVide);
+                sprite.setPosition({j* sizeCase, i* sizeCase});
+                tabSprite[j][i] = sprite;
+            }
+            
+        }
+
+        /////////////////////////////////////////////////////////////
+
+        /*
+        Zone jeu : extend
+        autour : screen
+        */
+            
+       
+        bool pieceEnJeu = false;
+
+        // views
+        gf::ViewContainer views;
+        gf::ExtendView mainView(ViewCenter, ViewSize);
+        views.addView(mainView);
+        gf::ScreenView hudView;
+        views.addView(hudView);
+        views.setInitialScreenSize(ScreenSize);
+
+        // actions
+        gf::ActionContainer actions;
+
+        gf::Action closeWindowAction("Close window");
+        closeWindowAction.addCloseControl();
+        closeWindowAction.addKeycodeKeyControl(gf::Keycode::Escape);
+        actions.addAction(closeWindowAction);
+
+
+        gf::Action leftAction("Left");
+        leftAction.addScancodeKeyControl(gf::Scancode::Q);
+        leftAction.addScancodeKeyControl(gf::Scancode::Left);
+        leftAction.setInstantaneous();
+        actions.addAction(leftAction);
+
+        gf::Action rightAction("Right");
+        rightAction.addScancodeKeyControl(gf::Scancode::D);
+        rightAction.addScancodeKeyControl(gf::Scancode::Right);
+        rightAction.setInstantaneous();
+        actions.addAction(rightAction);
+
+        gf::Action rotateAction("rotate");
+        rotateAction.addScancodeKeyControl(gf::Scancode::Space);
+        rotateAction.setInstantaneous();
+        actions.addAction(rotateAction);
+
+        gf::Action downAction("Down");
+        downAction.addScancodeKeyControl(gf::Scancode::S);
+        downAction.addScancodeKeyControl(gf::Scancode::Down);
+        downAction.setContinuous();
+        actions.addAction(downAction);
+
+
+
+    ///////////////////////////////////////////////////////////////
+
+        Tetromino p;
+    
+
+        // entities
+        gf::EntityContainer mainEntities;
+
+        // add entities to mainEntities
+        gf::EntityContainer hudEntities;
+
+        // add entities to hudEntities
+
+        // game loop
+        renderer.clear(gf::Color::White);
+        gf::Clock clock;
+        gf::Clock clockChute;
+        gf::Time t;
+        gf::Time periodChute = gf::seconds(1.0f);
+
+
+        while (window.isOpen()) {
+/*
             Tetromino t;
             t.setRotation(2);
             t.setType(4);
@@ -78,6 +422,124 @@ int main(int argc, char* argv[]){
                 printf("%d\n", t.getType());
                 printf("%d\n", t.getRotation());
             }
+*/
+            // 1. input
+            gf::Event event;
+
+            while (window.pollEvent(event)) {
+                actions.processEvent(event);
+                //views.processEvent(event);
+            }
+
+            if (closeWindowAction.isActive()) {
+                window.close();
+            }
+
+            if(!pieceEnJeu){ //?????? ICI
+                supprLigne(tabJeu, height, width);
+                p.setX(6);
+                p.setY(0);
+                p.setType(rand()%7+1);
+                pieceEnJeu = true;
+                tabJeu[p.getX()][p.getY()] = p.getType();
+                t = clockChute.restart();
+            }
+
+            //printf("%f\n", t.asSeconds());
+
+            if (rightAction.isActive()) {
+                if(droitePossible(tabJeu, height, width, p)){
+                    tabJeu[p.getX()][p.getY()] = 0;
+                    printf("droite\n");
+                    p.setX(p.getX() + 1);
+                    tabJeu[p.getX()][p.getY()] = p.getType();
+                    printZoneJeu(tabJeu, height, width);
+                }
+                
+            } else if (leftAction.isActive()) {
+                if (gauchePossible(tabJeu, height, width, p)){
+                    tabJeu[p.getX()][p.getY()] = 0;
+                    printf("droite\n");
+                    p.setX(p.getX() - 1);
+                    tabJeu[p.getX()][p.getY()] = p.getType();
+                    printZoneJeu(tabJeu, height, width);
+                }
+                
+            } else if (rotateAction.isActive()) {
+                p.rotate();
+            } else if (downAction.isActive()) {
+            // do something
+            } else {
+            // do something
+            }
+
+            t = clockChute.getElapsedTime();
+
+            if(chutePossible(tabJeu, height, width, p)){
+                if(t > periodChute){
+                    tabJeu[p.getX()][p.getY()] = 0;
+                    t = clockChute.restart();
+                    //printf("%f\n", t.asSeconds());
+                    //printf("Chute\n");
+                    //printf("%f\n", periodChute.asSeconds());
+                    p.setY(p.getY() + 1);
+                    tabJeu[p.getX()][p.getY()] = p.getType();
+                    printZoneJeu(tabJeu, height, width);
+                    
+                }
+            }else{
+
+                pieceEnJeu = false;
+                printEtatJeu(tabJeu, height, width, p);
+            }
+
+            
+
+            for (int i = 0; i < height; ++i){
+                for (int j = 0; j < width; ++j){
+                    if(tabJeu[j][i]>0){
+                        tabSprite[j][i].setTexture(tabTexturePiece[(tabJeu[j][i])-1], true);
+                        
+                    } else {
+                        tabSprite[j][i].setTexture(textureVide, true);
+                    }
+                }
+                
+            }
+
+            std::set<std::pair<int, int>> listeCurrentCase = p.getCases();
+
+            for (std::set<std::pair<int, int>>::const_iterator it = listeCurrentCase.begin(); it != listeCurrentCase.end(); it++){
+                if(it->second>=0){
+                    tabSprite[it->first][it->second].setTexture(tabTexturePiece[p.getType()-1], true);
+                }
+                
+            }
+
+            // 2. update
+            gf::Time time = clock.restart();
+            mainEntities.update(time);
+            hudEntities.update(time);
+
+            // 3. draw
+            renderer.clear();
+            renderer.setView(mainView);
+            mainEntities.render(renderer);
+            
+            for (int i = 0; i < height; ++i){
+                for (int j = 0; j < width; ++j){
+                    renderer.draw(tabSprite[j][i]);
+                }
+                
+            }
+
+            renderer.setView(hudView);
+            hudEntities.render(renderer);
+
+
+
+            renderer.display();
+            actions.reset();
         }
 
 
