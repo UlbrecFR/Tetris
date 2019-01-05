@@ -69,6 +69,7 @@
 	}
 
 	void Serializer::serialize(const Tetromino t){
+		serialize(t.getPos());
 		serialize(t.getType());
 		serialize(t.getRotation());
 	}

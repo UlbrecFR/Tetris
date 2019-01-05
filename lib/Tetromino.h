@@ -39,6 +39,8 @@ class Tetromino{
 
 		gf::Vector2u getPos() const;
 
+		void setPos(gf::Vector2u p);
+
 		std::set<std::pair<int, int>> getCases(); //modifier avec Vector2i
 
 		void rotate();

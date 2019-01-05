@@ -42,7 +42,7 @@ class Deserializer{
 
 		void deserialize(uint8_t *d, size_t Size);
 
-		void deserialize(const gf::Vector2i v);
+		void deserialize(gf::Vector2u *v);
 
 		void deserialize(Tetromino *t);
 };

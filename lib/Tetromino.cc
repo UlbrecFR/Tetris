@@ -106,6 +106,10 @@
 		return pos;
 	}
 
+	void Tetromino::setPos(gf::Vector2u p){
+		pos = p;
+	}
+
 	std::set<std::pair<int, int>> Tetromino::getCases() {
 
 		std::set<std::pair<int, int>> cases;

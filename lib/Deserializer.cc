@@ -68,9 +68,17 @@
 			d[i] = (uint8_t)data[readPos + Size - i -1];
 		}
 		readPos += Size*sizeof(d[0]);
-	}	
+	}
+
+	void Deserializer::deserialize(gf::Vector2u *v){
+		deserialize(v->x);
+		deserialize(v->y);
+	}
 
 	void Deserializer::deserialize(Tetromino *t){
+		gf::Vector2u v;
+		deserialize(&v);
+		t->setPos(v);
 		t->setType(data[readPos]);
 		t->setRotation(data[readPos+1]);
 		readPos += 2;
