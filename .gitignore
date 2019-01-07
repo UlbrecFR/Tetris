@@ -1,2 +1,6 @@
 build*/
 *.so
+lib/CMakeCache.txt
+lib/CMakeFiles/
+lib/Makefile
+lib/cmake_install.cmake
