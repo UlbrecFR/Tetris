@@ -57,37 +57,54 @@ int main(int argc, char* argv[]){
         std::thread(clientListener, sock2, &queueCli2).detach();
 
         std::vector<uint8_t> msg;
+        Tetromino new_tetro1;
+        Tetromino new_tetro2;
+
+        new_tetro1.setX(6);
+        new_tetro1.setY(0);
+        
+        new_tetro1.setType(rand()%7+1);
+
+        new_tetro2.setX(6);
+        new_tetro2.setY(0);
+
+        new_tetro2.setType(rand()%7+1);
+
+        Serializer s1;
+        Serializer s2;
+
+        std::vector<uint8_t> request1;
+        std::vector<uint8_t> request2;
 
         for(;;) {
             if (queueCli1.poll(msg)) {
 
-                Deserializer ds(msg);
-               
-                Tetromino t;
-                ds.deserialize(&t);
+                new_tetro1.setType(rand()%7+1);
 
-                Serializer s;
-                s.serialize(t);
+                s1.serialize(new_tetro1);
 
-                std::vector<uint8_t> request;
-                request = s.getData();
+                printf("1 -> %d\n", new_tetro1.getType());
 
-                boost::asio::write(*sock2, boost::asio::buffer(request));
+                request1 = s1.getData();
+
+                boost::asio::write(*sock1, boost::asio::buffer(request1));
+
+                s1.clear();
             }
 
             if (queueCli2.poll(msg)) {
-                Deserializer ds(msg);
-               
-                Tetromino t;
-                ds.deserialize(&t);
 
-                Serializer s;
-                s.serialize(t);
+                new_tetro2.setType(rand()%7+1);
 
-                std::vector<uint8_t> request;
-                request = s.getData();
+                s2.serialize(new_tetro2);
 
-                boost::asio::write(*sock1, boost::asio::buffer(request));
+                printf("2 -> %d\n", new_tetro2.getType());
+
+                request2 = s2.getData();
+
+                boost::asio::write(*sock2, boost::asio::buffer(request2));
+
+                s2.clear();
             }
 
         }

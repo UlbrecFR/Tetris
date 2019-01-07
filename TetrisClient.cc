@@ -13,11 +13,11 @@ void printZoneJeu(int tab[12][17], int height, int width){
     printf("\n");
 }
 
-void printEtatJeu(int tab[12][17], int height, int width, Tetromino p){
-    std::set<std::pair<int, int>> listeCase = p.getCases();
+void printEtatJeu(int tab[12][17], int height, int width, Tetromino tetro){
+    std::set<std::pair<int, int>> listeCase = tetro.getCases();
     for (std::set<std::pair<int, int>>::const_iterator it = listeCase.begin(); it != listeCase.end(); it++){
         if(it->second>0){
-            tab[it->first][it->second] = p.getType();
+            tab[it->first][it->second] = tetro.getType();
         }
         
     }
@@ -60,13 +60,13 @@ void supprLigne(int tab[12][17], int height, int width){
 
 
 
-bool chutePossible(int tab[12][17], int height, int width, Tetromino p){ 
+bool chutePossible(int tab[12][17], int height, int width, Tetromino tetro){ 
     
     bool chutePossible = false;
 
 
     //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<int, int>> listeCase = p.getCases();
+    std::set<std::pair<int, int>> listeCase = tetro.getCases();
 
     for (auto it = listeCase.begin(); it != listeCase.end(); it++){
         if(it->second < height-1){
@@ -93,12 +93,12 @@ bool chutePossible(int tab[12][17], int height, int width, Tetromino p){
     return true;
 }
 
-bool droitePossible(int tab[12][17], int height, int width, Tetromino p){
+bool droitePossible(int tab[12][17], int height, int width, Tetromino tetro){
     bool possible = false;
 
 
     //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<int, int>> listeCase = p.getCases();
+    std::set<std::pair<int, int>> listeCase = tetro.getCases();
 
     for (auto it = listeCase.begin(); it != listeCase.end(); it++){
         if(it->first < width-1){
@@ -125,12 +125,12 @@ bool droitePossible(int tab[12][17], int height, int width, Tetromino p){
     return true;
 }
 
-bool gauchePossible(int tab[12][17], int height, int width, Tetromino p){
+bool gauchePossible(int tab[12][17], int height, int width, Tetromino tetro){
     bool possible = false;
 
 
     //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<int, int>> listeCase = p.getCases();
+    std::set<std::pair<int, int>> listeCase = tetro.getCases();
 
     for (auto it = listeCase.begin(); it != listeCase.end(); it++){
         if(it->first >0){
@@ -378,7 +378,9 @@ int main(int argc, char* argv[]){
 
     ///////////////////////////////////////////////////////////////
 
-        Tetromino p;
+        Tetromino tetro;
+        Tetromino next_tetro;
+        std::vector<uint8_t> msg;
     
 
         // entities
@@ -396,33 +398,30 @@ int main(int argc, char* argv[]){
         gf::Time t;
         gf::Time periodChute = gf::seconds(1.0f);
 
+    //////////////////////////////////////////////////////////
+        
+        Deserializer d;
+        Serializer s;
+        std::vector<uint8_t> request;
+        
 
         while (window.isOpen()) {
-/*
-            Tetromino t;
-            t.setRotation(2);
-            t.setType(4);
 
-            Serializer s;
-            s.serialize(t);
-
-            std::vector<uint8_t> request;
-            request = s.getData();
-            
-            boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
-        
-            std::vector<uint8_t> msg;
 
             if (queueServer.poll(msg)) {
-
-                Deserializer s(msg);
-               
-                Tetromino t;
-                s.deserialize(&t);
-                printf("%d\n", t.getType());
-                printf("%d\n", t.getRotation());
+                printf("-------------------------------\n");
+                d.printData();
+                d.setData(msg);
+                d.deserialize(&next_tetro);
+                d.printData();
+                printf("-------------------------------\n");
+                printf("%d\n", next_tetro.getType());
+                printf("%d\n", next_tetro.getRotation());
+                d.clear();
+                d.printData();
+                printf("-------------------------------\n" );
             }
-*/
+
             // 1. input
             gf::Event event;
 
@@ -437,36 +436,40 @@ int main(int argc, char* argv[]){
 
             if(!pieceEnJeu){ //?????? ICI
                 supprLigne(tabJeu, height, width);
-                p.setX(6);
-                p.setY(0);
-                p.setType(rand()%7+1);
+                tetro = next_tetro;
                 pieceEnJeu = true;
-                tabJeu[p.getX()][p.getY()] = p.getType();
+                tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
                 t = clockChute.restart();
+
+                s.serialize(tetro);
+
+                request = s.getData();
+                boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
+                s.clear();
             }
 
             //printf("%f\n", t.asSeconds());
 
             if (rightAction.isActive()) {
-                if(droitePossible(tabJeu, height, width, p)){
-                    tabJeu[p.getX()][p.getY()] = 0;
+                if(droitePossible(tabJeu, height, width, tetro)){
+                    tabJeu[tetro.getX()][tetro.getY()] = 0;
                     printf("droite\n");
-                    p.setX(p.getX() + 1);
-                    tabJeu[p.getX()][p.getY()] = p.getType();
-                    printZoneJeu(tabJeu, height, width);
+                    tetro.setX(tetro.getX() + 1);
+                    tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
+                    //printZoneJeu(tabJeu, height, width);
                 }
                 
             } else if (leftAction.isActive()) {
-                if (gauchePossible(tabJeu, height, width, p)){
-                    tabJeu[p.getX()][p.getY()] = 0;
+                if (gauchePossible(tabJeu, height, width, tetro)){
+                    tabJeu[tetro.getX()][tetro.getY()] = 0;
                     printf("droite\n");
-                    p.setX(p.getX() - 1);
-                    tabJeu[p.getX()][p.getY()] = p.getType();
-                    printZoneJeu(tabJeu, height, width);
+                    tetro.setX(tetro.getX() - 1);
+                    tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
+                    //printZoneJeu(tabJeu, height, width);
                 }
                 
             } else if (rotateAction.isActive()) {
-                p.rotate();
+                tetro.rotate();
             } else if (downAction.isActive()) {
             // do something
             } else {
@@ -475,22 +478,22 @@ int main(int argc, char* argv[]){
 
             t = clockChute.getElapsedTime();
 
-            if(chutePossible(tabJeu, height, width, p)){
+            if(chutePossible(tabJeu, height, width, tetro)){
                 if(t > periodChute){
-                    tabJeu[p.getX()][p.getY()] = 0;
+                    tabJeu[tetro.getX()][tetro.getY()] = 0;
                     t = clockChute.restart();
                     //printf("%f\n", t.asSeconds());
                     //printf("Chute\n");
                     //printf("%f\n", periodChute.asSeconds());
-                    p.setY(p.getY() + 1);
-                    tabJeu[p.getX()][p.getY()] = p.getType();
+                    tetro.setY(tetro.getY() + 1);
+                    tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
                     printZoneJeu(tabJeu, height, width);
                     
                 }
             }else{
 
                 pieceEnJeu = false;
-                printEtatJeu(tabJeu, height, width, p);
+                printEtatJeu(tabJeu, height, width, tetro);
             }
 
             
@@ -507,11 +510,11 @@ int main(int argc, char* argv[]){
                 
             }
 
-            std::set<std::pair<int, int>> listeCurrentCase = p.getCases();
+            std::set<std::pair<int, int>> listeCurrentCase = tetro.getCases();
 
             for (std::set<std::pair<int, int>>::const_iterator it = listeCurrentCase.begin(); it != listeCurrentCase.end(); it++){
                 if(it->second>=0){
-                    tabSprite[it->first][it->second].setTexture(tabTexturePiece[p.getType()-1], true);
+                    tabSprite[it->first][it->second].setTexture(tabTexturePiece[tetro.getType()-1], true);
                 }
                 
             }

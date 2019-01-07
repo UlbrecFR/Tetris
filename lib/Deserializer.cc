@@ -78,7 +78,8 @@
 	void Deserializer::deserialize(Tetromino *t){
 		gf::Vector2u v;
 		deserialize(&v);
-		t->setPos(v);
+		t->setX(v.x);
+		t->setY(v.y);
 		t->setType(data[readPos]);
 		t->setRotation(data[readPos+1]);
 		readPos += 2;

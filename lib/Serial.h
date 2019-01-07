@@ -14,6 +14,9 @@ struct CTS_TetrominoPlaced {
 	int posY;
 };
 
+struct CTS_NextTetrominoPlease {
+};
+
 
 struct CTS_ClientConnectionLost {
 	enum {
@@ -28,6 +31,10 @@ struct STC_NewTetromino {
 	Tetromino newTetro;
 };
 
+struct STC_GameStart {
+	Tetromino firstTetro;
+};
+
 struct STC_UpdateOtherPlayer {
 	int grid[12*17];
 };
@@ -35,22 +42,26 @@ struct STC_UpdateOtherPlayer {
 struct Request_CTS{
 	enum {
 		TYPE_TETROMINO_PLACED,
-		TYPE_CLIENT_LOST
+		TYPE_CLIENT_LOST,
+		TYPE_NEXT_TETRO
 	} Type;
 	union {
 		CTS_TetrominoPlaced tetroMsg;
 		CTS_ClientConnectionLost discoMsg;
+		CTS_NextTetrominoPlease nextTetroMsg;
 	} Content;
 };
 
 struct Request_STC{
 	enum {
 		TYPE_NEW_TETROMINO,
-		TYPE_UPDATE_OTHER
+		TYPE_UPDATE_OTHER,
+		TYPE_GAME_START
 	} Type;
 	union {
 		STC_NewTetromino newTetroMsg;
 		STC_UpdateOtherPlayer updateOtherMsg;
+		STC_GameStart gameStart;
 	} Content;
 };
 
