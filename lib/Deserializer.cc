@@ -63,24 +63,34 @@
 		deserializeAnyType(d);
 	}
 
-	void Deserializer::deserialize(uint8_t *d, size_t Size){
+	/* void Deserializer::deserialize(uint8_t *d, size_t Size){
 		for (size_t i = 0; i < Size; ++i){
 			d[i] = (uint8_t)data[readPos + Size - i -1];
 		}
 		readPos += Size*sizeof(d[0]);
+	}*/
+
+	void Deserializer::deserialize(gf::Vector2u & v){
+		deserialize(v.x);
+		deserialize(v.y);
 	}
 
-	void Deserializer::deserialize(gf::Vector2u *v){
-		deserialize(v->x);
-		deserialize(v->y);
-	}
-
-	void Deserializer::deserialize(Tetromino *t){
+	void Deserializer::deserialize(Tetromino & t){
 		gf::Vector2u v;
-		deserialize(&v);
-		t->setX(v.x);
-		t->setY(v.y);
-		t->setType(data[readPos]);
-		t->setRotation(data[readPos+1]);
+		deserialize(v);
+		t.setX(v.x);
+		t.setY(v.y);
+		t.setType(data[readPos]);
+		t.setRotation(data[readPos+1]);
 		readPos += 2;
+	}
+
+	void Deserializer::deserialize(gf::Array2D<uint8_t, uint8_t> & array){
+		uint8_t witdh, height;
+		deserialize(witdh);
+		deserialize(height);
+		array = gf::Array2D<uint8_t, uint8_t>(gf::Vector2u(witdh, height));
+		for(auto& x : array){
+			deserialize(x);
+		}
 	}
