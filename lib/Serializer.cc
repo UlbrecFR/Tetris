@@ -83,6 +83,74 @@
 		}
 	}
 
+	void Serializer::serialize(const STC_GameStart r){
+		serialize(r.firstTetro);
+	}
+	
+	void Serializer::serialize(const STC_UpdateOtherPlayer r){
+		serialize(r.grid);
+	}
+
+	void Serializer::serialize(const STC_NewTetromino r){
+		serialize(r.newTetro);
+	}
+
+	void Serializer::serialize(const Request_STC::Type t){
+		serialize((uint8_t)t);
+	}
+
+	void Serializer::serialize(const Request_STC r){
+		serialize(r.type);
+
+		switch (r.type) {
+			case Request_STC::TYPE_NEW_TETROMINO :
+				serialize(r.newTetroMsg);
+				break;
+			case Request_STC::TYPE_UPDATE_OTHER :
+				serialize(r.updateOtherMsg);
+				break;
+			case Request_STC::TYPE_GAME_START :
+				serialize(r.gameStart);
+				break;
+		}
+	}
+
+	void Serializer::serialize(const CTS_TetrominoPlaced r){
+		serialize(r.tetro);
+	}
+
+	void Serializer::serialize(const CTS_ClientConnectionLost::ErrorType t){
+		serialize(t);
+	}
+	
+	void Serializer::serialize(const CTS_ClientConnectionLost r){
+		serialize(r.error);
+	}
+
+	void Serializer::serialize(const CTS_NextTetrominoPlease r){
+		
+	}
+
+	void Serializer::serialize(const Request_CTS::Type t){
+		serialize((uint8_t)t);
+	}
+
+	void Serializer::serialize(const Request_CTS r){
+		serialize(r.type);
+
+		switch (r.type) {
+			case Request_CTS::TYPE_TETROMINO_PLACED :
+				serialize(r.tetroMsg);
+				break;
+			case Request_CTS::TYPE_CLIENT_LOST :
+				serialize(r.discoMsg);
+				break;
+			case Request_CTS::TYPE_NEXT_TETRO :
+				serialize(r.nextTetroMsg);
+				break;
+		}
+	}
+
 	std::vector<uint8_t> Serializer::getData(){
 		size_t size = data.capacity()-sizeof(size_t);
 		for (size_t i = 0; i < sizeof(size_t); ++i) {

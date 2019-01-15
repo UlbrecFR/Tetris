@@ -43,6 +43,28 @@ class Serializer{
 
 		void serialize(const gf::Array2D<uint8_t, uint8_t> array);
 
+		void serialize(const STC_GameStart r);
+		
+		void serialize(const STC_UpdateOtherPlayer r);
+
+		void serialize(const STC_NewTetromino r);
+
+		void serialize(const Request_STC::Type t);
+
+		void serialize(const Request_STC r);
+
+		void serialize(const CTS_TetrominoPlaced r);
+
+		void serialize(const CTS_ClientConnectionLost::ErrorType t);
+	
+		void serialize(const CTS_ClientConnectionLost r);
+
+		void serialize(const CTS_NextTetrominoPlease r);
+
+		void serialize(const Request_CTS::Type t);
+
+		void serialize(const Request_CTS r);
+
 		std::vector<uint8_t> getData();
 };
 

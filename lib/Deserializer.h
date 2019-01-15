@@ -48,6 +48,28 @@ class Deserializer{
 		void deserialize(Tetromino & t);
 
 		void deserialize(gf::Array2D<uint8_t, uint8_t> & array);
+
+		void deserialize(STC_GameStart & r);
+		
+		void deserialize(STC_UpdateOtherPlayer & r);
+
+		void deserialize(STC_NewTetromino & r);
+
+		void deserialize(Request_STC::Type & t);
+
+		void deserialize(Request_STC & r);
+
+		void deserialize(CTS_TetrominoPlaced & r);
+
+		void deserialize(CTS_ClientConnectionLost::ErrorType & t);
+	
+		void deserialize(CTS_ClientConnectionLost & r);
+
+		void deserialize(CTS_NextTetrominoPlease & r);
+
+		void deserialize(Request_CTS::Type & t);
+
+		void deserialize(Request_CTS & r);
 };
 
 #endif // DESERIALIZER_H

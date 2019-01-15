@@ -94,3 +94,72 @@
 			deserialize(x);
 		}
 	}
+
+	void Deserializer::deserialize(STC_GameStart & r){
+		deserialize(r.firstTetro);
+	}
+		
+	void Deserializer::deserialize(STC_UpdateOtherPlayer & r){
+		deserialize(r.grid);
+	}
+
+	void Deserializer::deserialize(STC_NewTetromino & r){
+		deserialize(r.newTetro);
+	}
+
+	void Deserializer::deserialize(Request_STC::Type & t){
+		deserialize(t);
+	}
+
+	void Deserializer::deserialize(Request_STC & r){
+		deserialize(r.type);
+
+		switch (r.type) {
+			case Request_STC::TYPE_NEW_TETROMINO :
+				deserialize(r.newTetroMsg);
+				break;
+			case Request_STC::TYPE_UPDATE_OTHER :
+				deserialize(r.updateOtherMsg);
+				break;
+			case Request_STC::TYPE_GAME_START :
+				deserialize(r.gameStart);
+				break;
+		}
+	}
+
+	void Deserializer::deserialize(CTS_TetrominoPlaced & r){
+		deserialize(r.tetro);
+	}
+
+	void Deserializer::deserialize(CTS_ClientConnectionLost::ErrorType & t){
+		deserialize(t);
+	}
+
+	void Deserializer::deserialize(CTS_ClientConnectionLost & r){
+		deserialize(r.error);
+	}
+
+	void Deserializer::deserialize(CTS_NextTetrominoPlease & r){
+
+	}
+
+	void Deserializer::deserialize(Request_CTS::Type & t){
+		deserialize(t);
+	}
+
+	void Deserializer::deserialize(Request_CTS & r){
+		deserialize(r.type);
+
+		switch (r.type) {
+			case Request_CTS::TYPE_TETROMINO_PLACED :
+				deserialize(r.tetroMsg);
+				break;
+			case Request_CTS::TYPE_CLIENT_LOST :
+				deserialize(r.discoMsg);
+				break;
+			case Request_CTS::TYPE_NEXT_TETRO :
+				deserialize(r.nextTetroMsg);
+				break;
+		}
+	}
+

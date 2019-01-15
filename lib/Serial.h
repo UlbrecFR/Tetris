@@ -4,14 +4,13 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <gf/Array2D.h>
 #include "Tetromino.h"
 
 const static size_t maxLength = 1024;
 
 struct CTS_TetrominoPlaced {
 	Tetromino tetro;
-	int posX;
-	int posY;
 };
 
 struct CTS_NextTetrominoPlease {
@@ -19,11 +18,13 @@ struct CTS_NextTetrominoPlease {
 
 
 struct CTS_ClientConnectionLost {
-	enum {
+	enum ErrorType : uint8_t {
 		ClientQuit,
 		ClientCrash,
 		ClientDisconnected
-	} ErrorType;
+	};
+
+	ErrorType error;
 };
 
 
@@ -36,33 +37,39 @@ struct STC_GameStart {
 };
 
 struct STC_UpdateOtherPlayer {
-	int grid[12*17];
+	gf::Array2D<uint8_t, uint8_t> grid;
 };
 
 struct Request_CTS{
-	enum {
+	enum Type : uint8_t {
 		TYPE_TETROMINO_PLACED,
 		TYPE_CLIENT_LOST,
 		TYPE_NEXT_TETRO
-	} Type;
+	};
+
+	Type type;
+
 	union {
 		CTS_TetrominoPlaced tetroMsg;
 		CTS_ClientConnectionLost discoMsg;
 		CTS_NextTetrominoPlease nextTetroMsg;
-	} Content;
+	};
 };
 
 struct Request_STC{
-	enum {
+	enum Type : uint8_t {
 		TYPE_NEW_TETROMINO,
 		TYPE_UPDATE_OTHER,
 		TYPE_GAME_START
-	} Type;
+	};
+
+	Type type;
+
 	union {
 		STC_NewTetromino newTetroMsg;
 		STC_UpdateOtherPlayer updateOtherMsg;
 		STC_GameStart gameStart;
-	} Content;
+	};
 };
 
 #endif // SERIAL_H
