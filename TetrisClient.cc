@@ -402,7 +402,7 @@ int main(int argc, char* argv[]){
                 printf("-------------------------------\n");
                 d.printData();
                 d.setData(msg);
-                d.deserialize(&next_tetro);
+                d.deserialize(next_tetro);
                 d.printData();
                 printf("-------------------------------\n");
                 printf("%d\n", next_tetro.getType());

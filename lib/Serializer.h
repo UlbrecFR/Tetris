@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstring>
 #include <gf/VectorOps.h>
+#include <gf/Array2D.h>
 #include "Serial.h"
 
 class Serializer{
@@ -34,11 +35,13 @@ class Serializer{
 
 		void serialize(const uint64_t d);
 
-		void serialize(const uint8_t *d, size_t Size);
+		//void serialize(const uint8_t *d, size_t Size);
 
 		void serialize(const gf::Vector2u v);
 
 		void serialize(const Tetromino t);
+
+		void serialize(const gf::Array2D<uint8_t, uint8_t> array);
 
 		std::vector<uint8_t> getData();
 };

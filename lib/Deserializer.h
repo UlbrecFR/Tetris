@@ -5,6 +5,7 @@
 #include <vector>
 #include <cstring>
 #include <gf/VectorOps.h>
+#include <gf/Array2D.h>
 #include "Serial.h"
 
 class Deserializer{
@@ -40,11 +41,13 @@ class Deserializer{
 
 		void deserialize(uint64_t & d);
 
-		void deserialize(uint8_t *d, size_t Size);
+		//void deserialize(uint8_t *d, size_t Size);
 
-		void deserialize(gf::Vector2u *v);
+		void deserialize(gf::Vector2u & v);
 
-		void deserialize(Tetromino *t);
+		void deserialize(Tetromino & t);
+
+		void deserialize(gf::Array2D<uint8_t, uint8_t> & array);
 };
 
 #endif // DESERIALIZER_H

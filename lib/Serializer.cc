@@ -50,7 +50,7 @@
 		serializeAnyType(d);
 	}
 
-	void Serializer::serialize(const uint8_t *d, size_t Size){
+	/* void Serializer::serialize(const uint8_t *d, size_t Size){
 
 		if((writePos + Size) > getSize()){
 			data.resize((writePos+Size)*2);				
@@ -61,7 +61,7 @@
 	    }
 	  
 	    writePos += Size;
-	}
+	}*/
 
 	void Serializer::serialize(const gf::Vector2u v){
 		serialize(v.x);
@@ -72,6 +72,15 @@
 		serialize(t.getPos());
 		serialize(t.getType());
 		serialize(t.getRotation());
+	}
+
+	void Serializer::serialize(const gf::Array2D<uint8_t, uint8_t> array){
+		auto size = array.getSize();
+		serialize(size.width);
+		serialize(size.height);
+		for (auto& x : array){
+			serialize(x);
+		}
 	}
 
 	std::vector<uint8_t> Serializer::getData(){
