@@ -110,14 +110,14 @@
 		pos = p;
 	}
 
-	std::set<std::pair<int, int>> Tetromino::getCases() {
+	std::set<std::pair<uint8_t, uint8_t>> Tetromino::getCases() {
 
-		std::set<std::pair<int, int>> cases;
-		int xAnchor = 0;
-		int yAnchor = 0;
+		std::set<std::pair<uint8_t, uint8_t>> cases;
+		uint8_t xAnchor = 0;
+		uint8_t yAnchor = 0;
 
-		for (int j = 0; j < 4; ++j) {
-			for (int i = 0; i < 2; ++i) {
+		for (uint8_t j = 0; j < 4; ++j) {
+			for (uint8_t i = 0; i < 2; ++i) {
 				if (shape[type-1][j][i] == 2) {
 					xAnchor = i;
 					yAnchor = j;
@@ -127,8 +127,8 @@
 		}
 
 
-		for (int j = 0; j < 4; ++j) {
-			for (int i = 0; i < 2; ++i) {
+		for (uint8_t j = 0; j < 4; ++j) {
+			for (uint8_t i = 0; i < 2; ++i) {
 				if (shape[type-1][j][i] != 0) {
 					switch(rotation) {
 						case 0 :
