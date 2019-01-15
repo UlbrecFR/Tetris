@@ -502,10 +502,6 @@ int main(int argc, char* argv[]){
 
             std::set<std::pair<uint8_t, uint8_t>> listeCurrentCase = tetro.getCases();
 
-            for (auto i : listeCurrentCase) {
-                printf("%d - %d\n", i.first, i.second);
-            }
-
             for (auto it : listeCurrentCase){
                 if(it.second>=0){
                     tabSprite[it.first][it.second].setTexture(tabTexturePiece[tetro.getType()-1], true);
