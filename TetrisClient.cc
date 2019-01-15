@@ -3,33 +3,32 @@
 using boost::asio::ip::tcp;
 
 
-void printZoneJeu(int tab[12][17], int height, int width){
-    for (int i = 0; i < height; ++i){
-        for(int j = 0; j < width; ++j){
-            printf("%d ", tab[j][i]);
+void printZoneJeu(gf::Array2D<uint8_t, uint8_t> & ga){
+    for (auto row : ga.getRowRange()){
+        for (auto col : ga.getColRange()){
+            printf("%d ", ga({row, col}));
         }
         printf("\n");
     }
     printf("\n");
 }
 
-void printEtatJeu(int tab[12][17], int height, int width, Tetromino tetro){
-    std::set<std::pair<int, int>> listeCase = tetro.getCases();
-    for (std::set<std::pair<int, int>>::const_iterator it = listeCase.begin(); it != listeCase.end(); it++){
-        if(it->second>0){
-            tab[it->first][it->second] = tetro.getType();
+void printEtatJeu(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
+    for (auto c : tetro.getCases()){
+        if(c.second>0){
+            ga({c.first, c.second}) = tetro.getType();
         }
-        
     }
 
 }
 
-void chuteLigneSuppr(int tab[12][17], int height, int width, int nLigne){
-    for (int i = nLigne; i>=0; --i){
-        for(int j = 0; j < width; ++j){
-            if(tab[j][i]>0){
-                tab[j][i+1] = tab[j][i];
-                tab[j][i] = 0;
+void chuteLigneSuppr(gf::Array2D<uint8_t, uint8_t> & ga, int nLigne){
+    for (size_t i = nLigne; i >= 0; --i){
+        for(auto col : ga.getColRange()) {
+
+            if(ga(gf::Vector2u(col,i)) > 0){
+                ga(gf::Vector2u(col,i+1)) = ga(gf::Vector2u(col,i));
+                ga(gf::Vector2u(col,i)) = 0;
             }
             
         }
@@ -37,20 +36,20 @@ void chuteLigneSuppr(int tab[12][17], int height, int width, int nLigne){
     }
 }
 
-void supprLigne(int tab[12][17], int height, int width){
+void supprLigne(gf::Array2D<uint8_t, uint8_t> & ga){
     bool plein = true;
-    for (int i = height-1; i>=0; --i){
-        for(int j = 0; j < width; ++j){
-            if(tab[j][i]==0){
+    for (auto row : ga.getRowRange()){
+        for(auto col : ga.getColRange()){
+            if(ga({row, col}) == 0){
                 plein = false;
             }
         }
         if(plein){
-            printf("La ligne %d est pleine !\n", i);
-            for(int h = 0; h < width; ++h){
-                tab[h][i] = 0;
+            printf("La ligne %d est pleine !\n", row);
+            for(auto col : ga.getColRange()){
+                ga({col,row}) = 0;
             }
-            chuteLigneSuppr(tab, height, width, i);
+            chuteLigneSuppr(ga, row);
         }else{
             plein=true;
         }  
@@ -60,20 +59,20 @@ void supprLigne(int tab[12][17], int height, int width){
 
 
 
-bool chutePossible(int tab[12][17], int height, int width, Tetromino tetro){ 
+bool chutePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){ 
     
     bool chutePossible = false;
 
 
     //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<int, int>> listeCase = tetro.getCases();
+    std::set<std::pair<uint8_t, uint8_t>> listeCase = tetro.getCases();
 
-    for (auto it = listeCase.begin(); it != listeCase.end(); it++){
-        if(it->second < height-1){
+    for (auto it : listeCase){
+        if(it.second < ga.getRows() - 1){
             //printf("%d\n", it->second);
-            if(tab[it->first][it->second+1] > 0){
-                for(std::set<std::pair<int, int>>::const_iterator iter = listeCase.begin(); iter != listeCase.end(); iter++){
-                    if(iter->second == it->second+1 && iter->first == it->first){
+            if(ga({it.first, it.second + 1}) > 0){
+                for(auto iter : listeCase){
+                    if(iter.second == it.second+1 && iter.first == it.first){
                         chutePossible = true;
                     }
                     
@@ -93,22 +92,21 @@ bool chutePossible(int tab[12][17], int height, int width, Tetromino tetro){
     return true;
 }
 
-bool droitePossible(int tab[12][17], int height, int width, Tetromino tetro){
+bool droitePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     bool possible = false;
 
 
     //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<int, int>> listeCase = tetro.getCases();
+    std::set<std::pair<uint8_t, uint8_t>> listeCase = tetro.getCases();
 
-    for (auto it = listeCase.begin(); it != listeCase.end(); it++){
-        if(it->first < width-1){
+    for (auto it : listeCase){
+        if(it.first < ga.getCols()-1){
             //printf("%d\n", it->second);
-            if(tab[it->first+1][it->second] > 0){
-                for(std::set<std::pair<int, int>>::const_iterator iter = listeCase.begin(); iter != listeCase.end(); iter++){
-                    if(iter->second == it->second && iter->first == it->first+1){
+            if(ga({it.first+1, it.second}) > 0){
+                for(auto iter : listeCase){
+                    if(iter.second == it.second && iter.first == it.first+1){
                         possible = true;
                     }
-                    
                 }
 
                 if(!possible){
@@ -125,19 +123,19 @@ bool droitePossible(int tab[12][17], int height, int width, Tetromino tetro){
     return true;
 }
 
-bool gauchePossible(int tab[12][17], int height, int width, Tetromino tetro){
+bool gauchePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     bool possible = false;
 
 
     //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<int, int>> listeCase = tetro.getCases();
+    std::set<std::pair<uint8_t, uint8_t>> listeCase = tetro.getCases();
 
-    for (auto it = listeCase.begin(); it != listeCase.end(); it++){
-        if(it->first >0){
+    for (auto it : listeCase){
+        if(it.first >0){
             //printf("%d\n", it->second);
-            if(tab[it->first-1][it->second] > 0){
-                for(std::set<std::pair<int, int>>::const_iterator iter = listeCase.begin(); iter != listeCase.end(); iter++){
-                    if(iter->second == it->second && iter->first == it->first-1){
+            if(ga({it.first-1, it.second}) > 0){
+                for(auto iter : listeCase){
+                    if(iter.second == it.second && iter.first == it.first-1){
                         possible = true;
                     }
                     
@@ -210,8 +208,8 @@ int main(int argc, char* argv[]){
 ///////////////////////////////////////////
 
     // initialization
-        static constexpr int width = 12;
-        static constexpr int height = 17;
+        static constexpr uint8_t width = 12;
+        static constexpr uint8_t height = 17;
         static constexpr int sizeCase = 40;
 
         static constexpr gf::Vector2u ScreenSize(1024, 576);
@@ -225,16 +223,8 @@ int main(int argc, char* argv[]){
         window.setFramerateLimit(60);
         gf::RenderWindow renderer(window);
 
-        
-        int tabJeu[width][height];
-        //init tab
-        for (int i = 0; i < height; ++i){
-            for (int j = 0; j < width; ++j){
-                tabJeu[j][i]=0;
-            }
-            
-        }
 
+        gf::Array2D<uint8_t, uint8_t> ga({width, height});
         ///////////////////////////////////////////////////////////////
         gf::Image imageVide;
         imageVide.create({ sizeCase, sizeCase }, gf::Color4u{0xFF, 0xFF, 0xFF, 0xFF});
@@ -435,10 +425,10 @@ int main(int argc, char* argv[]){
             }
 
             if(!pieceEnJeu){ //?????? ICI
-                supprLigne(tabJeu, height, width);
+                supprLigne(ga);
                 tetro = next_tetro;
                 pieceEnJeu = true;
-                tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
+                ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                 t = clockChute.restart();
 
                 s.serialize(tetro);
@@ -451,20 +441,20 @@ int main(int argc, char* argv[]){
             //printf("%f\n", t.asSeconds());
 
             if (rightAction.isActive()) {
-                if(droitePossible(tabJeu, height, width, tetro)){
-                    tabJeu[tetro.getX()][tetro.getY()] = 0;
+                if(droitePossible(ga, tetro)){
+                    ga({tetro.getX(), tetro.getY()}) = 0;
                     printf("droite\n");
                     tetro.setX(tetro.getX() + 1);
-                    tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
+                    ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                     //printZoneJeu(tabJeu, height, width);
                 }
                 
             } else if (leftAction.isActive()) {
-                if (gauchePossible(tabJeu, height, width, tetro)){
-                    tabJeu[tetro.getX()][tetro.getY()] = 0;
+                if (gauchePossible(ga, tetro)){
+                    ga({tetro.getX(), tetro.getY()}) = 0;
                     printf("droite\n");
                     tetro.setX(tetro.getX() - 1);
-                    tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
+                    ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                     //printZoneJeu(tabJeu, height, width);
                 }
                 
@@ -478,30 +468,30 @@ int main(int argc, char* argv[]){
 
             t = clockChute.getElapsedTime();
 
-            if(chutePossible(tabJeu, height, width, tetro)){
+            if(chutePossible(ga, tetro)){
                 if(t > periodChute){
-                    tabJeu[tetro.getX()][tetro.getY()] = 0;
+                    ga({tetro.getX(), tetro.getY()}) = 0;
                     t = clockChute.restart();
                     //printf("%f\n", t.asSeconds());
                     //printf("Chute\n");
                     //printf("%f\n", periodChute.asSeconds());
                     tetro.setY(tetro.getY() + 1);
-                    tabJeu[tetro.getX()][tetro.getY()] = tetro.getType();
-                    printZoneJeu(tabJeu, height, width);
+                    ga({tetro.getX(), tetro.getY()}) = tetro.getType();
+                    printZoneJeu(ga);
                     
                 }
             }else{
 
                 pieceEnJeu = false;
-                printEtatJeu(tabJeu, height, width, tetro);
+                printEtatJeu(ga, tetro);
             }
 
             
 
-            for (int i = 0; i < height; ++i){
-                for (int j = 0; j < width; ++j){
-                    if(tabJeu[j][i]>0){
-                        tabSprite[j][i].setTexture(tabTexturePiece[(tabJeu[j][i])-1], true);
+            for (uint8_t i = 0; i < height; ++i){
+                for (uint8_t j = 0; j < width; ++j){
+                    if(ga({j, i}) > 0){
+                        tabSprite[j][i].setTexture(tabTexturePiece[(ga({j,i}))-1], true);
                         
                     } else {
                         tabSprite[j][i].setTexture(textureVide, true);
@@ -510,11 +500,15 @@ int main(int argc, char* argv[]){
                 
             }
 
-            std::set<std::pair<int, int>> listeCurrentCase = tetro.getCases();
+            std::set<std::pair<uint8_t, uint8_t>> listeCurrentCase = tetro.getCases();
 
-            for (std::set<std::pair<int, int>>::const_iterator it = listeCurrentCase.begin(); it != listeCurrentCase.end(); it++){
-                if(it->second>=0){
-                    tabSprite[it->first][it->second].setTexture(tabTexturePiece[tetro.getType()-1], true);
+            for (auto i : listeCurrentCase) {
+                printf("%d - %d\n", i.first, i.second);
+            }
+
+            for (auto it : listeCurrentCase){
+                if(it.second>=0){
+                    tabSprite[it.first][it.second].setTexture(tabTexturePiece[tetro.getType()-1], true);
                 }
                 
             }

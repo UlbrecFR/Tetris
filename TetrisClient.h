@@ -2,6 +2,7 @@
 #include <cstring>
 #include <iostream>
 #include <thread>
+#include <vector>
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
@@ -10,6 +11,8 @@
 
 #include <gf/Queue.h>
 #include <gf/VectorOps.h>
+#include <gf/Array2D.h>
+#include <gf/Vector.h>
 
 #include <gf/RenderWindow.h>
 #include <gf/ViewContainer.h>
@@ -28,6 +31,7 @@
 #include <Tetromino.h>
 
 using boost::asio::ip::tcp;
+
 
 class TetrisClient{
 	public:
