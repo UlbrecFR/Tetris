@@ -57,24 +57,36 @@ int main(int argc, char* argv[]){
         std::thread(clientListener, sock2, &queueCli2).detach();
 
         std::vector<uint8_t> msg;
-        Tetromino new_tetro1;
-        Tetromino new_tetro2;
-
-        new_tetro1.setX(6);
-        new_tetro1.setY(0);
-        
-        new_tetro1.setType(rand()%7+1);
-
-        new_tetro2.setX(6);
-        new_tetro2.setY(0);
-
-        new_tetro2.setType(rand()%7+1);
 
         Serializer s1;
         Serializer s2;
 
         std::vector<uint8_t> request1;
         std::vector<uint8_t> request2;
+
+        Tetromino new_tetro1;
+        Tetromino new_tetro2;
+
+        for (int i = 0; i < 2; ++i) {
+            new_tetro1.setType(rand()%7+1);
+
+            s1.serialize(new_tetro1);
+            request1 = s1.getData();
+            printf("-> %d - %d\n", new_tetro1.getX(), new_tetro1.getY());
+            boost::asio::write(*sock1, boost::asio::buffer(request1));
+            s1.clear();
+            printf("envoie tetro %d client 1 : %d\n", i, new_tetro1.getType());
+
+            new_tetro2.setType(rand()%7+1);
+
+            s2.serialize(new_tetro2);
+            request2 = s2.getData();
+            printf("-> %d - %d\n", new_tetro2.getX(), new_tetro2.getY());
+            boost::asio::write(*sock2, boost::asio::buffer(request2));
+            s2.clear();
+            printf("envoie tetro %d client 2 : %d\n", i, new_tetro2.getType());
+        }
+        
 
         for(;;) {
             if (queueCli1.poll(msg)) {
@@ -83,13 +95,12 @@ int main(int argc, char* argv[]){
 
                 s1.serialize(new_tetro1);
 
-                printf("1 -> %d\n", new_tetro1.getType());
-
                 request1 = s1.getData();
 
                 boost::asio::write(*sock1, boost::asio::buffer(request1));
 
                 s1.clear();
+                printf("envoie tetro client 1 : %d\n", new_tetro1.getType());
             }
 
             if (queueCli2.poll(msg)) {
@@ -98,13 +109,12 @@ int main(int argc, char* argv[]){
 
                 s2.serialize(new_tetro2);
 
-                printf("2 -> %d\n", new_tetro2.getType());
-
                 request2 = s2.getData();
 
                 boost::asio::write(*sock2, boost::asio::buffer(request2));
 
                 s2.clear();
+                printf("envoie tetro client 2 : %d\n", new_tetro2.getType());
             }
 
         }

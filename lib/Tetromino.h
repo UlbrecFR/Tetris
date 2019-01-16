@@ -19,6 +19,8 @@ class Tetromino{
 	public:
 		Tetromino();
 		
+		Tetromino& operator=(const Tetromino& t);
+
 		void print();
 
 		uint8_t getX() const;

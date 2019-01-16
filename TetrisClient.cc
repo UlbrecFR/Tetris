@@ -4,13 +4,13 @@ using boost::asio::ip::tcp;
 
 
 void printZoneJeu(gf::Array2D<uint8_t, uint8_t> & ga){
-    for (auto row : ga.getRowRange()){
+  /*  for (auto row : ga.getRowRange()){
         for (auto col : ga.getColRange()){
-            printf("%d ", ga({row, col}));
+            printf("%d ", ga({col, row}));
         }
         printf("\n");
     }
-    printf("\n");
+    printf("\n");*/
 }
 
 void printEtatJeu(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
@@ -152,6 +152,19 @@ bool gauchePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     }
     
     
+    return true;
+}
+
+
+bool rotatePossible(uint8_t width, uint8_t height, Tetromino tetro) {
+    tetro.rotate();
+
+    for(auto c : tetro.getCases()) {
+        if (c.first < 0 || c.first >= width || c.second < 0 || c.second >= height) {
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -393,23 +406,38 @@ int main(int argc, char* argv[]){
         Deserializer d;
         Serializer s;
         std::vector<uint8_t> request;
+
+        while (!queueServer.poll(msg)) {
+            //printf("wait for first tetro\n");
+        }
+
+        d.setData(msg);
+        d.deserialize(tetro);
+        d.clear();
+        d.printData();
+
+        printf("->>>%d\n", tetro.getType());
+        printf("-> %d - %d\n", tetro.getX(), tetro.getY());
         
+        while (!queueServer.poll(msg)) {
+           // printf("wait for second tetro\n");
+        }
+
+        d.setData(msg);
+        d.deserialize(next_tetro);
+        d.clear();
+        d.printData();
+
+        printf("->>>%d\n", next_tetro.getType());            
+        printf("-> %d - %d\n", next_tetro.getX(), next_tetro.getY());
 
         while (window.isOpen()) {
 
-
             if (queueServer.poll(msg)) {
-                printf("-------------------------------\n");
-                d.printData();
                 d.setData(msg);
                 d.deserialize(next_tetro);
-                d.printData();
-                printf("-------------------------------\n");
-                printf("%d\n", next_tetro.getType());
-                printf("%d\n", next_tetro.getRotation());
                 d.clear();
                 d.printData();
-                printf("-------------------------------\n" );
             }
 
             // 1. input
@@ -424,9 +452,11 @@ int main(int argc, char* argv[]){
                 window.close();
             }
 
-            if(!pieceEnJeu){ //?????? ICI
+            if(!pieceEnJeu){ //RECEPTION SERVER
                 supprLigne(ga);
+
                 tetro = next_tetro;
+                
                 pieceEnJeu = true;
                 ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                 t = clockChute.restart();

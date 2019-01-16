@@ -3,8 +3,8 @@
 
 	const uint8_t Tetromino::shape[7][4][2] = {
 			{
-				{2,0},
 				{1,0},
+				{2,0},
 				{1,0},
 				{1,0}
 			},
@@ -17,9 +17,9 @@
 			},
 
 			{
-				{1,0},
-				{1,0},
-				{2,1},
+				{1,2},
+				{0,1},
+				{0,1},
 				{0,0}
 			},
 
@@ -57,9 +57,25 @@
 		rotation = 0;
 		type = rand()%7+1;
 		pos.x = 6;
-		pos.y = 0;
+		pos.y = 10;
 
 	}
+
+
+
+	Tetromino& Tetromino::operator=(const Tetromino& t) {
+		rotation = t.rotation;
+		type = t.type;
+		pos.x = t.pos.x;
+		pos.y = t.pos.y;
+
+		printf("VOUI %d %d \n", t.pos.x, t.pos.y);
+		printf("VOUI %d %d \n", pos.x, pos.y);
+
+		return *this;
+	}
+
+
 
 	void Tetromino::print(){
 		for (size_t i = 0; i < 4; ++i){
