@@ -478,7 +478,9 @@ int main(int argc, char* argv[]){
                 }
                 
             } else if (rotateAction.isActive()) {
-                tetro.rotate();
+                if (rotatePossible(ga.getCols(), ga.getRows(), tetro)) {
+                    tetro.rotate();
+                }
             } else if (downAction.isActive()) {
             // do something
             } else {
