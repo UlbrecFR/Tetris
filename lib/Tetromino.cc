@@ -142,26 +142,31 @@
 		for (uint8_t j = 0; j < 4; ++j) {
 			for (uint8_t i = 0; i < 2; ++i) {
 				if (shape[type-1][j][i] != 0) {
-					switch(rotation) {
-						case 0 :
-							cases.insert(std::make_pair(pos.x + (i - xAnchor), pos.y + (j - yAnchor)));
-							break;
+					if (type != 4) {
+						switch(rotation) {
+							case 0 :
+								cases.insert(std::make_pair(pos.x + (i - xAnchor), pos.y + (j - yAnchor)));
+								break;
 
-						case 1 :
-							cases.insert(std::make_pair(pos.x - (j - yAnchor), pos.y + (i - xAnchor)));
-							break;
+							case 1 :
+								cases.insert(std::make_pair(pos.x - (j - yAnchor), pos.y + (i - xAnchor)));
+								break;
 
-						case 2 :
-							cases.insert(std::make_pair(pos.x - (i - xAnchor), pos.y - (j - yAnchor)));
-							break;
+							case 2 :
+								cases.insert(std::make_pair(pos.x - (i - xAnchor), pos.y - (j - yAnchor)));
+								break;
 
-						case 3 :
-							cases.insert(std::make_pair(pos.x + (j - yAnchor), pos.y - (i - xAnchor)));
-							break;
+							case 3 :
+								cases.insert(std::make_pair(pos.x + (j - yAnchor), pos.y - (i - xAnchor)));
+								break;
 
-						default :
-							break;
+							default :
+								break;
+						}
+					} else {
+						cases.insert(std::make_pair(pos.x + (i - xAnchor), pos.y + (j - yAnchor)));
 					}
+					
 				}
 			}
 		}
