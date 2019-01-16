@@ -23,23 +23,26 @@ void printEtatJeu(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
 }
 
 void chuteLigneSuppr(gf::Array2D<uint8_t, uint8_t> & ga, int nLigne){
-    for (size_t i = nLigne; i >= 0; --i){
-        for(auto col : ga.getColRange()) {
 
-            if(ga(gf::Vector2u(col,i)) > 0){
-                ga(gf::Vector2u(col,i+1)) = ga(gf::Vector2u(col,i));
-                ga(gf::Vector2u(col,i)) = 0;
+    size_t nbrow = ga.getRows();
+
+    for (auto row : ga.getRowRange()){
+        for(auto col : ga.getColRange()){
+            if(ga.isValid({col,nbrow-2-row})){
+                ga({col,nbrow-1-row}) = ga({col,nbrow-2-row});
             }
-            
-        } 
+        }
     }
+
+    
 }
 
 void supprLigne(gf::Array2D<uint8_t, uint8_t> & ga){
+    printf("Suppr\n");
     bool plein = true;
     for (auto row : ga.getRowRange()){
         for(auto col : ga.getColRange()){
-            if(ga({row, col}) == 0){
+            if(ga({col, row}) == 0){
                 plein = false;
             }
         }
@@ -444,7 +447,6 @@ int main(int argc, char* argv[]){
             }
 
             if(!pieceEnJeu){ //RECEPTION SERVER
-                supprLigne(ga);
 
                 tetro = next_tetro;
                 
@@ -506,6 +508,7 @@ int main(int argc, char* argv[]){
                 pieceEnJeu = false;
                 printEtatJeu(ga, tetro);
                 periodChute = gf::seconds(1.0f);
+                supprLigne(ga);
             }
 
             
@@ -550,8 +553,6 @@ int main(int argc, char* argv[]){
 
             renderer.setView(hudView);
             hudEntities.render(renderer);
-
-
 
             renderer.display();
             actions.reset();
