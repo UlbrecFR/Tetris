@@ -28,7 +28,7 @@ void chuteLigneSuppr(gf::Array2D<uint8_t, uint8_t> & ga, int nLigne){
 
     for (auto row : ga.getRowRange()){
         for(auto col : ga.getColRange()){
-            if(ga.isValid({col,nbrow-2-row})){
+            if(ga.isValid({col,nbrow-2-row}) && nbrow-row-1<=nLigne){
                 ga({col,nbrow-1-row}) = ga({col,nbrow-2-row});
             }
         }
@@ -38,7 +38,6 @@ void chuteLigneSuppr(gf::Array2D<uint8_t, uint8_t> & ga, int nLigne){
 }
 
 void supprLigne(gf::Array2D<uint8_t, uint8_t> & ga){
-    printf("Suppr\n");
     bool plein = true;
     for (auto row : ga.getRowRange()){
         for(auto col : ga.getColRange()){
@@ -52,11 +51,12 @@ void supprLigne(gf::Array2D<uint8_t, uint8_t> & ga){
                 ga({col,row}) = 0;
             }
             chuteLigneSuppr(ga, row);
-        }else{
-            plein=true;
-        }  
+            supprLigne(ga);
+            break;
+        } else {
+            plein = true;
+        }
     }
-    
 }
 
 
