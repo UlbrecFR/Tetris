@@ -481,10 +481,12 @@ int main(int argc, char* argv[]){
                 if (rotatePossible(ga.getCols(), ga.getRows(), tetro)) {
                     tetro.rotate();
                 }
-            } else if (downAction.isActive()) {
-            // do something
+            } 
+
+            if (downAction.isActive()) {
+                periodChute.subTo(gf::seconds(0.1f));
             } else {
-            // do something
+                periodChute = gf::seconds(1.0f);
             }
 
             t = clockChute.getElapsedTime();
@@ -499,12 +501,11 @@ int main(int argc, char* argv[]){
                     tetro.setY(tetro.getY() + 1);
                     ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                     printZoneJeu(ga);
-                    
                 }
             }else{
-
                 pieceEnJeu = false;
                 printEtatJeu(ga, tetro);
+                periodChute = gf::seconds(1.0f);
             }
 
             
