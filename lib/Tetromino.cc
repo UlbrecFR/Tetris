@@ -53,11 +53,10 @@
 	};
 
 	Tetromino::Tetromino(){
-		srand(time(NULL));
 		rotation = 0;
-		type = rand()%7+1;
+		type = 0;
 		pos.x = 6;
-		pos.y = 10;
+		pos.y = 1;
 
 	}
 
@@ -68,9 +67,6 @@
 		type = t.type;
 		pos.x = t.pos.x;
 		pos.y = t.pos.y;
-
-		printf("VOUI %d %d \n", t.pos.x, t.pos.y);
-		printf("VOUI %d %d \n", pos.x, pos.y);
 
 		return *this;
 	}

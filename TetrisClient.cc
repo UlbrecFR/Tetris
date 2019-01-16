@@ -31,8 +31,7 @@ void chuteLigneSuppr(gf::Array2D<uint8_t, uint8_t> & ga, int nLigne){
                 ga(gf::Vector2u(col,i)) = 0;
             }
             
-        }
-       
+        } 
     }
 }
 
@@ -412,12 +411,9 @@ int main(int argc, char* argv[]){
         }
 
         d.setData(msg);
+
         d.deserialize(tetro);
         d.clear();
-        d.printData();
-
-        printf("->>>%d\n", tetro.getType());
-        printf("-> %d - %d\n", tetro.getX(), tetro.getY());
         
         while (!queueServer.poll(msg)) {
            // printf("wait for second tetro\n");
@@ -426,10 +422,6 @@ int main(int argc, char* argv[]){
         d.setData(msg);
         d.deserialize(next_tetro);
         d.clear();
-        d.printData();
-
-        printf("->>>%d\n", next_tetro.getType());            
-        printf("-> %d - %d\n", next_tetro.getX(), next_tetro.getY());
 
         while (window.isOpen()) {
 
@@ -437,7 +429,6 @@ int main(int argc, char* argv[]){
                 d.setData(msg);
                 d.deserialize(next_tetro);
                 d.clear();
-                d.printData();
             }
 
             // 1. input
@@ -473,7 +464,6 @@ int main(int argc, char* argv[]){
             if (rightAction.isActive()) {
                 if(droitePossible(ga, tetro)){
                     ga({tetro.getX(), tetro.getY()}) = 0;
-                    printf("droite\n");
                     tetro.setX(tetro.getX() + 1);
                     ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                     //printZoneJeu(tabJeu, height, width);
@@ -482,7 +472,6 @@ int main(int argc, char* argv[]){
             } else if (leftAction.isActive()) {
                 if (gauchePossible(ga, tetro)){
                     ga({tetro.getX(), tetro.getY()}) = 0;
-                    printf("droite\n");
                     tetro.setX(tetro.getX() - 1);
                     ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                     //printZoneJeu(tabJeu, height, width);

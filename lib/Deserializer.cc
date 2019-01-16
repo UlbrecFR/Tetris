@@ -41,7 +41,7 @@
 	void Deserializer::deserializeAnyType(T & d){
 		T res = 0;
 		for (size_t i = 0; i < sizeof(T); ++i) {
-	    	res = (res << 8) + data[readPos+i];
+	    	res = (res << 8) + data[readPos+sizeof(T)-1-i];
 	    }
 	    readPos += sizeof(T);
 	    d = res;
