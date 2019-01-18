@@ -1,3 +1,4 @@
+
 #ifndef SERIALIZER_H
 #define SERIALIZER_H
 
@@ -45,9 +46,11 @@ class Serializer{
 
 		void serialize(const STC_GameStart r);
 		
-		void serialize(const STC_UpdateOtherPlayer r);
+		//void serialize(const STC_UpdateOtherPlayer r);
 
 		void serialize(const STC_NewTetromino r);
+
+		void serialize(const CTS_GameOver r);
 
 		void serialize(const Request_STC::Type t);
 
@@ -58,8 +61,6 @@ class Serializer{
 		void serialize(const CTS_ClientConnectionLost::ErrorType t);
 	
 		void serialize(const CTS_ClientConnectionLost r);
-
-		void serialize(const CTS_NextTetrominoPlease r);
 
 		void serialize(const Request_CTS::Type t);
 

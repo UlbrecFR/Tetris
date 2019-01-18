@@ -52,6 +52,7 @@
 			}
 	};
 
+/*
 	Tetromino::Tetromino(){
 		rotation = 0;
 		type = 0;
@@ -59,9 +60,9 @@
 		pos.y = 1;
 
 	}
+*/
 
-
-
+/*
 	Tetromino& Tetromino::operator=(const Tetromino& t) {
 		rotation = t.rotation;
 		type = t.type;
@@ -70,7 +71,7 @@
 
 		return *this;
 	}
-
+*/
 
 
 	void Tetromino::print(){

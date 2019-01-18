@@ -8,6 +8,7 @@
 #include <Serializer.h>
 #include <Deserializer.h>
 #include <Tetromino.h>
+#include <Serial.h>
 
 using boost::asio::ip::tcp;
 

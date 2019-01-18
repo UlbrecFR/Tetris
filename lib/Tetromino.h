@@ -17,9 +17,10 @@ class Tetromino{
 		gf::Vector2u pos;
 
 	public:
-		Tetromino();
+		Tetromino() = default;
 		
-		Tetromino& operator=(const Tetromino& t);
+		Tetromino(const Tetromino&) = default;
+		Tetromino& operator=(const Tetromino& t) = default;
 
 		void print();
 

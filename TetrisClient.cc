@@ -242,10 +242,10 @@ int main(int argc, char* argv[]){
         gf::Array2D<uint8_t, uint8_t> ga({width, height});
         ///////////////////////////////////////////////////////////////
         gf::Image imageVide;
-        imageVide.create({ sizeCase, sizeCase }, gf::Color4u{0xFF, 0xFF, 0xFF, 0xFF});
+        imageVide.create({ sizeCase, sizeCase }, gf::Color4u{0xDF, 0xDF, 0xDF, 0xFF});
 
         gf::Texture textureVide;
-        if (!textureVide.loadFromImage(imageVide)) {
+        if (!textureVide.loadFromFile(gf::Path("../ressources/caseVide.png"))) {
         return EXIT_FAILURE;
         }
 
@@ -409,29 +409,39 @@ int main(int argc, char* argv[]){
         Serializer s;
         std::vector<uint8_t> request;
 
+        Request_STC rqFS;
+        Request_CTS rqTS;
+
         while (!queueServer.poll(msg)) {
             //printf("wait for first tetro\n");
         }
 
         d.setData(msg);
-
-        d.deserialize(tetro);
+        d.deserialize(rqFS);
         d.clear();
         
-        while (!queueServer.poll(msg)) {
-           // printf("wait for second tetro\n");
+        if (rqFS.type == Request_STC::TYPE_GAME_START) {
+            tetro = rqFS.gameStart.firstTetro;
+            next_tetro=rqFS.gameStart.secondTetro;
         }
-
-        d.setData(msg);
-        d.deserialize(next_tetro);
-        d.clear();
 
         while (window.isOpen()) {
 
-            if (queueServer.poll(msg)) {
+            if (queueServer.poll(msg)) { //RECEPTION SERVER
                 d.setData(msg);
-                d.deserialize(next_tetro);
+                d.deserialize(rqFS);
                 d.clear();
+
+
+                if (rqFS.type == Request_STC::TYPE_NEW_TETROMINO) {
+                    printf("type : %d\n", rqFS.gameStart.firstTetro.getType());
+
+                    next_tetro.setPos(rqFS.gameStart.firstTetro.getPos());
+                    next_tetro.setRotation(rqFS.gameStart.firstTetro.getRotation());
+                    next_tetro.setType(rqFS.gameStart.firstTetro.getType());
+                    
+                    printf("type : %d\n", next_tetro.getType());
+                }
             }
 
             // 1. input
@@ -446,7 +456,10 @@ int main(int argc, char* argv[]){
                 window.close();
             }
 
-            if(!pieceEnJeu){ //RECEPTION SERVER
+            if(!pieceEnJeu){ //ENVOI SERVER
+
+                rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
+                rqTS.tetroMsg.tetro = tetro;
 
                 tetro = next_tetro;
                 
@@ -454,7 +467,9 @@ int main(int argc, char* argv[]){
                 ga({tetro.getX(), tetro.getY()}) = tetro.getType();
                 t = clockChute.restart();
 
-                s.serialize(tetro);
+                s.serialize(rqTS);
+
+                printf("ENVOI = %d : %d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
 
                 request = s.getData();
                 boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));

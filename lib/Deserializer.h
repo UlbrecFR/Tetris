@@ -51,7 +51,7 @@ class Deserializer{
 
 		void deserialize(STC_GameStart & r);
 		
-		void deserialize(STC_UpdateOtherPlayer & r);
+		//void deserialize(STC_UpdateOtherPlayer & r);
 
 		void deserialize(STC_NewTetromino & r);
 
@@ -61,11 +61,11 @@ class Deserializer{
 
 		void deserialize(CTS_TetrominoPlaced & r);
 
+		void deserialize(CTS_GameOver & r);
+
 		void deserialize(CTS_ClientConnectionLost::ErrorType & t);
 	
 		void deserialize(CTS_ClientConnectionLost & r);
-
-		void deserialize(CTS_NextTetrominoPlease & r);
 
 		void deserialize(Request_CTS::Type & t);
 

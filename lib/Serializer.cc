@@ -85,12 +85,13 @@
 
 	void Serializer::serialize(const STC_GameStart r){
 		serialize(r.firstTetro);
+		serialize(r.secondTetro);
 	}
-	
+	/*
 	void Serializer::serialize(const STC_UpdateOtherPlayer r){
 		serialize(r.grid);
 	}
-
+*/
 	void Serializer::serialize(const STC_NewTetromino r){
 		serialize(r.newTetro);
 	}
@@ -106,9 +107,9 @@
 			case Request_STC::TYPE_NEW_TETROMINO :
 				serialize(r.newTetroMsg);
 				break;
-			case Request_STC::TYPE_UPDATE_OTHER :
-				serialize(r.updateOtherMsg);
-				break;
+			//case Request_STC::TYPE_UPDATE_OTHER :
+			//	serialize(r.updateOtherMsg);
+			//	break;
 			case Request_STC::TYPE_GAME_START :
 				serialize(r.gameStart);
 				break;
@@ -118,6 +119,10 @@
 	void Serializer::serialize(const CTS_TetrominoPlaced r){
 		serialize(r.tetro);
 	}
+	
+	void Serializer::serialize(const CTS_GameOver r){
+		serialize(r.tetro);
+	}
 
 	void Serializer::serialize(const CTS_ClientConnectionLost::ErrorType t){
 		serialize(t);
@@ -125,10 +130,6 @@
 	
 	void Serializer::serialize(const CTS_ClientConnectionLost r){
 		serialize(r.error);
-	}
-
-	void Serializer::serialize(const CTS_NextTetrominoPlease r){
-		
 	}
 
 	void Serializer::serialize(const Request_CTS::Type t){
@@ -142,11 +143,11 @@
 			case Request_CTS::TYPE_TETROMINO_PLACED :
 				serialize(r.tetroMsg);
 				break;
-			case Request_CTS::TYPE_CLIENT_LOST :
+			case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
 				serialize(r.discoMsg);
 				break;
-			case Request_CTS::TYPE_NEXT_TETRO :
-				serialize(r.nextTetroMsg);
+			case Request_CTS::TYPE_GAME_OVER :
+				serialize(r.gameOverMsg);
 				break;
 		}
 	}

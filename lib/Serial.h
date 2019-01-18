@@ -13,19 +13,38 @@ struct CTS_TetrominoPlaced {
 	Tetromino tetro;
 };
 
-struct CTS_NextTetrominoPlease {
-};
-
 
 struct CTS_ClientConnectionLost {
 	enum ErrorType : uint8_t {
 		ClientQuit,
-		ClientCrash,
-		ClientDisconnected
+		ClientCrash
 	};
 
 	ErrorType error;
 };
+
+struct CTS_GameOver {
+	Tetromino tetro;
+};
+
+struct Request_CTS{
+	enum Type : uint8_t {
+		TYPE_TETROMINO_PLACED,
+		TYPE_GAME_OVER,
+		TYPE_CLIENT_CONNECTION_LOST
+	};
+
+	Type type;
+
+	union {
+		CTS_TetrominoPlaced tetroMsg;
+		CTS_GameOver gameOverMsg;
+		CTS_ClientConnectionLost discoMsg;
+	};
+};
+
+
+//////////////////////////////////////////////////
 
 
 struct STC_NewTetromino {
@@ -34,32 +53,17 @@ struct STC_NewTetromino {
 
 struct STC_GameStart {
 	Tetromino firstTetro;
+	Tetromino secondTetro;
 };
-
+/*
 struct STC_UpdateOtherPlayer {
-	gf::Array2D<uint8_t, uint8_t> grid;
+	//uint8_t* grid;
 };
-
-struct Request_CTS{
-	enum Type : uint8_t {
-		TYPE_TETROMINO_PLACED,
-		TYPE_CLIENT_LOST,
-		TYPE_NEXT_TETRO
-	};
-
-	Type type;
-
-	union {
-		CTS_TetrominoPlaced tetroMsg;
-		CTS_ClientConnectionLost discoMsg;
-		CTS_NextTetrominoPlease nextTetroMsg;
-	};
-};
-
+*/
 struct Request_STC{
 	enum Type : uint8_t {
 		TYPE_NEW_TETROMINO,
-		TYPE_UPDATE_OTHER,
+		//TYPE_UPDATE_OTHER,
 		TYPE_GAME_START
 	};
 
@@ -67,7 +71,7 @@ struct Request_STC{
 
 	union {
 		STC_NewTetromino newTetroMsg;
-		STC_UpdateOtherPlayer updateOtherMsg;
+		//STC_UpdateOtherPlayer updateOtherMsg;
 		STC_GameStart gameStart;
 	};
 };

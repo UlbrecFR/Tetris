@@ -27,9 +27,104 @@ static void clientListener(tcp::socket *socketClient, gf::Queue<std::vector<uint
         else if (error)
             throw boost::system::system_error(error); // Some other error.
 
+        printf("RECU !!\n");
+
         queueClient->push(msg);
     } 
 }
+
+void sendNewTetro(tcp::socket *socketClient, int id) {
+        Serializer s;
+        std::vector<uint8_t> serializedRequest;
+
+        Tetromino t;
+
+        t.setRotation(0);
+        t.setType(0);
+        t.setPos({6,1});
+        t.setType(rand()%7+1);
+
+        printf("%d type : %d\n", id, t.getType());
+
+        Request_STC rqSTC;
+        rqSTC.type = Request_STC::TYPE_NEW_TETROMINO;
+
+        rqSTC.newTetroMsg.newTetro = t;
+
+        s.serialize(rqSTC);
+        serializedRequest = s.getData();
+        boost::asio::write(*socketClient, boost::asio::buffer(serializedRequest));
+        s.clear();
+
+}
+
+void exploitMessage(std::vector<uint8_t> msg, tcp::socket *socketClient, int id) {
+
+    printf("VOUI\n");
+
+    Deserializer d;
+    Request_CTS rqFC;
+
+    d.setData(msg);
+    d.deserialize(rqFC);
+    d.clear();
+
+    printf("RECU = %d : %d-%d\n", rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
+
+    switch(rqFC.type) {
+        case Request_CTS::TYPE_TETROMINO_PLACED : 
+                sendNewTetro(socketClient, id);
+            break;
+        case Request_CTS::TYPE_GAME_OVER : 
+
+            break;        
+        case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : 
+
+            break;
+    }
+
+
+    printf("BOB\n");
+
+
+}
+
+void sendGameStart(tcp::socket *socketClient, int id) {
+        Serializer s;
+        std::vector<uint8_t> serializedRequest;
+
+        Tetromino firstTetro;
+        Tetromino secondTetro;
+
+        firstTetro.setRotation(0);
+        firstTetro.setType(0);
+        firstTetro.setPos({6,1});
+        firstTetro.setType(rand()%7+1);
+
+        secondTetro.setRotation(0);
+        secondTetro.setType(0);
+        secondTetro.setPos({6,1});
+        secondTetro.setType(rand()%7+1);
+
+        printf("%d type : %d\n", id, firstTetro.getType());
+        printf("%d type : %d\n", id, secondTetro.getType());
+
+
+        Request_STC rqSTC;
+        rqSTC.type = Request_STC::TYPE_GAME_START;
+
+        rqSTC.gameStart.firstTetro = firstTetro;
+        rqSTC.gameStart.secondTetro = secondTetro;
+
+        s.serialize(rqSTC);
+        serializedRequest = s.getData();
+        boost::asio::write(*socketClient, boost::asio::buffer(serializedRequest));
+        s.clear();
+
+}
+
+
+
 
 int main(int argc, char* argv[]){
 
@@ -57,58 +152,24 @@ int main(int argc, char* argv[]){
 
         std::vector<uint8_t> msg;
 
-        Serializer s1;
-        Serializer s2;
+        ////////////////    GAME START  //////////////////////
 
-        std::vector<uint8_t> request1;
-        std::vector<uint8_t> request2;
-
-        Tetromino new_tetro1;
-        Tetromino new_tetro2;
-
-        for (int i = 0; i < 2; ++i) {
-            new_tetro1.setType(rand()%7+1);
-
-            s1.serialize(new_tetro1);
-
-            request1 = s1.getData();
-            boost::asio::write(*sock1, boost::asio::buffer(request1));
-            s1.clear();
-
-            new_tetro2.setType(rand()%7+1);
-
-            s2.serialize(new_tetro2);
-            request2 = s2.getData();
-            boost::asio::write(*sock2, boost::asio::buffer(request2));
-            s2.clear();
-        }
+        sendGameStart(sock1, 1);
+        sendGameStart(sock2, 2);
         
 
         for(;;) {
+            printf("???\n");
+
             if (queueCli1.poll(msg)) {
-
-                new_tetro1.setType(rand()%7+1);
-
-                s1.serialize(new_tetro1);
-
-                request1 = s1.getData();
-
-                boost::asio::write(*sock1, boost::asio::buffer(request1));
-
-                s1.clear();
+                printf("client 1 reçu\n"); 
+                exploitMessage(msg, sock1, 1);
             }
 
             if (queueCli2.poll(msg)) {
+                printf("client 2 reçu\n"); 
+                exploitMessage(msg, sock1, 2);
 
-                new_tetro2.setType(rand()%7+1);
-
-                s2.serialize(new_tetro2);
-
-                request2 = s2.getData();
-
-                boost::asio::write(*sock2, boost::asio::buffer(request2));
-
-                s2.clear();
             }
 
         }
