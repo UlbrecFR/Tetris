@@ -170,6 +170,22 @@ bool rotatePossible(uint8_t width, uint8_t height, Tetromino tetro) {
     return true;
 }
 
+bool testFinPartie(gf::Array2D<uint8_t, uint8_t> & ga, uint8_t width, Tetromino tetro){
+    printZoneJeu(ga);
+    for (int i = 0; i < 4; ++i){
+        for (int j = 0; j < width; ++j){
+            if(ga({j,i}) != 0){
+                if(tetro.getX()!= j && tetro.getY() != i){
+                    return false;
+                }
+                
+            }
+        }
+    }
+
+    return true;
+}
+
 static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint8_t>> *queueServer) {
 
     for(;;) {
@@ -321,6 +337,7 @@ int main(int argc, char* argv[]){
             
        
         bool pieceEnJeu = false;
+        bool enPartie = true;
 
         // views
         gf::ViewContainer views;
@@ -446,97 +463,103 @@ int main(int argc, char* argv[]){
                 window.close();
             }
 
-            if(!pieceEnJeu){ //ENVOI SERVER
+            if(enPartie){
+                if(!pieceEnJeu){ //ENVOI SERVER
 
-                rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
-                rqTS.tetroMsg.tetro = tetro;
+                    rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
+                    rqTS.tetroMsg.tetro = tetro;
 
-                tetro = next_tetro;
-                
-                pieceEnJeu = true;
-                ga({tetro.getX(), tetro.getY()}) = tetro.getType();
-                t = clockChute.restart();
-
-                s.serialize(rqTS);
-
-                printf("Sending a TYPE_TETROMINO_PLACED msg\n\t placed-tetro : t%d r%d pos%d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getRotation(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
-
-                request = s.getData();
-                boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
-                s.clear();
-            }
-
-            //printf("%f\n", t.asSeconds());
-
-            if (rightAction.isActive()) {
-                if(droitePossible(ga, tetro)){
-                    ga({tetro.getX(), tetro.getY()}) = 0;
-                    tetro.setX(tetro.getX() + 1);
+                    tetro = next_tetro;
+                    
+                    pieceEnJeu = true;
                     ga({tetro.getX(), tetro.getY()}) = tetro.getType();
-                    //printZoneJeu(tabJeu, height, width);
-                }
-                
-            } else if (leftAction.isActive()) {
-                if (gauchePossible(ga, tetro)){
-                    ga({tetro.getX(), tetro.getY()}) = 0;
-                    tetro.setX(tetro.getX() - 1);
-                    ga({tetro.getX(), tetro.getY()}) = tetro.getType();
-                    //printZoneJeu(tabJeu, height, width);
-                }
-                
-            } else if (rotateAction.isActive()) {
-                if (rotatePossible(ga.getCols(), ga.getRows(), tetro)) {
-                    tetro.rotate();
-                }
-            } 
-
-            if (downAction.isActive()) {
-                periodChute.subTo(gf::seconds(0.1f));
-            } else {
-                periodChute = gf::seconds(1.0f);
-            }
-
-            t = clockChute.getElapsedTime();
-
-            if(chutePossible(ga, tetro)){
-                if(t > periodChute){
-                    ga({tetro.getX(), tetro.getY()}) = 0;
                     t = clockChute.restart();
-                    //printf("%f\n", t.asSeconds());
-                    //printf("Chute\n");
-                    //printf("%f\n", periodChute.asSeconds());
-                    tetro.setY(tetro.getY() + 1);
-                    ga({tetro.getX(), tetro.getY()}) = tetro.getType();
-                    printZoneJeu(ga);
+
+                    s.serialize(rqTS);
+
+                    printf("Sending a TYPE_TETROMINO_PLACED msg\n\t placed-tetro : t%d r%d pos%d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getRotation(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
+
+                    request = s.getData();
+                    boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
+                    s.clear();
                 }
-            }else{
-                pieceEnJeu = false;
-                printEtatJeu(ga, tetro);
-                periodChute = gf::seconds(1.0f);
-                supprLigne(ga);
-            }
 
+                //printf("%f\n", t.asSeconds());
 
-            
-
-            for (uint8_t i = 0; i < height; ++i){
-                for (uint8_t j = 0; j < width; ++j){
-                    if(ga({j, i}) > 0){
-                        tabSprite[j][i].setTexture(tabTexturePiece[(ga({j,i}))-1], true);  
-                    } else {
-                        tabSprite[j][i].unsetTexture();
+                if (rightAction.isActive()) {
+                    if(droitePossible(ga, tetro)){
+                        ga({tetro.getX(), tetro.getY()}) = 0;
+                        tetro.setX(tetro.getX() + 1);
+                        ga({tetro.getX(), tetro.getY()}) = tetro.getType();
+                        //printZoneJeu(tabJeu, height, width);
                     }
-                }
-                
-            }
+                    
+                } else if (leftAction.isActive()) {
+                    if (gauchePossible(ga, tetro)){
+                        ga({tetro.getX(), tetro.getY()}) = 0;
+                        tetro.setX(tetro.getX() - 1);
+                        ga({tetro.getX(), tetro.getY()}) = tetro.getType();
+                        //printZoneJeu(tabJeu, height, width);
+                    }
+                    
+                } else if (rotateAction.isActive()) {
+                    if (rotatePossible(ga.getCols(), ga.getRows(), tetro)) {
+                        tetro.rotate();
+                    }
+                } 
 
-            std::set<std::pair<uint8_t, uint8_t>> listeCurrentCase = tetro.getCases();
-
-            for (auto it : listeCurrentCase){
-                if(it.second>=0){
-                    tabSprite[it.first][it.second].setTexture(tabTexturePiece[tetro.getType()-1], true);
+                if (downAction.isActive()) {
+                    periodChute.subTo(gf::seconds(0.1f));
+                } else {
+                    periodChute = gf::seconds(1.0f);
                 }
+
+                t = clockChute.getElapsedTime();
+
+                if(chutePossible(ga, tetro)){
+                    if(t > periodChute){
+                        ga({tetro.getX(), tetro.getY()}) = 0;
+                        t = clockChute.restart();
+                        //printf("%f\n", t.asSeconds());
+                        //printf("Chute\n");
+                        //printf("%f\n", periodChute.asSeconds());
+                        tetro.setY(tetro.getY() + 1);
+                        ga({tetro.getX(), tetro.getY()}) = tetro.getType();
+                        printZoneJeu(ga);
+                    }
+                }else{
+                    pieceEnJeu = false;
+                    printEtatJeu(ga, tetro);
+                    periodChute = gf::seconds(1.0f);
+                    supprLigne(ga);
+                }
+
+
                 
+
+                for (uint8_t i = 0; i < height; ++i){
+                    for (uint8_t j = 0; j < width; ++j){
+                        if(ga({j, i}) > 0){
+                            tabSprite[j][i].setTexture(tabTexturePiece[(ga({j,i}))-1], true);  
+                        } else {
+                            tabSprite[j][i].unsetTexture();
+                        }
+                    }
+                    
+                }
+
+                std::set<std::pair<uint8_t, uint8_t>> listeCurrentCase = tetro.getCases();
+
+                for (auto it : listeCurrentCase){
+                    if(it.second>=0){
+                        tabSprite[it.first][it.second].setTexture(tabTexturePiece[tetro.getType()-1], true);
+                    }
+                    
+                }
+
+                enPartie = testFinPartie(ga, width, tetro);
+            }else{
+                printf("FIN DE PARTIE\n");
             }
 
             // 2. update
