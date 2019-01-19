@@ -151,7 +151,9 @@
 	}
 
 	void Deserializer::deserialize(Request_CTS & r){
-		deserialize(r.type);
+		uint8_t t;
+		deserialize(t);
+		r.type = (Request_CTS::Type)t;
 
 		switch (r.type) {
 			case Request_CTS::TYPE_TETROMINO_PLACED :

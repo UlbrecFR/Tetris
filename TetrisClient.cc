@@ -412,9 +412,13 @@ int main(int argc, char* argv[]){
         Request_STC rqFS;
         Request_CTS rqTS;
 
+        printf("Connecting to server...\n");
+
         while (!queueServer.poll(msg)) {
             //printf("wait for first tetro\n");
         }
+
+        printf("Connected\n");
 
         d.setData(msg);
         d.deserialize(rqFS);
@@ -423,7 +427,10 @@ int main(int argc, char* argv[]){
         if (rqFS.type == Request_STC::TYPE_GAME_START) {
             tetro = rqFS.gameStart.firstTetro;
             next_tetro=rqFS.gameStart.secondTetro;
+            printf("Received a TYPE_GAME_START msg\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", tetro.getType(), tetro.getRotation(), next_tetro.getType(), next_tetro.getRotation());
         }
+
+        pieceEnJeu = true;
 
         while (window.isOpen()) {
 
@@ -431,16 +438,14 @@ int main(int argc, char* argv[]){
                 d.setData(msg);
                 d.deserialize(rqFS);
                 d.clear();
-
-
+                
                 if (rqFS.type == Request_STC::TYPE_NEW_TETROMINO) {
-                    printf("type : %d\n", rqFS.gameStart.firstTetro.getType());
 
-                    next_tetro.setPos(rqFS.gameStart.firstTetro.getPos());
-                    next_tetro.setRotation(rqFS.gameStart.firstTetro.getRotation());
-                    next_tetro.setType(rqFS.gameStart.firstTetro.getType());
-                    
-                    printf("type : %d\n", next_tetro.getType());
+                    next_tetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
+                    next_tetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
+                    next_tetro.setType(rqFS.newTetroMsg.newTetro.getType());
+
+                    printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", next_tetro.getType(), next_tetro.getRotation());
                 }
             }
 
@@ -469,7 +474,7 @@ int main(int argc, char* argv[]){
 
                 s.serialize(rqTS);
 
-                printf("ENVOI = %d : %d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
+                printf("Sending a TYPE_TETROMINO_PLACED msg\n\t placed-tetro : t%d r%d pos%d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getRotation(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
 
                 request = s.getData();
                 boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));

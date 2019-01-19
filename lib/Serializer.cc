@@ -153,7 +153,7 @@
 	}
 
 	std::vector<uint8_t> Serializer::getData(){
-		size_t size = data.capacity()-sizeof(size_t);
+		size_t size = data.size()-sizeof(size_t);
 		for (size_t i = 0; i < sizeof(size_t); ++i) {
 	    	data[i] = static_cast<uint8_t>(size >> (8 * i));
 	    }

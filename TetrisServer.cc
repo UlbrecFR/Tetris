@@ -27,40 +27,31 @@ static void clientListener(tcp::socket *socketClient, gf::Queue<std::vector<uint
         else if (error)
             throw boost::system::system_error(error); // Some other error.
 
-        printf("RECU !!\n");
-
         queueClient->push(msg);
     } 
 }
 
 void sendNewTetro(tcp::socket *socketClient, int id) {
         Serializer s;
-        std::vector<uint8_t> serializedRequest;
-
         Tetromino t;
 
         t.setRotation(0);
-        t.setType(0);
         t.setPos({6,1});
         t.setType(rand()%7+1);
 
-        printf("%d type : %d\n", id, t.getType());
-
         Request_STC rqSTC;
         rqSTC.type = Request_STC::TYPE_NEW_TETROMINO;
-
         rqSTC.newTetroMsg.newTetro = t;
 
         s.serialize(rqSTC);
-        serializedRequest = s.getData();
-        boost::asio::write(*socketClient, boost::asio::buffer(serializedRequest));
+        boost::asio::write(*socketClient, boost::asio::buffer(s.getData()));
+        printf("Sending a TYPE_NEW_TETROMINO msg to Client %d\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), rqSTC.newTetroMsg.newTetro.getRotation());
+        s.printData();
         s.clear();
 
 }
 
-void exploitMessage(std::vector<uint8_t> msg, tcp::socket *socketClient, int id) {
-
-    printf("VOUI\n");
+void exploitMessage(std::vector<uint8_t> & msg, tcp::socket *socketClient, int id) {
 
     Deserializer d;
     Request_CTS rqFC;
@@ -69,46 +60,34 @@ void exploitMessage(std::vector<uint8_t> msg, tcp::socket *socketClient, int id)
     d.deserialize(rqFC);
     d.clear();
 
-    printf("RECU = %d : %d-%d\n", rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
-
     switch(rqFC.type) {
         case Request_CTS::TYPE_TETROMINO_PLACED : 
-                sendNewTetro(socketClient, id);
+            printf("Received a TYPE_TETROMINO_PLACED msg from Client %d\n\t placed-tetro : t%d r%d pos%d-%d\n", id, rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
+            sendNewTetro(socketClient, id);
             break;
         case Request_CTS::TYPE_GAME_OVER : 
-
             break;        
         case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : 
-
             break;
     }
-
-
-    printf("BOB\n");
-
 
 }
 
 void sendGameStart(tcp::socket *socketClient, int id) {
         Serializer s;
-        std::vector<uint8_t> serializedRequest;
 
         Tetromino firstTetro;
         Tetromino secondTetro;
 
         firstTetro.setRotation(0);
-        firstTetro.setType(0);
         firstTetro.setPos({6,1});
         firstTetro.setType(rand()%7+1);
 
         secondTetro.setRotation(0);
-        secondTetro.setType(0);
         secondTetro.setPos({6,1});
         secondTetro.setType(rand()%7+1);
 
-        printf("%d type : %d\n", id, firstTetro.getType());
-        printf("%d type : %d\n", id, secondTetro.getType());
-
+        printf("Sending a TYPE_GAME_START msg to Client %d\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", id, firstTetro.getType(), firstTetro.getRotation(), secondTetro.getType(), secondTetro.getRotation());
 
         Request_STC rqSTC;
         rqSTC.type = Request_STC::TYPE_GAME_START;
@@ -117,18 +96,12 @@ void sendGameStart(tcp::socket *socketClient, int id) {
         rqSTC.gameStart.secondTetro = secondTetro;
 
         s.serialize(rqSTC);
-        serializedRequest = s.getData();
-        boost::asio::write(*socketClient, boost::asio::buffer(serializedRequest));
+        boost::asio::write(*socketClient, boost::asio::buffer(s.getData()));
         s.clear();
 
 }
 
-
-
-
 int main(int argc, char* argv[]){
-
-
 	try {
        	if (argc != 2) {
             std::cerr << "Usage: blocking_tcp_echo_server <port>\n";
@@ -154,24 +127,19 @@ int main(int argc, char* argv[]){
 
         ////////////////    GAME START  //////////////////////
 
+        printf("Waiting for clients...\n");
+
         sendGameStart(sock1, 1);
         sendGameStart(sock2, 2);
-        
 
         for(;;) {
-            printf("???\n");
-
             if (queueCli1.poll(msg)) {
-                printf("client 1 reçu\n"); 
                 exploitMessage(msg, sock1, 1);
             }
 
             if (queueCli2.poll(msg)) {
-                printf("client 2 reçu\n"); 
-                exploitMessage(msg, sock1, 2);
-
+                exploitMessage(msg, sock2, 2);
             }
-
         }
 
     } catch (std::exception& e) {
