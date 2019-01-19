@@ -227,13 +227,17 @@ int main(int argc, char* argv[]){
         static constexpr uint8_t height = 17;
         static constexpr int sizeCase = 40;
 
-        static constexpr gf::Vector2u ScreenSize(1024, 576);
-        static constexpr gf::Vector2f ViewSize(2 * width * sizeCase + sizeCase, height * sizeCase); // dummy values
-        static constexpr gf::Vector2f ViewCenter = ViewSize / 2; // dummy values
+        static constexpr gf::Vector2u ScreenSize(30*sizeCase, 19*sizeCase);
+
+        static constexpr gf::Vector2f ViewSize1(30*sizeCase, 17*sizeCase); // dummy values
+        static constexpr gf::Vector2f ViewCenter1(14*sizeCase, 17*sizeCase/2); // dummy values7
+
+        static constexpr gf::Vector2f ViewSize2(30*sizeCase, 17*sizeCase); // dummy values
+        static constexpr gf::Vector2f ViewCenter2(-2*sizeCase, 17*sizeCase/2); // dummy values
 
 
 
-        gf::Window window("Testris", ScreenSize);
+        gf::Window window("Vouitris", ScreenSize);
         window.setVerticalSyncEnabled(true);
         window.setFramerateLimit(60);
         gf::RenderWindow renderer(window);
@@ -241,89 +245,68 @@ int main(int argc, char* argv[]){
 
         gf::Array2D<uint8_t, uint8_t> ga({width, height});
         ///////////////////////////////////////////////////////////////
-        gf::Image imageVide;
-        imageVide.create({ sizeCase, sizeCase }, gf::Color4u{0xDF, 0xDF, 0xDF, 0xFF});
 
-        gf::Texture textureVide;
-        if (!textureVide.loadFromFile(gf::Path("../ressources/caseVide.png"))) {
+        gf::Texture textureFond;
+        if (!textureFond.loadFromFile(gf::Path("../ressources/fond.png"))) {
         return EXIT_FAILURE;
         }
 
         gf::Texture tabTexturePiece[7];
 
-        gf::Image imagePiece;
-        imagePiece.create({ sizeCase, sizeCase }, gf::Color4u{0x00, 0x13, 0x52, 0x58});
+        gf::Texture texturePiece0;
+        if (!texturePiece0.loadFromFile(gf::Path("../ressources/0.png"))) {
+        return EXIT_FAILURE;
+        }
+        tabTexturePiece[0] = std::move(texturePiece0);
 
         gf::Texture texturePiece1;
-        if (!texturePiece1.loadFromImage(imagePiece)) {
+        if (!texturePiece1.loadFromFile(gf::Path("../ressources/1.png"))) {
         return EXIT_FAILURE;
         }
-        tabTexturePiece[0] = std::move(texturePiece1);
-
-        gf::Image imagePiece2;
-        imagePiece2.create({ sizeCase, sizeCase }, gf::Color4u{0xFF, 0x62, 0x52, 0xFF});
+        tabTexturePiece[1] = std::move(texturePiece1);
 
         gf::Texture texturePiece2;
-        if (!texturePiece2.loadFromImage(imagePiece2)) {
+        if (!texturePiece2.loadFromFile(gf::Path("../ressources/2.png"))) {
         return EXIT_FAILURE;
         }
-        tabTexturePiece[1] = std::move(texturePiece2);
-
-        gf::Image imagePiece3;
-        imagePiece3.create({ sizeCase, sizeCase }, gf::Color4u{0x00, 0x13, 0x52, 0x58});
+        tabTexturePiece[2] = std::move(texturePiece2);
 
         gf::Texture texturePiece3;
-        if (!texturePiece3.loadFromImage(imagePiece3)) {
+        if (!texturePiece3.loadFromFile(gf::Path("../ressources/3.png"))) {
         return EXIT_FAILURE;
         }
-        tabTexturePiece[2] = std::move(texturePiece3);
-
-        gf::Image imagePiece4;
-        imagePiece4.create({ sizeCase, sizeCase }, gf::Color4u{0x12, 0x13, 0xFF, 0x30});
+        tabTexturePiece[3] = std::move(texturePiece3);
 
         gf::Texture texturePiece4;
-        if (!texturePiece4.loadFromImage(imagePiece4)) {
+        if (!texturePiece4.loadFromFile(gf::Path("../ressources/4.png"))) {
         return EXIT_FAILURE;
         }
-        tabTexturePiece[3] = std::move(texturePiece4);
-
-        gf::Image imagePiece5;
-        imagePiece5.create({ sizeCase, sizeCase }, gf::Color4u{0x30, 0x44, 0xFF, 0x30});
+        tabTexturePiece[4] = std::move(texturePiece4);
 
         gf::Texture texturePiece5;
-        if (!texturePiece5.loadFromImage(imagePiece5)) {
+        if (!texturePiece5.loadFromFile(gf::Path("../ressources/5.png"))) {
         return EXIT_FAILURE;
         }
-        tabTexturePiece[4] = std::move(texturePiece5);
 
-        gf::Image imagePiece6;
-        imagePiece6.create({ sizeCase, sizeCase }, gf::Color4u{0x02, 0x13, 0xFF, 0x78});
+        tabTexturePiece[5] = std::move(texturePiece5);
 
         gf::Texture texturePiece6;
-        if (!texturePiece6.loadFromImage(imagePiece6)) {
+        if (!texturePiece6.loadFromFile(gf::Path("../ressources/6.png"))) {
         return EXIT_FAILURE;
         }
 
-        tabTexturePiece[5] = std::move(texturePiece6);
-
-        gf::Image imagePiece7;
-        imagePiece7.create({ sizeCase, sizeCase }, gf::Color4u{0x12, 0xFF, 0x1F, 0x50});
-
-        gf::Texture texturePiece7;
-        if (!texturePiece7.loadFromImage(imagePiece7)) {
-        return EXIT_FAILURE;
-        }
-
-        tabTexturePiece[6] = std::move(texturePiece7);
+        tabTexturePiece[6] = std::move(texturePiece6);
         
+        gf::Sprite background;
+        background.setTexture(textureFond);
 
         //tableau zone de jeu de sprite
         gf::Sprite tabSprite[width][height];
 
         for (int i = 0; i < height; ++i){
             for (int j = 0; j < width; ++j){
-                gf::Sprite sprite(textureVide);
-                sprite.setPosition({j* sizeCase, i* sizeCase});
+                gf::Sprite sprite;
+                sprite.setPosition({j* sizeCase-2, i* sizeCase-2});
                 tabSprite[j][i] = sprite;
             }
             
@@ -341,8 +324,10 @@ int main(int argc, char* argv[]){
 
         // views
         gf::ViewContainer views;
-        gf::ExtendView mainView(ViewCenter, ViewSize);
+        gf::LockedView mainView(ViewCenter1, ViewSize1);
+        gf::LockedView otherView(ViewCenter2, ViewSize2);
         views.addView(mainView);
+        views.addView(otherView);
         gf::ScreenView hudView;
         views.addView(hudView);
         views.setInitialScreenSize(ScreenSize);
@@ -397,7 +382,7 @@ int main(int argc, char* argv[]){
         // add entities to hudEntities
 
         // game loop
-        renderer.clear(gf::Color::White);
+        renderer.clear(gf::Color::fromRgba32(50,50,50,255));
         gf::Clock clock;
         gf::Clock clockChute;
         gf::Time t;
@@ -531,15 +516,15 @@ int main(int argc, char* argv[]){
                 supprLigne(ga);
             }
 
+
             
 
             for (uint8_t i = 0; i < height; ++i){
                 for (uint8_t j = 0; j < width; ++j){
                     if(ga({j, i}) > 0){
-                        tabSprite[j][i].setTexture(tabTexturePiece[(ga({j,i}))-1], true);
-                        
+                        tabSprite[j][i].setTexture(tabTexturePiece[(ga({j,i}))-1], true);  
                     } else {
-                        tabSprite[j][i].setTexture(textureVide, true);
+                        tabSprite[j][i].unsetTexture();
                     }
                 }
                 
@@ -563,6 +548,8 @@ int main(int argc, char* argv[]){
             renderer.clear();
             renderer.setView(mainView);
             mainEntities.render(renderer);
+
+            renderer.draw(background);
             
             for (int i = 0; i < height; ++i){
                 for (int j = 0; j < width; ++j){
@@ -570,6 +557,10 @@ int main(int argc, char* argv[]){
                 }
                 
             }
+
+            renderer.setView(otherView);
+
+            renderer.draw(background);
 
             renderer.setView(hudView);
             hudEntities.render(renderer);
