@@ -3,33 +3,34 @@
 using boost::asio::ip::tcp;
 
 
-void printZoneJeu(gf::Array2D<uint8_t, uint8_t> & ga){
-  /*  for (auto row : ga.getRowRange()){
-        for (auto col : ga.getColRange()){
-            printf("%d ", ga({col, row}));
+
+void printZoneJeu(Grid & ga){
+    for (size_t row = 0; row < ga.getRows(); ++row){
+        for (size_t col = 0; col < ga.getCols(); ++col){
+            printf("%d ", ga(col,row));
         }
         printf("\n");
     }
-    printf("\n");*/
+    printf("\n");
 }
 
-void printEtatJeu(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
+void printEtatJeu(Grid & ga, Tetromino tetro){
     for (auto c : tetro.getCases()){
         if(c.second>0){
-            ga({c.first, c.second}) = tetro.getType();
+            ga(c.first, c.second) = tetro.getType();
         }
     }
 
 }
 
-void chuteLigneSuppr(gf::Array2D<uint8_t, uint8_t> & ga, int nLigne){
+void chuteLigneSuppr(Grid & ga, int nLigne){
 
     size_t nbrow = ga.getRows();
 
-    for (auto row : ga.getRowRange()){
-        for(auto col : ga.getColRange()){
-            if(ga.isValid({col,nbrow-2-row}) && nbrow-row-1<=nLigne){
-                ga({col,nbrow-1-row}) = ga({col,nbrow-2-row});
+   for (size_t row = 0; row < ga.getRows(); ++row){
+        for (size_t col = 0; col < ga.getCols(); ++col){
+            if(ga.isValid(col,nbrow-2-row) && nbrow-row-1<=nLigne){
+                ga(col,nbrow-1-row) = ga(col,nbrow-2-row);
             }
         }
     }
@@ -37,18 +38,17 @@ void chuteLigneSuppr(gf::Array2D<uint8_t, uint8_t> & ga, int nLigne){
     
 }
 
-void supprLigne(gf::Array2D<uint8_t, uint8_t> & ga){
+void supprLigne(Grid & ga){
     bool plein = true;
-    for (auto row : ga.getRowRange()){
-        for(auto col : ga.getColRange()){
-            if(ga({col, row}) == 0){
+    for (size_t row = 0; row < ga.getRows(); ++row){
+        for (size_t col = 0; col < ga.getCols(); ++col){
+            if(ga(col,row) == 0){
                 plein = false;
             }
         }
         if(plein){
-            printf("La ligne %d est pleine !\n", row);
-            for(auto col : ga.getColRange()){
-                ga({col,row}) = 0;
+            for (size_t col = 0; col < ga.getCols(); ++col){
+                ga(col,row) = 0;
             }
             chuteLigneSuppr(ga, row);
             supprLigne(ga);
@@ -61,7 +61,7 @@ void supprLigne(gf::Array2D<uint8_t, uint8_t> & ga){
 
 
 
-bool chutePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){ 
+bool chutePossible(Grid & ga, Tetromino tetro){ 
     
     bool chutePossible = false;
 
@@ -72,7 +72,7 @@ bool chutePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     for (auto it : listeCase){
         if(it.second < ga.getRows() - 1){
             //printf("%d\n", it->second);
-            if(ga({it.first, it.second + 1}) > 0){
+            if(ga(it.first, it.second + 1) > 0){
                 for(auto iter : listeCase){
                     if(iter.second == it.second+1 && iter.first == it.first){
                         chutePossible = true;
@@ -94,7 +94,7 @@ bool chutePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     return true;
 }
 
-bool droitePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
+bool droitePossible(Grid & ga, Tetromino tetro){
     bool possible = false;
 
 
@@ -104,7 +104,7 @@ bool droitePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     for (auto it : listeCase){
         if(it.first < ga.getCols()-1){
             //printf("%d\n", it->second);
-            if(ga({it.first+1, it.second}) > 0){
+            if(ga(it.first+1, it.second) > 0){
                 for(auto iter : listeCase){
                     if(iter.second == it.second && iter.first == it.first+1){
                         possible = true;
@@ -125,7 +125,7 @@ bool droitePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     return true;
 }
 
-bool gauchePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
+bool gauchePossible(Grid & ga, Tetromino tetro){
     bool possible = false;
 
 
@@ -135,7 +135,7 @@ bool gauchePossible(gf::Array2D<uint8_t, uint8_t> & ga, Tetromino tetro){
     for (auto it : listeCase){
         if(it.first >0){
             //printf("%d\n", it->second);
-            if(ga({it.first-1, it.second}) > 0){
+            if(ga(it.first-1, it.second) > 0){
                 for(auto iter : listeCase){
                     if(iter.second == it.second && iter.first == it.first-1){
                         possible = true;
@@ -170,11 +170,11 @@ bool rotatePossible(uint8_t width, uint8_t height, Tetromino tetro) {
     return true;
 }
 
-bool testFinPartie(gf::Array2D<uint8_t, uint8_t> & ga, uint8_t width, Tetromino tetro){
-    printZoneJeu(ga);
+bool testFinPartie(Grid & ga, uint8_t width, Tetromino tetro){
+    //printZoneJeu(ga);
     for (int i = 0; i < 4; ++i){
         for (int j = 0; j < width; ++j){
-            if(ga({j,i}) != 0){
+            if(ga(j,i) != 0){
                 if(tetro.getX()!= j && tetro.getY() != i){
                     return false;
                 }
@@ -259,7 +259,8 @@ int main(int argc, char* argv[]){
         gf::RenderWindow renderer(window);
 
 
-        gf::Array2D<uint8_t, uint8_t> ga({width, height});
+        Grid gaSelf;
+        Grid gaOther;    
         ///////////////////////////////////////////////////////////////
 
         gf::Texture textureFond;
@@ -318,12 +319,16 @@ int main(int argc, char* argv[]){
 
         //tableau zone de jeu de sprite
         gf::Sprite tabSprite[width][height];
+        gf::Sprite tabSpriteOther[width][height];
 
         for (int i = 0; i < height; ++i){
             for (int j = 0; j < width; ++j){
                 gf::Sprite sprite;
+                gf::Sprite spriteOther;
                 sprite.setPosition({j* sizeCase-2, i* sizeCase-2});
-                tabSprite[j][i] = sprite;
+                spriteOther.setPosition({j* sizeCase-2, i* sizeCase-2});
+                tabSprite[j][i] = std::move(sprite);
+                tabSpriteOther[j][i] = std::move(spriteOther);
             }
             
         }
@@ -441,13 +446,23 @@ int main(int argc, char* argv[]){
                 d.deserialize(rqFS);
                 d.clear();
                 
-                if (rqFS.type == Request_STC::TYPE_NEW_TETROMINO) {
+                switch (rqFS.type) {
 
-                    next_tetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
-                    next_tetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
-                    next_tetro.setType(rqFS.newTetroMsg.newTetro.getType());
-
-                    printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", next_tetro.getType(), next_tetro.getRotation());
+                    case Request_STC::TYPE_NEW_TETROMINO :
+                        next_tetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
+                        next_tetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
+                        next_tetro.setType(rqFS.newTetroMsg.newTetro.getType());
+                        printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", next_tetro.getType(), next_tetro.getRotation());
+                        break;
+                    case Request_STC::TYPE_UPDATE_OTHER : 
+                        //printZoneJeu(rqFS.updateOtherMsg.grid);
+                        gaOther = rqFS.updateOtherMsg.grid;
+                        printZoneJeu(gaOther);
+                        printf("Received a TYPE_UPDATE_OTHER\n");
+                        break;
+                    case Request_STC::TYPE_GAME_START :
+                        printf("Received a TYPE_UPDATE_OTHER\n");
+                        break;
                 }
             }
 
@@ -468,11 +483,12 @@ int main(int argc, char* argv[]){
 
                     rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
                     rqTS.tetroMsg.tetro = tetro;
+                    rqTS.tetroMsg.grid = gaSelf;
 
                     tetro = next_tetro;
                     
                     pieceEnJeu = true;
-                    ga({tetro.getX(), tetro.getY()}) = tetro.getType();
+                    gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                     t = clockChute.restart();
 
                     s.serialize(rqTS);
@@ -487,23 +503,23 @@ int main(int argc, char* argv[]){
                 //printf("%f\n", t.asSeconds());
 
                 if (rightAction.isActive()) {
-                    if(droitePossible(ga, tetro)){
-                        ga({tetro.getX(), tetro.getY()}) = 0;
+                    if(droitePossible(gaSelf, tetro)){
+                        gaSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() + 1);
-                        ga({tetro.getX(), tetro.getY()}) = tetro.getType();
+                        gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                         //printZoneJeu(tabJeu, height, width);
                     }
                     
                 } else if (leftAction.isActive()) {
-                    if (gauchePossible(ga, tetro)){
-                        ga({tetro.getX(), tetro.getY()}) = 0;
+                    if (gauchePossible(gaSelf, tetro)){
+                        gaSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() - 1);
-                        ga({tetro.getX(), tetro.getY()}) = tetro.getType();
+                        gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                         //printZoneJeu(tabJeu, height, width);
                     }
                     
                 } else if (rotateAction.isActive()) {
-                    if (rotatePossible(ga.getCols(), ga.getRows(), tetro)) {
+                    if (rotatePossible(gaSelf.getCols(), gaSelf.getRows(), tetro)) {
                         tetro.rotate();
                     }
                 } 
@@ -516,22 +532,22 @@ int main(int argc, char* argv[]){
 
                 t = clockChute.getElapsedTime();
 
-                if(chutePossible(ga, tetro)){
+               if(chutePossible(gaSelf, tetro)){
                     if(t > periodChute){
-                        ga({tetro.getX(), tetro.getY()}) = 0;
+                        gaSelf(tetro.getX(), tetro.getY()) = 0;
                         t = clockChute.restart();
                         //printf("%f\n", t.asSeconds());
                         //printf("Chute\n");
                         //printf("%f\n", periodChute.asSeconds());
                         tetro.setY(tetro.getY() + 1);
-                        ga({tetro.getX(), tetro.getY()}) = tetro.getType();
-                        printZoneJeu(ga);
+                        gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                        //printZoneJeu(gaSelf);
                     }
                 }else{
                     pieceEnJeu = false;
-                    printEtatJeu(ga, tetro);
+                    printEtatJeu(gaSelf, tetro);
                     periodChute = gf::seconds(1.0f);
-                    supprLigne(ga);
+                    supprLigne(gaSelf);
                 }
 
 
@@ -539,13 +555,19 @@ int main(int argc, char* argv[]){
 
                 for (uint8_t i = 0; i < height; ++i){
                     for (uint8_t j = 0; j < width; ++j){
-                        if(ga({j, i}) > 0){
-                            tabSprite[j][i].setTexture(tabTexturePiece[(ga({j,i}))-1], true);  
+                        if(gaSelf(j, i) > 0){
+                            tabSprite[j][i].setTexture(tabTexturePiece[(gaSelf(j,i))-1], true);  
                         } else {
                             tabSprite[j][i].unsetTexture();
                         }
+
+                        if(gaOther(j, i) > 0){
+                            tabSpriteOther[j][i].setTexture(tabTexturePiece[(gaOther(j,i))-1], true);  
+                        } else {
+                            tabSpriteOther[j][i].unsetTexture();
+                        }
+
                     }
-                    
                 }
 
                 std::set<std::pair<uint8_t, uint8_t>> listeCurrentCase = tetro.getCases();
@@ -553,14 +575,14 @@ int main(int argc, char* argv[]){
                 for (auto it : listeCurrentCase){
                     if(it.second>=0){
                         tabSprite[it.first][it.second].setTexture(tabTexturePiece[tetro.getType()-1], true);
-                    }
-                    
+                    }                
                 }
 
-                enPartie = testFinPartie(ga, width, tetro);
+                enPartie = testFinPartie(gaSelf, width, tetro);
             }else{
                 printf("FIN DE PARTIE\n");
             }
+
 
             // 2. update
             gf::Time time = clock.restart();
@@ -577,13 +599,18 @@ int main(int argc, char* argv[]){
             for (int i = 0; i < height; ++i){
                 for (int j = 0; j < width; ++j){
                     renderer.draw(tabSprite[j][i]);
-                }
-                
+                }  
             }
 
             renderer.setView(otherView);
 
             renderer.draw(background);
+
+            for (int i = 0; i < height; ++i){
+                for (int j = 0; j < width; ++j){
+                    renderer.draw(tabSpriteOther[j][i]);
+                }  
+            }
 
             renderer.setView(hudView);
             hudEntities.render(renderer);

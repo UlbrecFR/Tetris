@@ -29,6 +29,7 @@
 #include <Serializer.h>
 #include <Deserializer.h>
 #include <Tetromino.h>
+#include <Grid.h>
 
 using boost::asio::ip::tcp;
 

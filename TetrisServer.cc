@@ -7,14 +7,14 @@ static void clientListener(tcp::socket *socketClient, gf::Queue<std::vector<uint
     for(;;) {
 
         //on lit le message envoyé par le client
-        std::vector<uint8_t> length(sizeof(size_t));
+        std::vector<uint8_t> length(sizeof(uint64_t));
 
         boost::system::error_code error;
         socketClient->read_some(boost::asio::buffer(length), error);
 
         Deserializer ds(length);
 
-        size_t size;
+        uint64_t size;
         ds.deserialize(size);
 
         std::vector<uint8_t> msg(size);
@@ -32,45 +32,59 @@ static void clientListener(tcp::socket *socketClient, gf::Queue<std::vector<uint
 }
 
 void sendNewTetro(tcp::socket *socketClient, int id) {
-        Serializer s;
-        Tetromino t;
+    Serializer s;
+    Tetromino t;
 
-        t.setRotation(0);
-        t.setPos({6,1});
-        t.setType(rand()%7+1);
+    t.setRotation(0);
+    t.setPos({6,1});
+    t.setType(rand()%7+1);
 
-        Request_STC rqSTC;
-        rqSTC.type = Request_STC::TYPE_NEW_TETROMINO;
-        rqSTC.newTetroMsg.newTetro = t;
+    Request_STC rqSTC;
+    rqSTC.type = Request_STC::TYPE_NEW_TETROMINO;
+    rqSTC.newTetroMsg.newTetro = t;
 
-        s.serialize(rqSTC);
-        boost::asio::write(*socketClient, boost::asio::buffer(s.getData()));
-        printf("Sending a TYPE_NEW_TETROMINO msg to Client %d\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), rqSTC.newTetroMsg.newTetro.getRotation());
-        s.printData();
-        s.clear();
-
+    s.serialize(rqSTC);
+    boost::asio::write(*socketClient, boost::asio::buffer(s.getData()));
+    printf("Sending a TYPE_NEW_TETROMINO msg to Client %d\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), rqSTC.newTetroMsg.newTetro.getRotation());
+    s.clear();
 }
 
-void exploitMessage(std::vector<uint8_t> & msg, tcp::socket *socketClient, int id) {
+void sendGrid(tcp::socket *socketClient, Grid & g, int id) {
+    Serializer s;
+
+    Request_STC rqSTC;
+    rqSTC.type = Request_STC::TYPE_UPDATE_OTHER;
+    rqSTC.updateOtherMsg.grid = g;
+
+    s.serialize(rqSTC);
+    boost::asio::write(*socketClient, boost::asio::buffer(s.getData()));
+    printf("Sending a TYPE_UPDATE_OTHER msg \n");
+    s.clear();
+}
+
+void exploitMessage(std::vector<uint8_t> & msg, tcp::socket *socketClient, tcp::socket *socketOtherClient, int id) {
 
     Deserializer d;
     Request_CTS rqFC;
 
+    printf("voui\n");
     d.setData(msg);
+    printf("BeforeDeser\n");
     d.deserialize(rqFC);
+    printf("AfterDeser\n");
     d.clear();
 
     switch(rqFC.type) {
         case Request_CTS::TYPE_TETROMINO_PLACED : 
             printf("Received a TYPE_TETROMINO_PLACED msg from Client %d\n\t placed-tetro : t%d r%d pos%d-%d\n", id, rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
             sendNewTetro(socketClient, id);
+            sendGrid(socketOtherClient, rqFC.tetroMsg.grid, id);
             break;
         case Request_CTS::TYPE_GAME_OVER : 
             break;        
         case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : 
             break;
     }
-
 }
 
 void sendGameStart(tcp::socket *socketClient, int id) {
@@ -102,8 +116,8 @@ void sendGameStart(tcp::socket *socketClient, int id) {
 }
 
 int main(int argc, char* argv[]){
-	try {
-       	if (argc != 2) {
+    try {
+        if (argc != 2) {
             std::cerr << "Usage: blocking_tcp_echo_server <port>\n";
             return 1;
         }
@@ -134,11 +148,12 @@ int main(int argc, char* argv[]){
 
         for(;;) {
             if (queueCli1.poll(msg)) {
-                exploitMessage(msg, sock1, 1);
+                exploitMessage(msg, sock1, sock2, 1);
+                printf("finExlpoit\n");
             }
 
             if (queueCli2.poll(msg)) {
-                exploitMessage(msg, sock2, 2);
+                exploitMessage(msg, sock2, sock1, 2);
             }
         }
 
@@ -148,6 +163,6 @@ int main(int argc, char* argv[]){
     
 
 
-	return 0;
+    return 0;
 
 }
