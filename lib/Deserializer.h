@@ -12,8 +12,7 @@ class Deserializer{
 
 	private:
 		std::vector<uint8_t> data;
-		size_t readPos;
-		size_t writePos;
+		uint64_t readPos;
 
 		template <typename T>
 		void deserializeAnyType(T & d);
@@ -25,7 +24,7 @@ class Deserializer{
 
 		void printData();
 
-		size_t getSize();
+		uint64_t getSize();
 
 		void clear();
 
@@ -41,17 +40,18 @@ class Deserializer{
 
 		void deserialize(uint64_t & d);
 
-		//void deserialize(uint8_t *d, size_t Size);
+		template <typename T>
+		void deserialize(T *d, uint64_t & Size);
+
+		void deserialize(Grid & g);
 
 		void deserialize(gf::Vector2u & v);
 
 		void deserialize(Tetromino & t);
 
-		void deserialize(gf::Array2D<uint8_t, uint8_t> & array);
-
 		void deserialize(STC_GameStart & r);
 		
-		//void deserialize(STC_UpdateOtherPlayer & r);
+		void deserialize(STC_UpdateOtherPlayer & r);
 
 		void deserialize(STC_NewTetromino & r);
 

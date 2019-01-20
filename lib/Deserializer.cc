@@ -63,12 +63,23 @@
 		deserializeAnyType(d);
 	}
 
-	/* void Deserializer::deserialize(uint8_t *d, size_t Size){
+	template <typename T>
+	void Deserializer::deserialize(T *d, uint64_t & Size){
+
+		deserialize(Size);
+
 		for (size_t i = 0; i < Size; ++i){
-			d[i] = (uint8_t)data[readPos + Size - i -1];
+			deserialize(d[i]);
 		}
-		readPos += Size*sizeof(d[0]);
-	}*/
+	}
+
+	void Deserializer::deserialize(Grid & g){
+		for (size_t row = 0; row < g.getRows(); ++row){
+	        for (size_t col = 0; col < g.getCols(); ++col){
+	            deserialize(g(col,row));
+	        }
+	    }
+	}
 
 	void Deserializer::deserialize(gf::Vector2u & v){
 		deserialize(v.x);
@@ -84,26 +95,16 @@
 		t.setRotation(data[readPos+1]);
 		readPos += 2;
 	}
-/*
-	void Deserializer::deserialize(gf::Array2D<uint8_t, uint8_t> & array){
-		uint8_t witdh, height;
-		deserialize(witdh);
-		deserialize(height);
-		array = gf::Array2D<uint8_t, uint8_t>(gf::Vector2u(witdh, height));
-		for(auto& x : array){
-			deserialize(x);
-		}
-	}
-*/
+
 	void Deserializer::deserialize(STC_GameStart & r){
 		deserialize(r.firstTetro);
 		deserialize(r.secondTetro);
 	}
-		/*
+
 	void Deserializer::deserialize(STC_UpdateOtherPlayer & r){
 		deserialize(r.grid);
 	}
-*/
+
 	void Deserializer::deserialize(STC_NewTetromino & r){
 		deserialize(r.newTetro);
 	}
@@ -121,10 +122,10 @@
 			case Request_STC::TYPE_NEW_TETROMINO :
 				deserialize(r.newTetroMsg);
 				break;
-			/*case Request_STC::TYPE_UPDATE_OTHER :
+			case Request_STC::TYPE_UPDATE_OTHER :
 				deserialize(r.updateOtherMsg);
 				break;
-*/			case Request_STC::TYPE_GAME_START :
+			case Request_STC::TYPE_GAME_START :
 				deserialize(r.gameStart);
 				break;
 		}
@@ -132,6 +133,7 @@
 
 	void Deserializer::deserialize(CTS_TetrominoPlaced & r){
 		deserialize(r.tetro);
+		deserialize(r.grid);
 	}
 	
 	void Deserializer::deserialize(CTS_GameOver & r){

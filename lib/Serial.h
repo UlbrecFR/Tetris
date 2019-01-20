@@ -6,11 +6,13 @@
 #include <cstring>
 #include <gf/Array2D.h>
 #include "Tetromino.h"
+#include "Grid.h"
 
 const static size_t maxLength = 1024;
 
 struct CTS_TetrominoPlaced {
 	Tetromino tetro;
+	Grid grid;
 };
 
 
@@ -55,15 +57,15 @@ struct STC_GameStart {
 	Tetromino firstTetro;
 	Tetromino secondTetro;
 };
-/*
+
 struct STC_UpdateOtherPlayer {
-	//uint8_t* grid;
+	Grid grid;
 };
-*/
+
 struct Request_STC{
 	enum Type : uint8_t {
 		TYPE_NEW_TETROMINO,
-		//TYPE_UPDATE_OTHER,
+		TYPE_UPDATE_OTHER,
 		TYPE_GAME_START
 	};
 
@@ -71,7 +73,7 @@ struct Request_STC{
 
 	union {
 		STC_NewTetromino newTetroMsg;
-		//STC_UpdateOtherPlayer updateOtherMsg;
+		STC_UpdateOtherPlayer updateOtherMsg;
 		STC_GameStart gameStart;
 	};
 };

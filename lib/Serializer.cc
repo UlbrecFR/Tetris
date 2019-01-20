@@ -1,7 +1,7 @@
 #include "Serializer.h"
 
 	Serializer::Serializer(){
-		writePos = sizeof(size_t);
+		writePos = sizeof(uint64_t);
 	};
 
 	void Serializer::printData(){
@@ -17,14 +17,14 @@
 
 	void Serializer::clear(){
 		data.clear();
-		writePos = sizeof(size_t);
+		writePos = sizeof(uint64_t);
 	}
 
 	template <typename T>
 	void Serializer::serializeAnyType(T d){
 
-		if((writePos + 2) > getSize()){
-			data.resize((writePos+1)*2);				
+		if((writePos + sizeof(T)) > data.capacity()){
+			data.resize((writePos+sizeof(T))*2);				
 		}
 
 		for (size_t i = 0; i < sizeof(T); ++i) {
@@ -50,18 +50,28 @@
 		serializeAnyType(d);
 	}
 
-	/* void Serializer::serialize(const uint8_t *d, size_t Size){
+	template <typename T>
+	void Serializer::serialize(const T *d, uint64_t Size){
 
-		if((writePos + Size) > getSize()){
-			data.resize((writePos+Size)*2);				
-		}
+		serialize(Size);
+
+		data.resize((writePos+Size+sizeof(Size)));
 
 		for (size_t i = 0; i < Size; ++i) {
-	      	data[writePos + Size - i -1] = d[i];
+	      	serialize(d[i]);
 	    }
-	  
-	    writePos += Size;
-	}*/
+	}
+
+	void Serializer::serialize(const Grid g){
+
+		data.resize(writePos+g.getRows()*g.getCols());
+
+		for (size_t row = 0; row < g.getRows(); ++row){
+	        for (size_t col = 0; col < g.getCols(); ++col){
+	            serialize(g(col,row));
+	        }
+	    }
+	}
 
 	void Serializer::serialize(const gf::Vector2u v){
 		serialize(v.x);
@@ -74,24 +84,15 @@
 		serialize(t.getRotation());
 	}
 
-	void Serializer::serialize(const gf::Array2D<uint8_t, uint8_t> array){
-		auto size = array.getSize();
-		serialize(size.width);
-		serialize(size.height);
-		for (auto& x : array){
-			serialize(x);
-		}
-	}
-
 	void Serializer::serialize(const STC_GameStart r){
 		serialize(r.firstTetro);
 		serialize(r.secondTetro);
 	}
-	/*
+	
 	void Serializer::serialize(const STC_UpdateOtherPlayer r){
 		serialize(r.grid);
 	}
-*/
+
 	void Serializer::serialize(const STC_NewTetromino r){
 		serialize(r.newTetro);
 	}
@@ -107,9 +108,9 @@
 			case Request_STC::TYPE_NEW_TETROMINO :
 				serialize(r.newTetroMsg);
 				break;
-			//case Request_STC::TYPE_UPDATE_OTHER :
-			//	serialize(r.updateOtherMsg);
-			//	break;
+			case Request_STC::TYPE_UPDATE_OTHER :
+				serialize(r.updateOtherMsg);
+				break;
 			case Request_STC::TYPE_GAME_START :
 				serialize(r.gameStart);
 				break;
@@ -118,6 +119,7 @@
 
 	void Serializer::serialize(const CTS_TetrominoPlaced r){
 		serialize(r.tetro);
+		serialize(r.grid);
 	}
 	
 	void Serializer::serialize(const CTS_GameOver r){
@@ -153,8 +155,8 @@
 	}
 
 	std::vector<uint8_t> Serializer::getData(){
-		size_t size = data.size()-sizeof(size_t);
-		for (size_t i = 0; i < sizeof(size_t); ++i) {
+		size_t size = data.size()-sizeof(uint64_t);
+		for (size_t i = 0; i < sizeof(uint64_t); ++i) {
 	    	data[i] = static_cast<uint8_t>(size >> (8 * i));
 	    }
 		return data;

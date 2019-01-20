@@ -13,7 +13,7 @@ class Serializer{
 
 	private:
 		std::vector<uint8_t> data;
-		size_t writePos;
+		uint64_t writePos;
 
 		template <typename T>
 		void serializeAnyType(T d);
@@ -24,7 +24,7 @@ class Serializer{
 
 		void printData();
 
-		size_t getSize();
+		uint64_t getSize();
 
 		void clear();
 
@@ -36,17 +36,18 @@ class Serializer{
 
 		void serialize(const uint64_t d);
 
-		//void serialize(const uint8_t *d, size_t Size);
+		template <typename T>
+		void serialize(const T *d, uint64_t Size);
+
+		void serialize(const Grid g);
 
 		void serialize(const gf::Vector2u v);
 
 		void serialize(const Tetromino t);
 
-		void serialize(const gf::Array2D<uint8_t, uint8_t> array);
-
 		void serialize(const STC_GameStart r);
 		
-		//void serialize(const STC_UpdateOtherPlayer r);
+		void serialize(const STC_UpdateOtherPlayer r);
 
 		void serialize(const STC_NewTetromino r);
 
