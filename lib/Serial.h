@@ -62,11 +62,16 @@ struct STC_UpdateOtherPlayer {
 	Grid grid;
 };
 
+struct STC_GameOver {
+	uint8_t win;
+};
+
 struct Request_STC{
 	enum Type : uint8_t {
 		TYPE_NEW_TETROMINO,
 		TYPE_UPDATE_OTHER,
-		TYPE_GAME_START
+		TYPE_GAME_START,
+		TYPE_GAME_OVER
 	};
 
 	Type type;
@@ -75,6 +80,7 @@ struct Request_STC{
 		STC_NewTetromino newTetroMsg;
 		STC_UpdateOtherPlayer updateOtherMsg;
 		STC_GameStart gameStart;
+		STC_GameOver gameOver;
 	};
 };
 

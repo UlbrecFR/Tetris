@@ -265,57 +265,74 @@ int main(int argc, char* argv[]){
 
         gf::Texture textureFond;
         if (!textureFond.loadFromFile(gf::Path("../ressources/fond.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
 
         gf::Texture tabTexturePiece[7];
 
         gf::Texture texturePiece0;
         if (!texturePiece0.loadFromFile(gf::Path("../ressources/0.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
         tabTexturePiece[0] = std::move(texturePiece0);
 
         gf::Texture texturePiece1;
         if (!texturePiece1.loadFromFile(gf::Path("../ressources/1.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
         tabTexturePiece[1] = std::move(texturePiece1);
 
         gf::Texture texturePiece2;
         if (!texturePiece2.loadFromFile(gf::Path("../ressources/2.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
         tabTexturePiece[2] = std::move(texturePiece2);
 
         gf::Texture texturePiece3;
         if (!texturePiece3.loadFromFile(gf::Path("../ressources/3.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
         tabTexturePiece[3] = std::move(texturePiece3);
 
         gf::Texture texturePiece4;
         if (!texturePiece4.loadFromFile(gf::Path("../ressources/4.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
         tabTexturePiece[4] = std::move(texturePiece4);
 
         gf::Texture texturePiece5;
         if (!texturePiece5.loadFromFile(gf::Path("../ressources/5.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
 
         tabTexturePiece[5] = std::move(texturePiece5);
 
         gf::Texture texturePiece6;
         if (!texturePiece6.loadFromFile(gf::Path("../ressources/6.png"))) {
-        return EXIT_FAILURE;
+            return EXIT_FAILURE;
         }
 
         tabTexturePiece[6] = std::move(texturePiece6);
         
         gf::Sprite background;
         background.setTexture(textureFond);
+
+
+        gf::Texture textureWin;
+        if (!texturePiece6.loadFromFile(gf::Path("../ressources/win.png"))) {
+            return EXIT_FAILURE;
+        }
+
+        gf::Texture textureLost;
+        if (!texturePiece6.loadFromFile(gf::Path("../ressources/lost.png"))) {
+            return EXIT_FAILURE;
+        }
+
+
+        gf::Sprite spriteGameOver;
+        spriteGameOver.setPosition({150, 150});
+
+
 
         //tableau zone de jeu de sprite
         gf::Sprite tabSprite[width][height];
@@ -454,14 +471,23 @@ int main(int argc, char* argv[]){
                         next_tetro.setType(rqFS.newTetroMsg.newTetro.getType());
                         printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", next_tetro.getType(), next_tetro.getRotation());
                         break;
-                    case Request_STC::TYPE_UPDATE_OTHER : 
-                        //printZoneJeu(rqFS.updateOtherMsg.grid);
+                    case Request_STC::TYPE_UPDATE_OTHER :
                         gaOther = rqFS.updateOtherMsg.grid;
-                        printZoneJeu(gaOther);
                         printf("Received a TYPE_UPDATE_OTHER\n");
                         break;
                     case Request_STC::TYPE_GAME_START :
                         printf("Received a TYPE_UPDATE_OTHER\n");
+                        break;
+                    case Request_STC::TYPE_GAME_OVER :
+                        printf("Received a TYPE_GAME_OVER\n");
+                        enPartie = false;
+                        if (rqFS.gameOver.win == false) {
+                            spriteGameOver.setTexture(textureLost);
+                            printf("LOOOOOOOOOOOOOOOOOOOSE !!!\n");
+                        } else {
+                            printf("WIIIIIIIIIIIN !!\n");
+                            spriteGameOver.setTexture(textureWin);
+                        }
                         break;
                 }
             }
@@ -578,9 +604,21 @@ int main(int argc, char* argv[]){
                     }                
                 }
 
-                enPartie = testFinPartie(gaSelf, width, tetro);
-            }else{
-                printf("FIN DE PARTIE\n");
+                if (!testFinPartie(gaSelf, width, tetro)) {
+                    printf("FIN DE PARTIE\n");
+                    enPartie = false;
+
+                    rqTS.type = Request_CTS::TYPE_GAME_OVER;
+                    rqTS.tetroMsg.tetro = tetro;
+                    
+                    s.serialize(rqTS);
+
+                    printf("Sending Game Over message\n");
+
+                    request = s.getData();
+                    boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
+                    s.clear();
+                }
             }
 
 
@@ -612,11 +650,17 @@ int main(int argc, char* argv[]){
                 }  
             }
 
+            if (!enPartie) {
+                renderer.draw(spriteGameOver);
+                //printf("DONEEEEEEEEE\n");
+            }
+
             renderer.setView(hudView);
             hudEntities.render(renderer);
 
             renderer.display();
             actions.reset();
+
         }
 
 

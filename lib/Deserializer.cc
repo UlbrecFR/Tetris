@@ -109,6 +109,10 @@
 		deserialize(r.newTetro);
 	}
 
+	void Deserializer::deserialize(STC_GameOver & r){
+		deserialize(r.win);
+	}
+
 	void Deserializer::deserialize(Request_STC::Type & t){
 		deserialize(t);
 	}
@@ -127,6 +131,9 @@
 				break;
 			case Request_STC::TYPE_GAME_START :
 				deserialize(r.gameStart);
+				break;
+			case Request_STC::TYPE_GAME_OVER :
+				deserialize(r.gameOver);
 				break;
 		}
 	}

@@ -62,16 +62,33 @@ void sendGrid(tcp::socket *socketClient, Grid & g, int id) {
     s.clear();
 }
 
+void sendGameOver(tcp::socket *socketLooser, tcp::socket *socketWinner) {
+    Serializer s;
+
+    Request_STC rqSTC;
+    rqSTC.type = Request_STC::TYPE_GAME_OVER;
+    rqSTC.gameOver.win = true;
+
+    s.serialize(rqSTC);
+    boost::asio::write(*socketWinner, boost::asio::buffer(s.getData()));
+    printf("Sending a win message \n");
+    s.clear();
+
+    rqSTC.gameOver.win = false;
+
+    s.serialize(rqSTC);
+    boost::asio::write(*socketLooser, boost::asio::buffer(s.getData()));
+    printf("Sending a Loose message \n");
+    s.clear();
+}
+
 void exploitMessage(std::vector<uint8_t> & msg, tcp::socket *socketClient, tcp::socket *socketOtherClient, int id) {
 
     Deserializer d;
     Request_CTS rqFC;
 
-    printf("voui\n");
     d.setData(msg);
-    printf("BeforeDeser\n");
     d.deserialize(rqFC);
-    printf("AfterDeser\n");
     d.clear();
 
     switch(rqFC.type) {
@@ -80,7 +97,9 @@ void exploitMessage(std::vector<uint8_t> & msg, tcp::socket *socketClient, tcp::
             sendNewTetro(socketClient, id);
             sendGrid(socketOtherClient, rqFC.tetroMsg.grid, id);
             break;
-        case Request_CTS::TYPE_GAME_OVER : 
+        case Request_CTS::TYPE_GAME_OVER :
+            printf("Received a TYPE_GAME_OVER\n");   
+            sendGameOver(socketClient, socketOtherClient);
             break;        
         case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : 
             break;

@@ -97,6 +97,10 @@
 		serialize(r.newTetro);
 	}
 
+	void Serializer::serialize(const STC_GameOver r){
+		serialize(r.win);
+	}
+
 	void Serializer::serialize(const Request_STC::Type t){
 		serialize((uint8_t)t);
 	}
@@ -113,6 +117,9 @@
 				break;
 			case Request_STC::TYPE_GAME_START :
 				serialize(r.gameStart);
+				break;
+			case Request_STC::TYPE_GAME_OVER :
+				serialize(r.gameOver);
 				break;
 		}
 	}
