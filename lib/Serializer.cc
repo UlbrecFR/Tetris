@@ -2,6 +2,7 @@
 
 	Serializer::Serializer(){
 		writePos = sizeof(uint64_t);
+		data.resize(sizeof(uint64_t));
 	};
 
 	void Serializer::printData(){
@@ -18,17 +19,14 @@
 	void Serializer::clear(){
 		data.clear();
 		writePos = sizeof(uint64_t);
+		data.resize(sizeof(uint64_t));
 	}
 
 	template <typename T>
 	void Serializer::serializeAnyType(T d){
 
-		if((writePos + sizeof(T)) > data.capacity()){
-			data.resize((writePos+sizeof(T))*2);				
-		}
-
 		for (size_t i = 0; i < sizeof(T); ++i) {
-	    	data[writePos+i] = (d >> 8*i); 
+	    	data.push_back((d >> 8*i)); 
 	    }
 	    writePos += sizeof(T);
 	}

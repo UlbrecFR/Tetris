@@ -190,13 +190,13 @@ static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint
 
     for(;;) {
 
-        std::vector<uint8_t> length(sizeof(size_t));
+        std::vector<uint8_t> length(sizeof(uint64_t));
 
         boost::system::error_code error;
         socketServer->read_some(boost::asio::buffer(length), error);
 
         Deserializer ds(length);
-        size_t size;
+        uint64_t size;
         ds.deserialize(size);
 
         std::vector<uint8_t> msg(size);
