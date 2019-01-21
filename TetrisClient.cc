@@ -332,7 +332,6 @@ int main(int argc, char* argv[]){
         }
 
         gf::Sprite spriteGameOver;
-        spriteGameOver.setPosition({150, 150});
 
 
         gf::Texture textureWait;
@@ -669,6 +668,7 @@ int main(int argc, char* argv[]){
             }
 
             if (!enPartie) {
+                renderer.setView(mainView);
                 renderer.draw(spriteGameOver);
                 printf("DONEEEEEEEEE\n");
             }
