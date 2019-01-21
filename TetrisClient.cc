@@ -260,7 +260,8 @@ int main(int argc, char* argv[]){
 
 
         Grid gaSelf;
-        Grid gaOther;    
+        Grid gaOther;
+        //GameArea ga(width, height);   
         ///////////////////////////////////////////////////////////////
 
         gf::Texture textureFond;
@@ -317,20 +318,27 @@ int main(int argc, char* argv[]){
         gf::Sprite background;
         background.setTexture(textureFond);
 
-
         gf::Texture textureWin;
-        if (!texturePiece6.loadFromFile(gf::Path("../ressources/win.png"))) {
+        if (!textureWin.loadFromFile(gf::Path("../ressources/win.png"))) {
             return EXIT_FAILURE;
         }
 
         gf::Texture textureLost;
-        if (!texturePiece6.loadFromFile(gf::Path("../ressources/lost.png"))) {
+        if (!textureLost.loadFromFile(gf::Path("../ressources/lost.png"))) {
             return EXIT_FAILURE;
         }
 
-
         gf::Sprite spriteGameOver;
         spriteGameOver.setPosition({150, 150});
+
+
+        gf::Texture textureWait;
+        if (!textureWait.loadFromFile(gf::Path("../ressources/waitingScreen.png"))) {
+            return EXIT_FAILURE;
+        }
+
+        gf::Sprite spriteWait;
+        spriteWait.setTexture(textureWait);
 
 
 
@@ -438,6 +446,13 @@ int main(int argc, char* argv[]){
 
         printf("Connecting to server...\n");
 
+
+        renderer.draw(spriteWait);
+        renderer.setView(hudView);
+        hudEntities.render(renderer);
+
+        renderer.display();
+
         while (!queueServer.poll(msg)) {
             //printf("wait for first tetro\n");
         }
@@ -483,9 +498,7 @@ int main(int argc, char* argv[]){
                         enPartie = false;
                         if (rqFS.gameOver.win == false) {
                             spriteGameOver.setTexture(textureLost);
-                            printf("LOOOOOOOOOOOOOOOOOOOSE !!!\n");
                         } else {
-                            printf("WIIIIIIIIIIIN !!\n");
                             spriteGameOver.setTexture(textureWin);
                         }
                         break;
@@ -652,7 +665,7 @@ int main(int argc, char* argv[]){
 
             if (!enPartie) {
                 renderer.draw(spriteGameOver);
-                //printf("DONEEEEEEEEE\n");
+                printf("DONEEEEEEEEE\n");
             }
 
             renderer.setView(hudView);

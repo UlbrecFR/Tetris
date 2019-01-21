@@ -30,6 +30,7 @@
 #include <Deserializer.h>
 #include <Tetromino.h>
 #include <Grid.h>
+#include <GameArea.h>
 
 using boost::asio::ip::tcp;
 
