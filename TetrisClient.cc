@@ -38,8 +38,9 @@ void chuteLigneSuppr(Grid & ga, int nLigne){
     
 }
 
-void supprLigne(Grid & ga){
+size_t supprLigne(Grid & ga){
     bool plein = true;
+    size_t nbLine = 0;
     for (size_t row = 0; row < ga.getRows(); ++row){
         for (size_t col = 0; col < ga.getCols(); ++col){
             if(ga(col,row) == 0){
@@ -47,16 +48,15 @@ void supprLigne(Grid & ga){
             }
         }
         if(plein){
-            for (size_t col = 0; col < ga.getCols(); ++col){
-                ga(col,row) = 0;
-            }
+            ++nbLine;
             chuteLigneSuppr(ga, row);
-            supprLigne(ga);
+            nbLine += supprLigne(ga);
             break;
         } else {
             plein = true;
         }
     }
+    return nbLine;
 }
 
 
@@ -261,6 +261,9 @@ int main(int argc, char* argv[]){
 
         Grid gaSelf;
         Grid gaOther;
+
+        uint32_t score = 0;
+
         //GameArea ga(width, height);   
         ///////////////////////////////////////////////////////////////
 
@@ -586,11 +589,13 @@ int main(int argc, char* argv[]){
                     pieceEnJeu = false;
                     printEtatJeu(gaSelf, tetro);
                     periodChute = gf::seconds(1.0f);
-                    supprLigne(gaSelf);
+                    size_t nbLine = supprLigne(gaSelf);
+                    if(nbLine > 0){
+                        score += nbLine * nbLine;
+                        printf("Score : %d\n", score);
+                    }
                 }
 
-
-                
 
                 for (uint8_t i = 0; i < height; ++i){
                     for (uint8_t j = 0; j < width; ++j){
