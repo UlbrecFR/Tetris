@@ -53,17 +53,13 @@
 
 		serialize(Size);
 
-		data.resize((writePos+Size+sizeof(Size)));
-
 		for (size_t i = 0; i < Size; ++i) {
 	      	serialize(d[i]);
 	    }
 	}
 
 	void Serializer::serialize(const Grid g){
-
-		data.resize(writePos+g.getRows()*g.getCols());
-
+		
 		for (size_t row = 0; row < g.getRows(); ++row){
 	        for (size_t col = 0; col < g.getCols(); ++col){
 	            serialize(g(col,row));
@@ -112,6 +108,7 @@
 				break;
 			case Request_STC::TYPE_UPDATE_OTHER :
 				serialize(r.updateOtherMsg);
+				printData();
 				break;
 			case Request_STC::TYPE_GAME_START :
 				serialize(r.gameStart);
@@ -149,6 +146,7 @@
 		switch (r.type) {
 			case Request_CTS::TYPE_TETROMINO_PLACED :
 				serialize(r.tetroMsg);
+				printData();
 				break;
 			case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
 				serialize(r.discoMsg);
