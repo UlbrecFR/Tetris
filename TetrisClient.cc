@@ -73,70 +73,17 @@ int main(int argc, char* argv[]){
         window.setVerticalSyncEnabled(true);
         window.setFramerateLimit(60);
         gf::RenderWindow renderer(window);
-
-
-        Grid gaSelf;
-        Grid gaOther;
+        gf::RenderStates r_state;
 
         uint32_t score = 0;
 
-       // GameArea ga(width, height);   
+        Grid gdSelf; 
+        Grid gdOther; 
+
+        GameArea gaSelf(width, height); 
+        GameArea gaOther(width, height);   
         ///////////////////////////////////////////////////////////////
-
-        gf::Texture textureFond;
-        if (!textureFond.loadFromFile(gf::Path("../ressources/fond.png"))) {
-            return EXIT_FAILURE;
-        }
-
-        gf::Texture tabTexturePiece[7];
-
-        gf::Texture texturePiece0;
-        if (!texturePiece0.loadFromFile(gf::Path("../ressources/0.png"))) {
-            return EXIT_FAILURE;
-        }
-        tabTexturePiece[0] = std::move(texturePiece0);
-
-        gf::Texture texturePiece1;
-        if (!texturePiece1.loadFromFile(gf::Path("../ressources/1.png"))) {
-            return EXIT_FAILURE;
-        }
-        tabTexturePiece[1] = std::move(texturePiece1);
-
-        gf::Texture texturePiece2;
-        if (!texturePiece2.loadFromFile(gf::Path("../ressources/2.png"))) {
-            return EXIT_FAILURE;
-        }
-        tabTexturePiece[2] = std::move(texturePiece2);
-
-        gf::Texture texturePiece3;
-        if (!texturePiece3.loadFromFile(gf::Path("../ressources/3.png"))) {
-            return EXIT_FAILURE;
-        }
-        tabTexturePiece[3] = std::move(texturePiece3);
-
-        gf::Texture texturePiece4;
-        if (!texturePiece4.loadFromFile(gf::Path("../ressources/4.png"))) {
-            return EXIT_FAILURE;
-        }
-        tabTexturePiece[4] = std::move(texturePiece4);
-
-        gf::Texture texturePiece5;
-        if (!texturePiece5.loadFromFile(gf::Path("../ressources/5.png"))) {
-            return EXIT_FAILURE;
-        }
-
-        tabTexturePiece[5] = std::move(texturePiece5);
-
-        gf::Texture texturePiece6;
-        if (!texturePiece6.loadFromFile(gf::Path("../ressources/6.png"))) {
-            return EXIT_FAILURE;
-        }
-
-        tabTexturePiece[6] = std::move(texturePiece6);
         
-        gf::Sprite background;
-        background.setTexture(textureFond);
-
         gf::Texture textureWin;
         if (!textureWin.loadFromFile(gf::Path("../ressources/win.png"))) {
             return EXIT_FAILURE;
@@ -157,24 +104,6 @@ int main(int argc, char* argv[]){
 
         gf::Sprite spriteWait;
         spriteWait.setTexture(textureWait);
-
-
-
-        //tableau zone de jeu de sprite
-        gf::Sprite tabSprite[width][height];
-        gf::Sprite tabSpriteOther[width][height];
-
-        for (int i = 0; i < height; ++i){
-            for (int j = 0; j < width; ++j){
-                gf::Sprite sprite;
-                gf::Sprite spriteOther;
-                sprite.setPosition({j* sizeCase-2, i* sizeCase-2});
-                spriteOther.setPosition({j* sizeCase-2, i* sizeCase-2});
-                tabSprite[j][i] = std::move(sprite);
-                tabSpriteOther[j][i] = std::move(spriteOther);
-            }
-            
-        }
 
         /////////////////////////////////////////////////////////////
 
@@ -204,7 +133,6 @@ int main(int argc, char* argv[]){
         closeWindowAction.addCloseControl();
         closeWindowAction.addKeycodeKeyControl(gf::Keycode::Escape);
         actions.addAction(closeWindowAction);
-
 
         gf::Action leftAction("Left");
         leftAction.addScancodeKeyControl(gf::Scancode::Q);
@@ -305,7 +233,7 @@ int main(int argc, char* argv[]){
                         printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", next_tetro.getType(), next_tetro.getRotation());
                         break;
                     case Request_STC::TYPE_UPDATE_OTHER :
-                        gaOther = rqFS.updateOtherMsg.grid;
+                        gdOther = rqFS.updateOtherMsg.grid;
                         printf("Received a TYPE_UPDATE_OTHER\n");
                         break;
                     case Request_STC::TYPE_GAME_START :
@@ -340,12 +268,12 @@ int main(int argc, char* argv[]){
 
                     rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
                     rqTS.tetroMsg.tetro = tetro;
-                    rqTS.tetroMsg.grid = gaSelf;
+                    rqTS.tetroMsg.grid = gdSelf;
 
                     tetro = next_tetro;
                     
                     pieceEnJeu = true;
-                    gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                    gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                     t = clockChute.restart();
 
                     s.serialize(rqTS);
@@ -360,23 +288,23 @@ int main(int argc, char* argv[]){
                 //printf("%f\n", t.asSeconds());
 
                 if (rightAction.isActive()) {
-                    if(gaSelf.rightPossible(tetro)){
-                        gaSelf(tetro.getX(), tetro.getY()) = 0;
+                    if(gdSelf.rightPossible(tetro)){
+                        gdSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() + 1);
-                        gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                        gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                         //printZoneJeu(tabJeu, height, width);
                     }
                     
                 } else if (leftAction.isActive()) {
-                    if (gaSelf.leftPossible(tetro)){
-                        gaSelf(tetro.getX(), tetro.getY()) = 0;
+                    if (gdSelf.leftPossible(tetro)){
+                        gdSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() - 1);
-                        gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                        gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                         //printZoneJeu(tabJeu, height, width);
                     }
                     
                 } else if (rotateAction.isActive()) {
-                    if (gaSelf.rotatePossible(tetro)) {
+                    if (gdSelf.rotatePossible(tetro)) {
                         tetro.rotate();
                     }
                 } 
@@ -389,22 +317,22 @@ int main(int argc, char* argv[]){
 
                 t = clockChute.getElapsedTime();
 
-               if(gaSelf.downPossible(tetro)){
+               if(gdSelf.downPossible(tetro)){
                     if(t > periodChute){
-                        gaSelf(tetro.getX(), tetro.getY()) = 0;
+                        gdSelf(tetro.getX(), tetro.getY()) = 0;
                         t = clockChute.restart();
                         //printf("%f\n", t.asSeconds());
                         //printf("Chute\n");
                         //printf("%f\n", periodChute.asSeconds());
                         tetro.setY(tetro.getY() + 1);
-                        gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
-                        //printZoneJeu(gaSelf);
+                        gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                        //printZoneJeu(gdSelf);
                     }
                 }else{
                     pieceEnJeu = false;
-                    gaSelf.addTetromino(tetro);
+                    gdSelf.addTetromino(tetro);
                     periodChute = gf::seconds(1.0f);
-                    size_t nbLine = gaSelf.deleteLines();
+                    size_t nbLine = gdSelf.deleteLines();
                     if(nbLine > 0){
                         score += nbLine * nbLine;
                         printf("Score : %d\n", score);
@@ -412,32 +340,12 @@ int main(int argc, char* argv[]){
                 }
 
 
-                for (uint8_t i = 0; i < height; ++i){
-                    for (uint8_t j = 0; j < width; ++j){
-                        if(gaSelf(j, i) > 0){
-                            tabSprite[j][i].setTexture(tabTexturePiece[(gaSelf(j,i))-1], true);  
-                        } else {
-                            tabSprite[j][i].unsetTexture();
-                        }
+                gaSelf.updateTextureBackground(gdSelf);
+                gaOther.updateTextureBackground(gdOther);
 
-                        if(gaOther(j, i) > 0){
-                            tabSpriteOther[j][i].setTexture(tabTexturePiece[(gaOther(j,i))-1], true);  
-                        } else {
-                            tabSpriteOther[j][i].unsetTexture();
-                        }
+                gaSelf.updateTextureTetromino(tetro);
 
-                    }
-                }
-
-                auto listeCurrentCase = tetro.getCases();
-
-                for (auto it : listeCurrentCase){
-                    if(it.y>=0){
-                        tabSprite[it.x][it.y].setTexture(tabTexturePiece[tetro.getType()-1], true);
-                    }                
-                }
-
-                if (!gaSelf.gameOver(tetro)) {
+                if (!gdSelf.gameOver(tetro)) {
                     enPartie = false;
 
                     rqTS.type = Request_CTS::TYPE_GAME_OVER;
@@ -464,23 +372,12 @@ int main(int argc, char* argv[]){
             renderer.setView(mainView);
             mainEntities.render(renderer);
 
-            renderer.draw(background);
             
-            for (int i = 0; i < height; ++i){
-                for (int j = 0; j < width; ++j){
-                    renderer.draw(tabSprite[j][i]);
-                }  
-            }
+            gaSelf.draw(renderer, r_state);
 
             renderer.setView(otherView);
 
-            renderer.draw(background);
-
-            for (int i = 0; i < height; ++i){
-                for (int j = 0; j < width; ++j){
-                    renderer.draw(tabSpriteOther[j][i]);
-                }  
-            }
+            gaOther.draw(renderer, r_state);
 
             if (!enPartie) {
                 renderer.setView(mainView);

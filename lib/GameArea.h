@@ -17,46 +17,45 @@
 #include <gf/RenderStates.h>
 
 #include <Tetromino.h>
+#include <Grid.h>
 
+#define HEIGHT_G 17
+#define WIDTH_G 12
+#define SIZE_CASE 40
 
 class GameArea : public gf::Transformable {
 
 	private :
-		gf::Array2D<uint8_t, uint8_t> ga;
-		gf::Array2D<gf::Sprite, uint8_t> tabSprite;
-		gf::Texture tabTexturePiece[7];
-		gf::Texture textureVide;
-
-		uint8_t sizeCase;
-		uint8_t width;
-		uint8_t height;
+		gf::Sprite tabSprite[HEIGHT_G * WIDTH_G];
+		gf::Texture tabTexture[7];
+		gf::Texture textureBackground;
+        gf::Sprite background;
 
 
 	public :
 
-		void updateTextureBackground();
+		void updateTextureBackground(Grid & gd);
 
 		void updateTextureTetromino(Tetromino & tetro);
 
 		void loadTextures();
 
+		gf::Sprite & operator()(size_t x, size_t y);
+
 		void draw(gf::RenderTarget& target, const gf::RenderStates& states) override;
 
-		GameArea(uint8_t width, uint8_t height) :
-			width(width), height(height){
-			ga({width, height});
-			tabSprite({width, height});
-			sizeCase = 40;
+		GameArea(uint8_t width, uint8_t height) {
 
 			loadTextures();
 
-	        for (int i = 0; i < this->height; ++i){
-	            for (int j = 0; j < this->width; ++j){
-	                gf::Sprite sprite(textureVide);
-	                sprite.setPosition({j* sizeCase, i* sizeCase});
-	                tabSprite({j, i}) = sprite;
+       		background.setTexture(textureBackground);
+
+	        for (size_t i = 0; i < WIDTH_G; ++i){
+	        	for (size_t j = 0; j < HEIGHT_G; ++j){
+	                gf::Sprite sprite;
+	                sprite.setPosition({i*SIZE_CASE, j*SIZE_CASE});
+	                (*this)(i, j) = sprite;
 	            }
-	            
 	        }
 
 

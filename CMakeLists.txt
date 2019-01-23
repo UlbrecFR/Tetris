@@ -17,12 +17,12 @@ add_executable(TetrisServer
   TetrisServer.h
 )
 
-target_link_libraries(TetrisServer ${Boost_LIBRARIES} Tetris)
+target_link_libraries(TetrisServer ${Boost_LIBRARIES} TetrisServerLib)
 
 add_executable(TetrisClient
   TetrisClient.cc
   TetrisClient.h
 )
 
-target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} Tetris)
+target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} TetrisClientLib)
 
