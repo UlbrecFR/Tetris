@@ -88,7 +88,7 @@ bool Grid::movePossible(Tetromino & t, gf::Vector2i dir) const{
             return false;
         }
         if (!((*this)(cell.x+dir.x, cell.y+dir.y) == 0)){
-            if (cell.x+dir.x != anchor.x || cell.y+dir.y != anchor.y){
+            if (cell+dir != anchor){
                 return false;
             } 
         }
