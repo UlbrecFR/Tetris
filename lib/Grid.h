@@ -8,7 +8,7 @@
 #include "Tetromino.h"
 
 #define WIDTH 12
-#define HEIGHT 17
+#define HEIGHT 21
 
 class Grid{
 

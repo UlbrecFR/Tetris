@@ -4,28 +4,23 @@ void GameArea::updateTextureBackground(Grid & grid){
 
     for (size_t i = 0; i < WIDTH_G; ++i){
         for (size_t j = 0; j < HEIGHT_G; ++j){
-            if(grid(i, j) > 0){
-                (*this)(i,j).setTexture(tabTexture[(grid(i,j))-1], true);
+            if(grid(i, j+HEIGHT-HEIGHT_G) > 0){
+                (*this)(i,j).setTexture(tabTexture[(grid(i,j+HEIGHT-HEIGHT_G))-1], true);
                 
             } else {
                 (*this)(i, j).unsetTexture();
             }
-        }
-        
+        } 
     }
-
 }
 
 void GameArea::updateTextureTetromino(Tetromino & tetro) {
     auto cells = tetro.getCases();
-
     for (auto cell : cells){
-        if(cell.y>=0){
-            (*this)(cell.x, cell.y).setTexture(tabTexture[tetro.getType()-1], true);
-        }
-        
+        if(cell.y>=HEIGHT-HEIGHT_G){
+            (*this)(cell.x, cell.y-(HEIGHT-HEIGHT_G)).setTexture(tabTexture[tetro.getType()-1], true);
+        }    
     }
-
 }
 
 

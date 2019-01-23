@@ -25,7 +25,7 @@ const size_t Grid::getRows() const{
 }
 
 bool Grid::isValid(size_t x, size_t y) const{
-	return (x>=0 && x < WIDTH && y >= 0 && y < HEIGHT);
+	return (x>=0 && x < getCols() && y >= 0 && y < getRows());
 }
 
 void Grid::printGrid() const{
@@ -111,7 +111,7 @@ bool Grid::leftPossible(Tetromino & t) const{
 bool Grid::rotatePossible(Tetromino t) const{
 	t.rotate();
     for(auto c : t.getCases()) {
-        if (c.x < 0 || c.x >= WIDTH || c.y < 0 || c.y >= HEIGHT) {
+        if (c.x < 0 || c.x >= getCols() || c.y < 0 || c.y >= getRows()) {
             return false;
         }
     }
@@ -120,7 +120,7 @@ bool Grid::rotatePossible(Tetromino t) const{
 
 bool Grid::gameOver(Tetromino & t) const{
 	for (size_t i = 0; i < 4; ++i){
-        for (size_t j = 0; j < WIDTH; ++j){
+        for (size_t j = 0; j < getCols(); ++j){
             if((*this)(j,i) != 0){
                 if(t.getX()!= j && t.getY() != i){
                     return false;

@@ -55,17 +55,14 @@ int main(int argc, char* argv[]){
 ///////////////////////////////////////////
 
     // initialization
-        static constexpr uint8_t width = 12;
-        static constexpr uint8_t height = 17;
-        static constexpr int sizeCase = 40;
 
-        static constexpr gf::Vector2u ScreenSize(30*sizeCase, 19*sizeCase);
+        static constexpr gf::Vector2u ScreenSize(30*SIZE_CASE, 19*SIZE_CASE);
 
-        static constexpr gf::Vector2f ViewSize1(30*sizeCase, 17*sizeCase); // dummy values
-        static constexpr gf::Vector2f ViewCenter1(14*sizeCase, 17*sizeCase/2); // dummy values7
+        static constexpr gf::Vector2f ViewSize1(30*SIZE_CASE, 17*SIZE_CASE); // dummy values
+        static constexpr gf::Vector2f ViewCenter1(14*SIZE_CASE, 17*SIZE_CASE/2); // dummy values7
 
-        static constexpr gf::Vector2f ViewSize2(30*sizeCase, 17*sizeCase); // dummy values
-        static constexpr gf::Vector2f ViewCenter2(-2*sizeCase, 17*sizeCase/2); // dummy values
+        static constexpr gf::Vector2f ViewSize2(30*SIZE_CASE, 17*SIZE_CASE); // dummy values
+        static constexpr gf::Vector2f ViewCenter2(-2*SIZE_CASE, 17*SIZE_CASE/2); // dummy values
 
 
 
@@ -80,8 +77,8 @@ int main(int argc, char* argv[]){
         Grid gdSelf; 
         Grid gdOther; 
 
-        GameArea gaSelf(width, height); 
-        GameArea gaOther(width, height);   
+        GameArea gaSelf; 
+        GameArea gaOther;   
         ///////////////////////////////////////////////////////////////
         
         gf::Texture textureWin;
@@ -285,14 +282,11 @@ int main(int argc, char* argv[]){
                     s.clear();
                 }
 
-                //printf("%f\n", t.asSeconds());
-
                 if (rightAction.isActive()) {
                     if(gdSelf.rightPossible(tetro)){
                         gdSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() + 1);
                         gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
-                        //printZoneJeu(tabJeu, height, width);
                     }
                     
                 } else if (leftAction.isActive()) {
@@ -300,7 +294,6 @@ int main(int argc, char* argv[]){
                         gdSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() - 1);
                         gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
-                        //printZoneJeu(tabJeu, height, width);
                     }
                     
                 } else if (rotateAction.isActive()) {

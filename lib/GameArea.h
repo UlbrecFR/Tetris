@@ -43,7 +43,7 @@ class GameArea : public gf::Transformable {
 
 		void draw(gf::RenderTarget& target, const gf::RenderStates& states) override;
 
-		GameArea(uint8_t width, uint8_t height) {
+		GameArea() {
 
 			loadTextures();
 
