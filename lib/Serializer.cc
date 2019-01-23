@@ -108,7 +108,6 @@
 				break;
 			case Request_STC::TYPE_UPDATE_OTHER :
 				serialize(r.updateOtherMsg);
-				printData();
 				break;
 			case Request_STC::TYPE_GAME_START :
 				serialize(r.gameStart);
@@ -146,7 +145,6 @@
 		switch (r.type) {
 			case Request_CTS::TYPE_TETROMINO_PLACED :
 				serialize(r.tetroMsg);
-				printData();
 				break;
 			case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
 				serialize(r.discoMsg);

@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include "Tetromino.h"
 
 #define WIDTH 12
 #define HEIGHT 17
@@ -14,6 +15,10 @@ class Grid{
 	private:
 
 		uint8_t grid[WIDTH*HEIGHT];
+
+		void fallLines(size_t nLine);
+
+		bool movePossible(Tetromino & t, gf::Vector2i dir) const;
 
 	public:
 
@@ -34,7 +39,24 @@ class Grid{
 
 		const size_t getRows() const;
 
-		bool isValid(size_t x, size_t y);
+		bool isValid(size_t x, size_t y) const;
+
+		void printGrid() const;
+
+		void addTetromino(Tetromino & t);
+
+		uint32_t deleteLines();
+
+		bool downPossible(Tetromino & t) const;
+
+		bool rightPossible(Tetromino & t) const;
+
+		bool leftPossible(Tetromino & t) const;
+
+		bool rotatePossible(Tetromino tetro) const;
+
+		bool gameOver(Tetromino & t) const;
+
 };
 
 #endif // GRID_H

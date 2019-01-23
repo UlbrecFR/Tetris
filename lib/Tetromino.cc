@@ -123,9 +123,9 @@
 		pos = p;
 	}
 
-	std::set<std::pair<uint8_t, uint8_t>> Tetromino::getCases() {
+	std::vector<gf::Vector2u> Tetromino::getCases() {
 
-		std::set<std::pair<uint8_t, uint8_t>> cases;
+		std::vector<gf::Vector2u> cases;
 		uint8_t xAnchor = 0;
 		uint8_t yAnchor = 0;
 
@@ -146,26 +146,26 @@
 					if (type != 4) {
 						switch(rotation) {
 							case 0 :
-								cases.insert(std::make_pair(pos.x + (i - xAnchor), pos.y + (j - yAnchor)));
+								cases.push_back({pos.x + (i - xAnchor), pos.y + (j - yAnchor)});
 								break;
 
 							case 1 :
-								cases.insert(std::make_pair(pos.x - (j - yAnchor), pos.y + (i - xAnchor)));
+								cases.push_back({pos.x - (j - yAnchor), pos.y + (i - xAnchor)});
 								break;
 
 							case 2 :
-								cases.insert(std::make_pair(pos.x - (i - xAnchor), pos.y - (j - yAnchor)));
+								cases.push_back({pos.x - (i - xAnchor), pos.y - (j - yAnchor)});
 								break;
 
 							case 3 :
-								cases.insert(std::make_pair(pos.x + (j - yAnchor), pos.y - (i - xAnchor)));
+								cases.push_back({pos.x + (j - yAnchor), pos.y - (i - xAnchor)});
 								break;
 
 							default :
 								break;
 						}
 					} else {
-						cases.insert(std::make_pair(pos.x + (i - xAnchor), pos.y + (j - yAnchor)));
+						cases.push_back({pos.x + (i - xAnchor), pos.y + (j - yAnchor)});
 					}
 					
 				}

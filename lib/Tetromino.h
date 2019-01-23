@@ -5,7 +5,7 @@
 #include <time.h>
 #include <stdio.h>
 #include <iostream>
-#include <set>
+#include <vector>
 #include <gf/VectorOps.h>
 
 class Tetromino{
@@ -44,7 +44,7 @@ class Tetromino{
 
 		void setPos(gf::Vector2u p);
 
-		std::set<std::pair<uint8_t, uint8_t>> getCases(); //modifier avec Vector2i
+		std::vector<gf::Vector2u> getCases(); //modifier avec Vector2i
 
 		void rotate();
 

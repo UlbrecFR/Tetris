@@ -2,190 +2,6 @@
 
 using boost::asio::ip::tcp;
 
-
-
-void printZoneJeu(Grid & ga){
-    for (size_t row = 0; row < ga.getRows(); ++row){
-        for (size_t col = 0; col < ga.getCols(); ++col){
-            printf("%d ", ga(col,row));
-        }
-        printf("\n");
-    }
-    printf("\n");
-}
-
-void printEtatJeu(Grid & ga, Tetromino tetro){
-    for (auto c : tetro.getCases()){
-        if(c.second>0){
-            ga(c.first, c.second) = tetro.getType();
-        }
-    }
-
-}
-
-void chuteLigneSuppr(Grid & ga, int nLigne){
-
-    size_t nbrow = ga.getRows();
-
-   for (size_t row = 0; row < ga.getRows(); ++row){
-        for (size_t col = 0; col < ga.getCols(); ++col){
-            if(ga.isValid(col,nbrow-2-row) && nbrow-row-1<=nLigne){
-                ga(col,nbrow-1-row) = ga(col,nbrow-2-row);
-            }
-        }
-    }
-
-    
-}
-
-size_t supprLigne(Grid & ga){
-    bool plein = true;
-    size_t nbLine = 0;
-    for (size_t row = 0; row < ga.getRows(); ++row){
-        for (size_t col = 0; col < ga.getCols(); ++col){
-            if(ga(col,row) == 0){
-                plein = false;
-            }
-        }
-        if(plein){
-            ++nbLine;
-            chuteLigneSuppr(ga, row);
-            nbLine += supprLigne(ga);
-            break;
-        } else {
-            plein = true;
-        }
-    }
-    return nbLine;
-}
-
-
-
-bool chutePossible(Grid & ga, Tetromino tetro){ 
-    
-    bool chutePossible = false;
-
-
-    //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<uint8_t, uint8_t>> listeCase = tetro.getCases();
-
-    for (auto it : listeCase){
-        if(it.second < ga.getRows() - 1){
-            //printf("%d\n", it->second);
-            if(ga(it.first, it.second + 1) > 0){
-                for(auto iter : listeCase){
-                    if(iter.second == it.second+1 && iter.first == it.first){
-                        chutePossible = true;
-                    }
-                    
-                }
-
-                if(!chutePossible){
-                    return false;
-                }
-                chutePossible = false;
-            }
-        }else{
-            return false;
-        }
-    }
-    
-    
-    return true;
-}
-
-bool droitePossible(Grid & ga, Tetromino tetro){
-    bool possible = false;
-
-
-    //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<uint8_t, uint8_t>> listeCase = tetro.getCases();
-
-    for (auto it : listeCase){
-        if(it.first < ga.getCols()-1){
-            //printf("%d\n", it->second);
-            if(ga(it.first+1, it.second) > 0){
-                for(auto iter : listeCase){
-                    if(iter.second == it.second && iter.first == it.first+1){
-                        possible = true;
-                    }
-                }
-
-                if(!possible){
-                    return false;
-                }
-                possible = false;
-            }
-        }else{
-            return false;
-        }
-    }
-    
-    
-    return true;
-}
-
-bool gauchePossible(Grid & ga, Tetromino tetro){
-    bool possible = false;
-
-
-    //recupération des coordonnée des autres case du tetromino
-    std::set<std::pair<uint8_t, uint8_t>> listeCase = tetro.getCases();
-
-    for (auto it : listeCase){
-        if(it.first >0){
-            //printf("%d\n", it->second);
-            if(ga(it.first-1, it.second) > 0){
-                for(auto iter : listeCase){
-                    if(iter.second == it.second && iter.first == it.first-1){
-                        possible = true;
-                    }
-                    
-                }
-
-                if(!possible){
-                    return false;
-                }
-                possible = false;
-            }
-        }else{
-            return false;
-        }
-    }
-    
-    
-    return true;
-}
-
-
-bool rotatePossible(uint8_t width, uint8_t height, Tetromino tetro) {
-    tetro.rotate();
-
-    for(auto c : tetro.getCases()) {
-        if (c.first < 0 || c.first >= width || c.second < 0 || c.second >= height) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-bool testFinPartie(Grid & ga, uint8_t width, Tetromino tetro){
-    //printZoneJeu(ga);
-    for (int i = 0; i < 4; ++i){
-        for (int j = 0; j < width; ++j){
-            if(ga(j,i) != 0){
-                if(tetro.getX()!= j && tetro.getY() != i){
-                    return false;
-                }
-                
-            }
-        }
-    }
-
-    return true;
-}
-
 static void serverListener(tcp::socket & socketServer, gf::Queue<std::vector<uint8_t>> & queueServer) {
 
     for(;;) {
@@ -544,7 +360,7 @@ int main(int argc, char* argv[]){
                 //printf("%f\n", t.asSeconds());
 
                 if (rightAction.isActive()) {
-                    if(droitePossible(gaSelf, tetro)){
+                    if(gaSelf.rightPossible(tetro)){
                         gaSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() + 1);
                         gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
@@ -552,7 +368,7 @@ int main(int argc, char* argv[]){
                     }
                     
                 } else if (leftAction.isActive()) {
-                    if (gauchePossible(gaSelf, tetro)){
+                    if (gaSelf.leftPossible(tetro)){
                         gaSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() - 1);
                         gaSelf(tetro.getX(), tetro.getY()) = tetro.getType();
@@ -560,7 +376,7 @@ int main(int argc, char* argv[]){
                     }
                     
                 } else if (rotateAction.isActive()) {
-                    if (rotatePossible(gaSelf.getCols(), gaSelf.getRows(), tetro)) {
+                    if (gaSelf.rotatePossible(tetro)) {
                         tetro.rotate();
                     }
                 } 
@@ -573,7 +389,7 @@ int main(int argc, char* argv[]){
 
                 t = clockChute.getElapsedTime();
 
-               if(chutePossible(gaSelf, tetro)){
+               if(gaSelf.downPossible(tetro)){
                     if(t > periodChute){
                         gaSelf(tetro.getX(), tetro.getY()) = 0;
                         t = clockChute.restart();
@@ -586,9 +402,9 @@ int main(int argc, char* argv[]){
                     }
                 }else{
                     pieceEnJeu = false;
-                    printEtatJeu(gaSelf, tetro);
+                    gaSelf.addTetromino(tetro);
                     periodChute = gf::seconds(1.0f);
-                    size_t nbLine = supprLigne(gaSelf);
+                    size_t nbLine = gaSelf.deleteLines();
                     if(nbLine > 0){
                         score += nbLine * nbLine;
                         printf("Score : %d\n", score);
@@ -613,16 +429,15 @@ int main(int argc, char* argv[]){
                     }
                 }
 
-                std::set<std::pair<uint8_t, uint8_t>> listeCurrentCase = tetro.getCases();
+                auto listeCurrentCase = tetro.getCases();
 
                 for (auto it : listeCurrentCase){
-                    if(it.second>=0){
-                        tabSprite[it.first][it.second].setTexture(tabTexturePiece[tetro.getType()-1], true);
+                    if(it.y>=0){
+                        tabSprite[it.x][it.y].setTexture(tabTexturePiece[tetro.getType()-1], true);
                     }                
                 }
 
-                if (!testFinPartie(gaSelf, width, tetro)) {
-                    printf("FIN DE PARTIE\n");
+                if (!gaSelf.gameOver(tetro)) {
                     enPartie = false;
 
                     rqTS.type = Request_CTS::TYPE_GAME_OVER;
@@ -670,7 +485,6 @@ int main(int argc, char* argv[]){
             if (!enPartie) {
                 renderer.setView(mainView);
                 renderer.draw(spriteGameOver);
-                printf("DONEEEEEEEEE\n");
             }
 
             renderer.setView(hudView);
