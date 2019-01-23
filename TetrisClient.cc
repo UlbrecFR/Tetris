@@ -56,15 +56,10 @@ int main(int argc, char* argv[]){
 
     // initialization
 
-        static constexpr gf::Vector2u ScreenSize(30*SIZE_CASE, 19*SIZE_CASE);
+        static constexpr gf::Vector2u ScreenSize(24*SIZE_CASE, 19*SIZE_CASE);
 
-        static constexpr gf::Vector2f ViewSize1(30*SIZE_CASE, 17*SIZE_CASE); // dummy values
-        static constexpr gf::Vector2f ViewCenter1(14*SIZE_CASE, 17*SIZE_CASE/2); // dummy values7
-
-        static constexpr gf::Vector2f ViewSize2(30*SIZE_CASE, 17*SIZE_CASE); // dummy values
-        static constexpr gf::Vector2f ViewCenter2(-2*SIZE_CASE, 17*SIZE_CASE/2); // dummy values
-
-
+        static constexpr gf::Vector2f ViewSize1(24*SIZE_CASE, 19*SIZE_CASE); // dummy values
+        static constexpr gf::Vector2f ViewCenter1(24*SIZE_CASE/2, 19*SIZE_CASE/2); // dummy values7
 
         gf::Window window("Vouitris", ScreenSize);
         window.setVerticalSyncEnabled(true);
@@ -78,7 +73,17 @@ int main(int argc, char* argv[]){
         Grid gdOther; 
 
         GameArea gaSelf; 
-        GameArea gaOther;   
+        gaSelf.setPosition({SIZE_CASE,SIZE_CASE});
+        GameArea gaOther;
+        gaOther.setPosition({15*SIZE_CASE,SIZE_CASE});
+        gaOther.setScale({0.66666,0.66666});   
+
+        gf::Font font;
+        font.loadFromFile("../ressources/font.ttf");
+        gf::Text text("Score : " + std::to_string(score), font);
+        text.setCharacterSize(20);
+        text.setColor(gf::Color::White);
+        text.setPosition({15*SIZE_CASE,14*SIZE_CASE});
         ///////////////////////////////////////////////////////////////
         
         gf::Texture textureWin;
@@ -116,9 +121,7 @@ int main(int argc, char* argv[]){
         // views
         gf::ViewContainer views;
         gf::LockedView mainView(ViewCenter1, ViewSize1);
-        gf::LockedView otherView(ViewCenter2, ViewSize2);
         views.addView(mainView);
-        views.addView(otherView);
         gf::ScreenView hudView;
         views.addView(hudView);
         views.setInitialScreenSize(ScreenSize);
@@ -328,7 +331,7 @@ int main(int argc, char* argv[]){
                     size_t nbLine = gdSelf.deleteLines();
                     if(nbLine > 0){
                         score += nbLine * nbLine;
-                        printf("Score : %d\n", score);
+                        text.setString("Score : " + std::to_string(score) + "00");
                     }
                 }
 
@@ -364,13 +367,14 @@ int main(int argc, char* argv[]){
             renderer.clear();
             renderer.setView(mainView);
             mainEntities.render(renderer);
-
-            
+     
+            // Draw it
+        
             gaSelf.draw(renderer, r_state);
 
-            renderer.setView(otherView);
-
             gaOther.draw(renderer, r_state);
+
+            renderer.draw(text);
 
             if (!enPartie) {
                 renderer.setView(mainView);

@@ -43,6 +43,10 @@ class GameArea : public gf::Transformable {
 
 		void draw(gf::RenderTarget& target, const gf::RenderStates& states) override;
 
+		void setPosition(gf::Vector2f pos);
+
+		void setScale(gf::Vector2f scale);
+
 		GameArea() {
 
 			loadTextures();
@@ -52,7 +56,7 @@ class GameArea : public gf::Transformable {
 	        for (size_t i = 0; i < WIDTH_G; ++i){
 	        	for (size_t j = 0; j < HEIGHT_G; ++j){
 	                gf::Sprite sprite;
-	                sprite.setPosition({(float)i*SIZE_CASE, (float)j*SIZE_CASE});
+	                sprite.setPosition( gf::Vector2f((float)i*SIZE_CASE, (float)j*SIZE_CASE) );
 	                (*this)(i, j) = sprite;
 	            }
 	        }

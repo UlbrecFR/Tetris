@@ -24,6 +24,8 @@
 #include <gf/Color.h>
 #include <gf/EntityContainer.h>
 #include <gf/Event.h>
+#include <gf/Text.h>
+#include <gf/Font.h>
 
 #include <Serial.h>
 #include <Serializer.h>
