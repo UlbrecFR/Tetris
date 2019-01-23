@@ -186,14 +186,14 @@ bool testFinPartie(Grid & ga, uint8_t width, Tetromino tetro){
     return true;
 }
 
-static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint8_t>> *queueServer) {
+static void serverListener(tcp::socket & socketServer, gf::Queue<std::vector<uint8_t>> & queueServer) {
 
     for(;;) {
 
         std::vector<uint8_t> length(sizeof(uint64_t));
 
         boost::system::error_code error;
-        socketServer->read_some(boost::asio::buffer(length), error);
+        socketServer.read_some(boost::asio::buffer(length), error);
 
         Deserializer ds(length);
         uint64_t size;
@@ -201,7 +201,7 @@ static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint
 
         std::vector<uint8_t> msg(size);
 
-        socketServer->read_some(boost::asio::buffer(msg), error);
+        socketServer.read_some(boost::asio::buffer(msg), error);
 
         //on gère les erreurs
         if (error == boost::asio::error::eof)
@@ -209,7 +209,7 @@ static void serverListener(tcp::socket *socketServer, gf::Queue<std::vector<uint
         else if (error)
             throw boost::system::system_error(error); // Some other error.
 
-        queueServer->push(msg);
+        queueServer.push(msg);
 
     }
 
@@ -228,13 +228,13 @@ int main(int argc, char* argv[]){
 
         boost::asio::io_service io_service;
 
-        tcp::socket *sock(new tcp::socket(io_service));
+        tcp::socket sock(io_service);
         tcp::resolver resolver(io_service);
-        boost::asio::connect(*sock, resolver.resolve({argv[1], argv[2]}));
+        boost::asio::connect(sock, resolver.resolve({argv[1], argv[2]}));
 
         gf::Queue<std::vector<uint8_t>> queueServer;
 
-        std::thread(serverListener, sock, &queueServer).detach();
+        std::thread(serverListener, std::ref(sock), std::ref(queueServer)).detach();
     
 ///////////////////////////////////////////
 
@@ -264,7 +264,7 @@ int main(int argc, char* argv[]){
 
         uint32_t score = 0;
 
-        //GameArea ga(width, height);   
+       // GameArea ga(width, height);   
         ///////////////////////////////////////////////////////////////
 
         gf::Texture textureFond;
@@ -537,7 +537,7 @@ int main(int argc, char* argv[]){
                     printf("Sending a TYPE_TETROMINO_PLACED msg\n\t placed-tetro : t%d r%d pos%d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getRotation(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
 
                     request = s.getData();
-                    boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
+                    boost::asio::write(sock, boost::asio::buffer(request, request.capacity()));
                     s.clear();
                 }
 
@@ -633,7 +633,7 @@ int main(int argc, char* argv[]){
                     printf("Sending Game Over message\n");
 
                     request = s.getData();
-                    boost::asio::write(*sock, boost::asio::buffer(request, request.capacity()));
+                    boost::asio::write(sock, boost::asio::buffer(request, request.capacity()));
                     s.clear();
                 }
             }
