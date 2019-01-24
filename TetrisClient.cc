@@ -84,8 +84,8 @@ int main(int argc, char* argv[]){
         bool enPartie = true;
         bool win = false;     
         uint32_t score = 0;
-        Tetromino tetro;
-        Tetromino next_tetro;
+        Tetromino currentTetro;
+        Tetromino nextTetro;
         std::vector<uint8_t> msg;
         Grid gdSelf; 
         Grid gdOther; 
@@ -120,9 +120,9 @@ int main(int argc, char* argv[]){
         d.clear();
         
         if (rqFS.type == Request_STC::TYPE_GAME_START) {
-            tetro = rqFS.gameStart.firstTetro;
-            next_tetro=rqFS.gameStart.secondTetro;
-            printf("Received a TYPE_GAME_START msg\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", tetro.getType(), tetro.getRotation(), next_tetro.getType(), next_tetro.getRotation());
+            currentTetro = rqFS.gameStart.firstTetro;
+            nextTetro=rqFS.gameStart.secondTetro;
+            printf("Received a TYPE_GAME_START msg\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", currentTetro.getType(), currentTetro.getRotation(), nextTetro.getType(), nextTetro.getRotation());
         }
 
         pieceEnJeu = true;
@@ -137,10 +137,10 @@ int main(int argc, char* argv[]){
                 switch (rqFS.type) {
 
                     case Request_STC::TYPE_NEW_TETROMINO :
-                        next_tetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
-                        next_tetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
-                        next_tetro.setType(rqFS.newTetroMsg.newTetro.getType());
-                        printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", next_tetro.getType(), next_tetro.getRotation());
+                        nextTetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
+                        nextTetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
+                        nextTetro.setType(rqFS.newTetroMsg.newTetro.getType());
+                        printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", nextTetro.getType(), nextTetro.getRotation());
                         break;
                     case Request_STC::TYPE_UPDATE_OTHER :
                         gdOther = rqFS.updateOtherMsg.grid;
@@ -172,13 +172,13 @@ int main(int argc, char* argv[]){
                 if(!pieceEnJeu){ //ENVOI SERVER
 
                     rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
-                    rqTS.tetroMsg.tetro = tetro;
+                    rqTS.tetroMsg.tetro = currentTetro;
                     rqTS.tetroMsg.grid = gdSelf;
 
-                    tetro = next_tetro;
+                    currentTetro = nextTetro;
                     
                     pieceEnJeu = true;
-                    gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                    gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                     t = clockChute.restart();
 
                     s.serialize(rqTS);
@@ -191,22 +191,22 @@ int main(int argc, char* argv[]){
                 }
 
                 if (controls("Right").isActive()) {
-                    if(gdSelf.rightPossible(tetro)){
-                        gdSelf(tetro.getX(), tetro.getY()) = 0;
-                        tetro.setX(tetro.getX() + 1);
-                        gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                    if(gdSelf.rightPossible(currentTetro)){
+                        gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
+                        currentTetro.setX(currentTetro.getX() + 1);
+                        gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                     }
                     
                 } else if (controls("Left").isActive()) {
-                    if (gdSelf.leftPossible(tetro)){
-                        gdSelf(tetro.getX(), tetro.getY()) = 0;
-                        tetro.setX(tetro.getX() - 1);
-                        gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                    if (gdSelf.leftPossible(currentTetro)){
+                        gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
+                        currentTetro.setX(currentTetro.getX() - 1);
+                        gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                     }
                     
                 } else if (controls("Rotate").isActive()) {
-                    if (gdSelf.rotatePossible(tetro)) {
-                        tetro.rotate();
+                    if (gdSelf.rotatePossible(currentTetro)) {
+                        currentTetro.rotate();
                     }
                 } 
 
@@ -218,16 +218,16 @@ int main(int argc, char* argv[]){
 
                 t = clockChute.getElapsedTime();
 
-               if(gdSelf.downPossible(tetro)){
+               if(gdSelf.downPossible(currentTetro)){
                     if(t > periodChute){
-                        gdSelf(tetro.getX(), tetro.getY()) = 0;
+                        gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
                         t = clockChute.restart();
-                        tetro.setY(tetro.getY() + 1);
-                        gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
+                        currentTetro.setY(currentTetro.getY() + 1);
+                        gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                     }
                 }else{
                     pieceEnJeu = false;
-                    gdSelf.addTetromino(tetro);
+                    gdSelf.addTetromino(currentTetro);
                     periodChute = gf::seconds(1.0f);
                     size_t nbLine = gdSelf.deleteLines();
                     if(nbLine > 0){
@@ -235,11 +235,11 @@ int main(int argc, char* argv[]){
                     }
                 }
 
-                if (!gdSelf.gameOver(tetro)) {
+                if (!gdSelf.gameOver(currentTetro)) {
                     enPartie = false;
 
                     rqTS.type = Request_CTS::TYPE_GAME_OVER;
-                    rqTS.tetroMsg.tetro = tetro;
+                    rqTS.tetroMsg.tetro = currentTetro;
                     
                     s.serialize(rqTS);
 
@@ -256,7 +256,7 @@ int main(int argc, char* argv[]){
             renderer.clear();
             renderer.setView(mainView);
 
-            displayGame.draw(gdSelf, gdOther, tetro, next_tetro, score, renderer, r_state);
+            displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, score, renderer, r_state);
 
             if (!enPartie) {
                 displayGame.drawWinLoose(win, renderer);
