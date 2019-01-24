@@ -9,6 +9,7 @@
 #include <Deserializer.h>
 #include <Tetromino.h>
 #include <Serial.h>
+#include <random>
 
 using boost::asio::ip::tcp;
 

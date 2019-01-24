@@ -35,9 +35,13 @@ void sendNewTetro(tcp::socket & socketClient, int id) {
     Serializer s;
     Tetromino t;
 
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(1, 7);
+
     t.setRotation(0);
     t.setPos({6,1});
-    t.setType(rand()%7+1);
+    t.setType(dist(gen));
 
     Request_STC rqSTC;
     rqSTC.type = Request_STC::TYPE_NEW_TETROMINO;

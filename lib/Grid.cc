@@ -131,4 +131,13 @@ bool Grid::gameOver(Tetromino & t) const{
     return true;
 }
 
+void Grid::clear(){
+    for (size_t row = 0; row < getRows(); ++row){
+        for (size_t col = 0; col < getCols(); ++col){
+            (*this)(col,row) = 0;
+        }  
+    }
+}
+
+
 

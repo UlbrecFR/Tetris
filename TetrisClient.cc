@@ -66,11 +66,10 @@ int main(int argc, char* argv[]){
 
         // initialization
 
-        static constexpr gf::Vector2u ScreenSize(24*SIZE_CASE, 19*SIZE_CASE);
-        static constexpr gf::Vector2f ViewSize1(24*SIZE_CASE, 19*SIZE_CASE); // dummy values
-        static constexpr gf::Vector2f ViewCenter1(24*SIZE_CASE/2, 19*SIZE_CASE/2); // dummy values7
+        static constexpr gf::Vector2f ViewSize(24*SIZE_CASE, 19*SIZE_CASE); // dummy values
+        static constexpr gf::Vector2f ViewCenter(24*SIZE_CASE/2, 19*SIZE_CASE/2); // dummy values7
 
-        gf::Window window("Vouitris", ScreenSize);
+        gf::Window window("Vouitris", ViewSize);
         window.setVerticalSyncEnabled(true);
         window.setFramerateLimit(60);
         gf::RenderWindow renderer(window);
@@ -82,11 +81,11 @@ int main(int argc, char* argv[]){
 
         // views
         gf::ViewContainer views;
-        gf::LockedView mainView(ViewCenter1, ViewSize1);
+        gf::LockedView mainView(ViewCenter, ViewSize);
         views.addView(mainView);
         gf::ScreenView hudView;
         views.addView(hudView);
-        views.setInitialScreenSize(ScreenSize);
+        views.setInitialScreenSize(ViewSize);
 
         std::thread(updateScreenSize, std::ref(window), std::ref(mainView)).detach();
 
@@ -251,7 +250,7 @@ int main(int argc, char* argv[]){
                 }
 
                 if (!gdSelf.gameOver(currentTetro)) {
-                    enPartie = false;
+                    /*enPartie = false;
 
                     rqTS.type = Request_CTS::TYPE_GAME_OVER;
                     rqTS.tetroMsg.tetro = currentTetro;
@@ -262,7 +261,10 @@ int main(int argc, char* argv[]){
 
                     request = s.getData();
                     boost::asio::write(sock, boost::asio::buffer(request, request.capacity()));
-                    s.clear();
+                    s.clear();*/
+
+                    gdSelf.clear();
+                    score /= 2;
                 }
             }
 

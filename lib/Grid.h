@@ -57,6 +57,8 @@ class Grid{
 
 		bool gameOver(Tetromino & t) const;
 
+		void clear();
+
 };
 
 #endif // GRID_H
