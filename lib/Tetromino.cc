@@ -182,4 +182,8 @@
 		if(rotation == 4) {
 			rotation = 0;
 		}
-}
+	}
+
+	uint8_t Tetromino::getShape(size_t x, size_t y) const{
+		return Tetromino::shape[type-1][x][y];
+	}

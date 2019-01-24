@@ -27,7 +27,7 @@ class GameArea : public gf::Transformable {
 
 	private :
 		gf::Sprite tabSprite[HEIGHT_G * WIDTH_G];
-		gf::Texture tabTexture[7];
+		gf::Texture *tabTexture;
 		gf::Texture textureBackground;
         gf::Sprite background;
 
@@ -37,7 +37,7 @@ class GameArea : public gf::Transformable {
 
 		void updateTextureTetromino(Tetromino & tetro);
 
-		void loadTextures();
+		void loadTextures(gf::Texture t[7]);
 
 		gf::Sprite & operator()(size_t x, size_t y);
 
@@ -48,10 +48,6 @@ class GameArea : public gf::Transformable {
 		void setScale(gf::Vector2f scale);
 
 		GameArea() {
-
-			loadTextures();
-
-       		background.setTexture(textureBackground);
 
 	        for (size_t i = 0; i < WIDTH_G; ++i){
 	        	for (size_t j = 0; j < HEIGHT_G; ++j){

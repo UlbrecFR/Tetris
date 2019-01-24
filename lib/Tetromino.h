@@ -48,6 +48,8 @@ class Tetromino{
 
 		void rotate();
 
+		uint8_t getShape(size_t x, size_t y) const;
+
 };
 
 

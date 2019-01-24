@@ -31,8 +31,16 @@ class DisplayGame{
 	gf::Sprite spriteGameOver;
 	gf::Sprite spriteWait;
 
+	gf::Sprite tabSprite[4][2];
+
+	gf::Texture tabTexture[7];
+
 	public:
 		DisplayGame(){
+
+			loadTextures();
+			gaSelf.loadTextures(tabTexture);
+			gaOther.loadTextures(tabTexture);
 
 			if (!textureWin.loadFromFile(gf::Path("../ressources/win.png"))) {exit(EXIT_FAILURE);}
 			if (!textureLost.loadFromFile(gf::Path("../ressources/lost.png"))) {exit(EXIT_FAILURE);}
@@ -47,9 +55,15 @@ class DisplayGame{
 	        scoreText.setFont(font);
 	        scoreText.setCharacterSize(20);
 	        scoreText.setColor(gf::Color::White);
-	        scoreText.setPosition({15*SIZE_CASE,14*SIZE_CASE});
+	        scoreText.setPosition({17.5*SIZE_CASE,14*SIZE_CASE});
 
 	        spriteWait.setTexture(textureWait);	
+
+	        for (size_t i = 0; i < 4; ++i){
+		    	for (size_t j = 0; j < 2; ++j){
+		    		tabSprite[i][j].setPosition({(15+j)*SIZE_CASE,(13+i)*SIZE_CASE});
+		    	}
+		    }
 		}
 		
 		void draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, uint32_t score, gf::RenderWindow & renderer, gf::RenderStates & r_state);
@@ -57,6 +71,8 @@ class DisplayGame{
 		void drawWait(gf::RenderWindow & renderer);
 
 		void drawWinLoose(bool win, gf::RenderWindow & renderer);
+
+		void loadTextures();
 };
 
 #endif // DISPLAYGAME_H

@@ -24,41 +24,15 @@ void GameArea::updateTextureTetromino(Tetromino & tetro) {
 }
 
 
-void GameArea::loadTextures(){
+void GameArea::loadTextures(gf::Texture t[7]){
+
+    tabTexture = &t[0];
 
     if (!textureBackground.loadFromFile(gf::Path("../ressources/fond.png"))) {
         exit(EXIT_FAILURE);
-    }
+    }  
 
-    if (!tabTexture[0].loadFromFile(gf::Path("../ressources/0.png"))) {
-        exit(EXIT_FAILURE);
-    }
-
-    if (!tabTexture[1].loadFromFile(gf::Path("../ressources/1.png"))) {
-        exit(EXIT_FAILURE);
-    }
-
-    if (!tabTexture[2].loadFromFile(gf::Path("../ressources/2.png"))) {
-        exit(EXIT_FAILURE);
-    }
-
-    if (!tabTexture[3].loadFromFile(gf::Path("../ressources/3.png"))) {
-        exit(EXIT_FAILURE);
-    }
-
-    if (!tabTexture[4].loadFromFile(gf::Path("../ressources/4.png"))) {
-        exit(EXIT_FAILURE);
-    }
-
-    if (!tabTexture[5].loadFromFile(gf::Path("../ressources/5.png"))) {
-        exit(EXIT_FAILURE);
-    }
-
-    if (!tabTexture[6].loadFromFile(gf::Path("../ressources/6.png"))) {
-        exit(EXIT_FAILURE);
-    }
-    
-
+    background.setTexture(textureBackground);
 }
 
 
