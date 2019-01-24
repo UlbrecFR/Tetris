@@ -33,6 +33,8 @@
 #include <Tetromino.h>
 #include <Grid.h>
 #include <GameArea.h>
+#include "DisplayGame.h"
+#include "Controls.h"
 
 using boost::asio::ip::tcp;
 

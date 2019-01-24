@@ -26,11 +26,8 @@ static void serverListener(tcp::socket & socketServer, gf::Queue<std::vector<uin
             throw boost::system::system_error(error); // Some other error.
 
         queueServer.push(msg);
-
     }
-
 }
-
 
 int main(int argc, char* argv[]){
 
@@ -52,12 +49,11 @@ int main(int argc, char* argv[]){
 
         std::thread(serverListener, std::ref(sock), std::ref(queueServer)).detach();
     
-///////////////////////////////////////////
+        ///////////////////////////////////////////
 
-    // initialization
+        // initialization
 
         static constexpr gf::Vector2u ScreenSize(24*SIZE_CASE, 19*SIZE_CASE);
-
         static constexpr gf::Vector2f ViewSize1(24*SIZE_CASE, 19*SIZE_CASE); // dummy values
         static constexpr gf::Vector2f ViewCenter1(24*SIZE_CASE/2, 19*SIZE_CASE/2); // dummy values7
 
@@ -67,56 +63,9 @@ int main(int argc, char* argv[]){
         gf::RenderWindow renderer(window);
         gf::RenderStates r_state;
 
-        uint32_t score = 0;
-
-        Grid gdSelf; 
-        Grid gdOther; 
-
-        GameArea gaSelf; 
-        gaSelf.setPosition({SIZE_CASE,SIZE_CASE});
-        GameArea gaOther;
-        gaOther.setPosition({15*SIZE_CASE,SIZE_CASE});
-        gaOther.setScale({0.66666,0.66666});   
-
-        gf::Font font;
-        font.loadFromFile("../ressources/font.ttf");
-        gf::Text text("Score : " + std::to_string(score), font);
-        text.setCharacterSize(20);
-        text.setColor(gf::Color::White);
-        text.setPosition({15*SIZE_CASE,14*SIZE_CASE});
-        ///////////////////////////////////////////////////////////////
-        
-        gf::Texture textureWin;
-        if (!textureWin.loadFromFile(gf::Path("../ressources/win.png"))) {
-            return EXIT_FAILURE;
-        }
-
-        gf::Texture textureLost;
-        if (!textureLost.loadFromFile(gf::Path("../ressources/lost.png"))) {
-            return EXIT_FAILURE;
-        }
-
-        gf::Sprite spriteGameOver;
-
-
-        gf::Texture textureWait;
-        if (!textureWait.loadFromFile(gf::Path("../ressources/waitingScreen.png"))) {
-            return EXIT_FAILURE;
-        }
-
-        gf::Sprite spriteWait;
-        spriteWait.setTexture(textureWait);
+        DisplayGame displayGame;
 
         /////////////////////////////////////////////////////////////
-
-        /*
-        Zone jeu : extend
-        autour : screen
-        */
-            
-       
-        bool pieceEnJeu = false;
-        bool enPartie = true;
 
         // views
         gf::ViewContainer views;
@@ -127,52 +76,19 @@ int main(int argc, char* argv[]){
         views.setInitialScreenSize(ScreenSize);
 
         // actions
-        gf::ActionContainer actions;
+        Controls controls;  
 
-        gf::Action closeWindowAction("Close window");
-        closeWindowAction.addCloseControl();
-        closeWindowAction.addKeycodeKeyControl(gf::Keycode::Escape);
-        actions.addAction(closeWindowAction);
+        ///////////////////////////////////////////////////////////////
 
-        gf::Action leftAction("Left");
-        leftAction.addScancodeKeyControl(gf::Scancode::Q);
-        leftAction.addScancodeKeyControl(gf::Scancode::Left);
-        leftAction.setInstantaneous();
-        actions.addAction(leftAction);
-
-        gf::Action rightAction("Right");
-        rightAction.addScancodeKeyControl(gf::Scancode::D);
-        rightAction.addScancodeKeyControl(gf::Scancode::Right);
-        rightAction.setInstantaneous();
-        actions.addAction(rightAction);
-
-        gf::Action rotateAction("rotate");
-        rotateAction.addScancodeKeyControl(gf::Scancode::Space);
-        rotateAction.setInstantaneous();
-        actions.addAction(rotateAction);
-
-        gf::Action downAction("Down");
-        downAction.addScancodeKeyControl(gf::Scancode::S);
-        downAction.addScancodeKeyControl(gf::Scancode::Down);
-        downAction.setContinuous();
-        actions.addAction(downAction);
-
-
-
-    ///////////////////////////////////////////////////////////////
-
+        bool pieceEnJeu = false;
+        bool enPartie = true;
+        bool win = false;     
+        uint32_t score = 0;
         Tetromino tetro;
         Tetromino next_tetro;
         std::vector<uint8_t> msg;
-    
-
-        // entities
-        gf::EntityContainer mainEntities;
-
-        // add entities to mainEntities
-        gf::EntityContainer hudEntities;
-
-        // add entities to hudEntities
+        Grid gdSelf; 
+        Grid gdOther; 
 
         // game loop
         renderer.clear(gf::Color::fromRgba32(50,50,50,255));
@@ -192,16 +108,10 @@ int main(int argc, char* argv[]){
 
         printf("Connecting to server...\n");
 
-
-        renderer.draw(spriteWait);
-        renderer.setView(hudView);
-        hudEntities.render(renderer);
-
+        displayGame.drawWait(renderer);
         renderer.display();
 
-        while (!queueServer.poll(msg)) {
-            //printf("wait for first tetro\n");
-        }
+        while (!queueServer.poll(msg)) {}
 
         printf("Connected\n");
 
@@ -242,11 +152,7 @@ int main(int argc, char* argv[]){
                     case Request_STC::TYPE_GAME_OVER :
                         printf("Received a TYPE_GAME_OVER\n");
                         enPartie = false;
-                        if (rqFS.gameOver.win == false) {
-                            spriteGameOver.setTexture(textureLost);
-                        } else {
-                            spriteGameOver.setTexture(textureWin);
-                        }
+                        win = rqFS.gameOver.win;
                         break;
                 }
             }
@@ -255,11 +161,10 @@ int main(int argc, char* argv[]){
             gf::Event event;
 
             while (window.pollEvent(event)) {
-                actions.processEvent(event);
-                //views.processEvent(event);
+                controls.processEvent(event);
             }
 
-            if (closeWindowAction.isActive()) {
+            if (controls("Close").isActive()) {
                 window.close();
             }
 
@@ -285,27 +190,27 @@ int main(int argc, char* argv[]){
                     s.clear();
                 }
 
-                if (rightAction.isActive()) {
+                if (controls("Right").isActive()) {
                     if(gdSelf.rightPossible(tetro)){
                         gdSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() + 1);
                         gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                     }
                     
-                } else if (leftAction.isActive()) {
+                } else if (controls("Left").isActive()) {
                     if (gdSelf.leftPossible(tetro)){
                         gdSelf(tetro.getX(), tetro.getY()) = 0;
                         tetro.setX(tetro.getX() - 1);
                         gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
                     }
                     
-                } else if (rotateAction.isActive()) {
+                } else if (controls("Rotate").isActive()) {
                     if (gdSelf.rotatePossible(tetro)) {
                         tetro.rotate();
                     }
                 } 
 
-                if (downAction.isActive()) {
+                if (controls("Down").isActive()) {
                     periodChute.subTo(gf::seconds(0.1f));
                 } else {
                     periodChute = gf::seconds(1.0f);
@@ -317,12 +222,8 @@ int main(int argc, char* argv[]){
                     if(t > periodChute){
                         gdSelf(tetro.getX(), tetro.getY()) = 0;
                         t = clockChute.restart();
-                        //printf("%f\n", t.asSeconds());
-                        //printf("Chute\n");
-                        //printf("%f\n", periodChute.asSeconds());
                         tetro.setY(tetro.getY() + 1);
                         gdSelf(tetro.getX(), tetro.getY()) = tetro.getType();
-                        //printZoneJeu(gdSelf);
                     }
                 }else{
                     pieceEnJeu = false;
@@ -331,15 +232,8 @@ int main(int argc, char* argv[]){
                     size_t nbLine = gdSelf.deleteLines();
                     if(nbLine > 0){
                         score += nbLine * nbLine;
-                        text.setString("Score : " + std::to_string(score) + "00");
                     }
                 }
-
-
-                gaSelf.updateTextureBackground(gdSelf);
-                gaOther.updateTextureBackground(gdOther);
-
-                gaSelf.updateTextureTetromino(tetro);
 
                 if (!gdSelf.gameOver(tetro)) {
                     enPartie = false;
@@ -357,39 +251,20 @@ int main(int argc, char* argv[]){
                 }
             }
 
-
-            // 2. update
             gf::Time time = clock.restart();
-            mainEntities.update(time);
-            hudEntities.update(time);
 
-            // 3. draw
             renderer.clear();
             renderer.setView(mainView);
-            mainEntities.render(renderer);
-     
-            // Draw it
-        
-            gaSelf.draw(renderer, r_state);
 
-            gaOther.draw(renderer, r_state);
-
-            renderer.draw(text);
+            displayGame.draw(gdSelf, gdOther, tetro, next_tetro, score, renderer, r_state);
 
             if (!enPartie) {
-                renderer.setView(mainView);
-                renderer.draw(spriteGameOver);
+                displayGame.drawWinLoose(win, renderer);
             }
 
-            renderer.setView(hudView);
-            hudEntities.render(renderer);
-
             renderer.display();
-            actions.reset();
-
+            controls.reset();
         }
-
-
     } catch (std::exception& e) {
         std::cerr << "Exception CLIENT : " << e.what() << "\n";
     }
