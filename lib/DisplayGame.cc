@@ -47,7 +47,25 @@ void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, 
     		renderer.draw(tabSprite[i][j]);
     	}
     }
-    scoreText.setString("Score : " + std::to_string(score) + "00");
+    scoreText.setPosition({18*SIZE_CASE,13.5*SIZE_CASE});
+    scoreText.setString("You : ");
+    renderer.draw(scoreText);
+    scoreText.setPosition({19*SIZE_CASE,14.5*SIZE_CASE});
+    if (score == 0){
+        scoreText.setString(std::to_string(score));
+    } else {
+        scoreText.setString(std::to_string(score) + "00");
+    }
+    renderer.draw(scoreText);
+    scoreText.setPosition({18*SIZE_CASE,15.5*SIZE_CASE});
+    scoreText.setString("Other Player : ");
+    renderer.draw(scoreText);
+    scoreText.setPosition({19*SIZE_CASE,16.5*SIZE_CASE});
+    if (score == 0){
+        scoreText.setString(std::to_string(score));
+    } else {
+        scoreText.setString(std::to_string(score) + "00");
+    }
     renderer.draw(scoreText);
 }
 

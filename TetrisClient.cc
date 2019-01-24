@@ -29,6 +29,19 @@ static void serverListener(tcp::socket & socketServer, gf::Queue<std::vector<uin
     }
 }
 
+static void updateScreenSize(gf::Window & window, gf::LockedView & mainView){
+
+    for (;;){
+        if(window.getSize().x < 24*SIZE_CASE){
+            window.setSize({24*SIZE_CASE, window.getSize().y});
+        }
+        if(window.getSize().y < 19*SIZE_CASE){
+            window.setSize({window.getSize().x, 19*SIZE_CASE});
+        }
+        mainView.onScreenSizeChange(window.getSize());
+    }  
+}
+
 int main(int argc, char* argv[]){
 
     printf("%s\n", "Tetris Client : Le Vouitris");
@@ -74,6 +87,8 @@ int main(int argc, char* argv[]){
         gf::ScreenView hudView;
         views.addView(hudView);
         views.setInitialScreenSize(ScreenSize);
+
+        std::thread(updateScreenSize, std::ref(window), std::ref(mainView)).detach();
 
         // actions
         Controls controls;  

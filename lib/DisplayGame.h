@@ -51,17 +51,16 @@ class DisplayGame{
 			gaOther.setScale({0.66666,0.66666}); 
 
 	        font.loadFromFile("../ressources/font.ttf");
-	        scoreText.setString("Score : " + std::to_string(0));
+	        scoreText.setString("Score : \n" + std::to_string(0));
 	        scoreText.setFont(font);
-	        scoreText.setCharacterSize(20);
+	        scoreText.setCharacterSize(10);
 	        scoreText.setColor(gf::Color::White);
-	        scoreText.setPosition({17.5*SIZE_CASE,14*SIZE_CASE});
 
 	        spriteWait.setTexture(textureWait);	
 
 	        for (size_t i = 0; i < 4; ++i){
 		    	for (size_t j = 0; j < 2; ++j){
-		    		tabSprite[i][j].setPosition({(15+j)*SIZE_CASE,(13+i)*SIZE_CASE});
+		    		tabSprite[i][j].setPosition({static_cast<float>((15+j)*SIZE_CASE),static_cast<float>((13+i)*SIZE_CASE)});
 		    	}
 		    }
 		}
