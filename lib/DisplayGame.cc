@@ -31,7 +31,7 @@ void DisplayGame::loadTextures(){
     }
 }
 
-void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, uint32_t scoreSelf, uint32_t scoreOther, gf::RenderWindow & renderer, gf::RenderStates & r_state){
+void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, gf::RenderWindow & renderer, gf::RenderStates & r_state){
 	gaSelf.updateTextureBackground(gdSelf);
     gaOther.updateTextureBackground(gdOther);
     gaSelf.updateTextureTetromino(currentTetro);
@@ -47,20 +47,30 @@ void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, 
     		renderer.draw(tabSprite[i][j]);
     	}
     }
-    scoreText.setPosition({18*SIZE_CASE,13.5*SIZE_CASE});
+    scoreText.setPosition({19*SIZE_CASE,14*SIZE_CASE});
+
+    std::string min = std::to_string(static_cast<int>(time.asSeconds())/60);
+    std::string sec = std::to_string(static_cast<int>(time.asSeconds())%60);
+    if (sec.length() < 2){
+        sec = "0" + sec;
+    }
+
+    scoreText.setString(min+" : "+sec);
+    renderer.draw(scoreText);
+    scoreText.setPosition({18*SIZE_CASE,15*SIZE_CASE});
     scoreText.setString("You : ");
     renderer.draw(scoreText);
-    scoreText.setPosition({19*SIZE_CASE,14.5*SIZE_CASE});
+    scoreText.setPosition({19*SIZE_CASE,16*SIZE_CASE});
     if (scoreSelf == 0){
         scoreText.setString(std::to_string(scoreSelf));
     } else {
         scoreText.setString(std::to_string(scoreSelf) + "00");
     }
     renderer.draw(scoreText);
-    scoreText.setPosition({18*SIZE_CASE,15.5*SIZE_CASE});
+    scoreText.setPosition({18*SIZE_CASE,17*SIZE_CASE});
     scoreText.setString("Other Player : ");
     renderer.draw(scoreText);
-    scoreText.setPosition({19*SIZE_CASE,16.5*SIZE_CASE});
+    scoreText.setPosition({19*SIZE_CASE,18*SIZE_CASE});
     if (scoreOther == 0){
         scoreText.setString(std::to_string(scoreOther));
     } else {

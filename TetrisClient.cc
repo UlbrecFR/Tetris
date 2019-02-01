@@ -106,7 +106,6 @@ int main(int argc, char* argv[]){
 
         // game loop
         renderer.clear(gf::Color::fromRgba32(50,50,50,255));
-        gf::Clock clock;
         gf::Clock clockChute;
         gf::Time t;
         gf::Time periodChute = gf::seconds(1.0f);
@@ -139,40 +138,13 @@ int main(int argc, char* argv[]){
             printf("Received a TYPE_GAME_START msg\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", currentTetro.getType(), currentTetro.getRotation(), nextTetro.getType(), nextTetro.getRotation());
         }
 
+        gf::Clock clock;
+        gf::Time pastTime;
+        gf::Time gameDuratiion = (gf::seconds(180.0f));
+        gf::Time time;
+
         while (window.isOpen()) {
 
-            if (queueServer.poll(msg)) { //RECEPTION SERVER
-                d.setData(msg);
-                d.deserialize(rqFS);
-                d.clear();
-                
-                switch (rqFS.type) {
-                    case Request_STC::TYPE_NEW_TETROMINO :
-                        nextTetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
-                        nextTetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
-                        nextTetro.setType(rqFS.newTetroMsg.newTetro.getType());
-                        printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", nextTetro.getType(), nextTetro.getRotation());
-                        break;
-                    case Request_STC::TYPE_UPDATE :
-                        gdSelf = rqFS.updateMsg.grid;
-                        scoreSelf = rqFS.updateMsg.score;
-                        printf("Received a TYPE_UPDATE\n");
-                        break;
-                    case Request_STC::TYPE_UPDATE_OTHER :
-                        gdOther = rqFS.updateOtherMsg.grid;
-                        scoreOther = rqFS.updateOtherMsg.score;
-                        printf("Received a TYPE_UPDATE_OTHER\n");
-                        break;
-                    case Request_STC::TYPE_GAME_START :
-                        printf("Received a TYPE_GAME_START\n");
-                        break;
-                    case Request_STC::TYPE_GAME_OVER :
-                        printf("Received a TYPE_GAME_OVER\n");
-                        enPartie = false;
-                        win = rqFS.gameOver.win;
-                        break;
-                }
-            }
 
             // 1. input
             gf::Event event;
@@ -187,6 +159,38 @@ int main(int argc, char* argv[]){
 
             if(enPartie){
 
+                if (queueServer.poll(msg)) { //RECEPTION SERVER
+                    d.setData(msg);
+                    d.deserialize(rqFS);
+                    d.clear();
+                    
+                    switch (rqFS.type) {
+                        case Request_STC::TYPE_NEW_TETROMINO :
+                            nextTetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
+                            nextTetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
+                            nextTetro.setType(rqFS.newTetroMsg.newTetro.getType());
+                            printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", nextTetro.getType(), nextTetro.getRotation());
+                            break;
+                        case Request_STC::TYPE_UPDATE :
+                            gdSelf = rqFS.updateMsg.grid;
+                            scoreSelf = rqFS.updateMsg.score;
+                            printf("Received a TYPE_UPDATE\n");
+                            break;
+                        case Request_STC::TYPE_UPDATE_OTHER :
+                            gdOther = rqFS.updateOtherMsg.grid;
+                            scoreOther = rqFS.updateOtherMsg.score;
+                            printf("Received a TYPE_UPDATE_OTHER\n");
+                            break;
+                        case Request_STC::TYPE_GAME_START :
+                            printf("Received a TYPE_GAME_START\n");
+                            break;
+                        case Request_STC::TYPE_GAME_OVER :
+                            printf("Received a TYPE_GAME_OVER\n");
+                            enPartie = false;
+                            win = rqFS.gameOver.win;
+                            break;
+                    }
+                }
                 if (controls("Right").isActive()) {
                     if(gdSelf.rightPossible(currentTetro)){
                         gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
@@ -243,12 +247,18 @@ int main(int argc, char* argv[]){
                 }
             }
 
-            gf::Time time = clock.restart();
+            if(enPartie){
+                pastTime = clock.getElapsedTime();
+                time = gameDuratiion-pastTime;            
+            } else {
+                time = gf::seconds(0.0f);
+            }
+
 
             renderer.clear();
             renderer.setView(mainView);
 
-            displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, renderer, r_state);
+            displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, renderer, r_state);
 
             if (!enPartie) {
                 displayGame.drawWinLoose(win, renderer);

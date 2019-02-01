@@ -80,24 +80,32 @@ void sendGrids(std::vector<tcp::socket> & socketClients, size_t id) {
     }
 }
 
-void sendGameOver(std::vector<tcp::socket> & socketClients, size_t idWinner) {
-    /*Serializer s;
+void sendGameOver(std::vector<tcp::socket> & socketClients) {
+    Serializer s;
 
     Request_STC rqSTC;
     rqSTC.type = Request_STC::TYPE_GAME_OVER;
-    rqSTC.gameOver.win = true;
 
-    s.serialize(rqSTC);
-    boost::asio::write(socketWinner, boost::asio::buffer(s.getData()));
-    printf("Sending a win message \n");
-    s.clear();
+    size_t winnerScore = 0;
 
-    rqSTC.gameOver.win = false;
+    for (size_t i = 0; i < NB_PLAYERS; ++i){
+        if (scores[i] >= winnerScore){
+            winnerScore = scores[i];
+        }
+    }
 
-    s.serialize(rqSTC);
-    boost::asio::write(socketLooser, boost::asio::buffer(s.getData()));
-    printf("Sending a Loose message \n");
-    s.clear();*/
+     for (size_t i = 0; i < NB_PLAYERS; ++i){
+        if (scores[i] == winnerScore){
+            rqSTC.gameOver.win = true;
+            printf("Sending a win message at player %zu\n", i);
+        } else {
+            rqSTC.gameOver.win = false;            
+            printf("Sending a loose message at player %zu\n", i);
+        }
+        s.serialize(rqSTC);
+        boost::asio::write(socketClients[i], boost::asio::buffer(s.getData()));
+        s.clear();
+    }  
 }
 
 void updateGrid(Tetromino t, size_t id){
@@ -144,13 +152,17 @@ void sendGameStart(tcp::socket & socketClient, size_t id) {
         Tetromino firstTetro;
         Tetromino secondTetro;
 
+        std::random_device rd;
+        std::mt19937 gen(rd());
+        std::uniform_int_distribution<size_t> dist(1, 7);
+
         firstTetro.setRotation(0);
         firstTetro.setPos({6,1});
-        firstTetro.setType(rand()%7+1);
+        firstTetro.setType(dist(gen));
 
         secondTetro.setRotation(0);
         secondTetro.setPos({6,1});
-        secondTetro.setType(rand()%7+1);
+        secondTetro.setType(dist(gen));
 
         printf("Sending a TYPE_GAME_START msg to Client %zu\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", id, firstTetro.getType(), firstTetro.getRotation(), secondTetro.getType(), secondTetro.getRotation());
 
@@ -163,7 +175,6 @@ void sendGameStart(tcp::socket & socketClient, size_t id) {
         s.serialize(rqSTC);
         boost::asio::write(socketClient, boost::asio::buffer(s.getData()));
         s.clear();
-
 }
 
 int main(int argc, char* argv[]){
@@ -172,6 +183,8 @@ int main(int argc, char* argv[]){
             std::cerr << "Usage: blocking_tcp_echo_server <port>\n";
             return 1;
         }
+
+        gf::Clock clock;
 
         boost::asio::io_service ioService;
         tcp::acceptor a(ioService, tcp::endpoint(tcp::v4(), std::atoi(argv[1])));
@@ -196,13 +209,22 @@ int main(int argc, char* argv[]){
             sendGameStart(socketClients[i], i);
         }
 
+        gf::Time time;
+        gf::Time gameDuration(gf::seconds(20.0f));
+
         for(;;) {
             for (size_t i = 0; i < NB_PLAYERS; ++i){
                 if (queueClients[i].poll(msg)) {
                     exploitMessage(msg, socketClients, i);
                 }
             }
+            time = clock.getElapsedTime();
+            if (time >= gameDuration){
+                break;
+            }
         }
+
+        sendGameOver(socketClients);
 
     } catch (std::exception& e) {
         std::cerr << "Exception SERVER: " << e.what() << "\n";
