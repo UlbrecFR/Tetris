@@ -227,23 +227,26 @@ int main(int argc, char* argv[]){
                         gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                     }
                 }else{
-                    gdSelf.addTetromino(currentTetro);
-                    periodChute = gf::seconds(1.0f);
+                    if(t > periodChute){
+                        t = clockChute.restart();
+                        gdSelf.addTetromino(currentTetro);
+                        periodChute = gf::seconds(1.0f);
 
-                    rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
-                    rqTS.tetroMsg.tetro = currentTetro;
+                        rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
+                        rqTS.tetroMsg.tetro = currentTetro;
 
-                    currentTetro = nextTetro;
-                    
-                    t = clockChute.restart();
+                        currentTetro = nextTetro;
+                        
+                        t = clockChute.restart();
 
-                    s.serialize(rqTS);
+                        s.serialize(rqTS);
 
-                    printf("Sending a TYPE_TETROMINO_PLACED msg\n\t placed-tetro : t%d r%d pos%d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getRotation(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
+                        printf("Sending a TYPE_TETROMINO_PLACED msg\n\t placed-tetro : t%d r%d pos%d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getRotation(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
 
-                    request = s.getData();
-                    boost::asio::write(sock, boost::asio::buffer(request, request.capacity()));
-                    s.clear();
+                        request = s.getData();
+                        boost::asio::write(sock, boost::asio::buffer(request, request.capacity()));
+                        s.clear();
+                    }
                 }
             }
 
