@@ -10,6 +10,9 @@
 #include <Tetromino.h>
 #include <Serial.h>
 #include <random>
+#include <Grid.h>
+
+#define NB_PLAYERS 2
 
 using boost::asio::ip::tcp;
 

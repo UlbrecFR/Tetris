@@ -50,8 +50,10 @@ class Deserializer{
 		void deserialize(Tetromino & t);
 
 		void deserialize(STC_GameStart & r);
+
+		void deserialize(STC_UpdateGrid & r);
 		
-		void deserialize(STC_UpdateOtherPlayer & r);
+		void deserialize(STC_UpdateOtherGrid & r);
 
 		void deserialize(STC_NewTetromino & r);
 

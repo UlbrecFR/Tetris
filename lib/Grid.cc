@@ -118,17 +118,15 @@ bool Grid::rotatePossible(Tetromino t) const{
     return true;
 }
 
-bool Grid::gameOver(Tetromino & t) const{
+bool Grid::gameOver() const{
 	for (size_t i = 0; i < 4; ++i){
         for (size_t j = 0; j < getCols(); ++j){
             if((*this)(j,i) != 0){
-                if(t.getX()!= j && t.getY() != i){
-                    return false;
-                }
+                return true;
             }
         }
     }
-    return true;
+    return false;
 }
 
 void Grid::clear(){

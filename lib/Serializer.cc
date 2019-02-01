@@ -82,9 +82,15 @@
 		serialize(r.firstTetro);
 		serialize(r.secondTetro);
 	}
-	
-	void Serializer::serialize(const STC_UpdateOtherPlayer r){
+
+	void Serializer::serialize(const STC_UpdateGrid r){
 		serialize(r.grid);
+		serialize(r.score);
+	}
+	
+	void Serializer::serialize(const STC_UpdateOtherGrid r){
+		serialize(r.grid);
+		serialize(r.score);
 	}
 
 	void Serializer::serialize(const STC_NewTetromino r){
@@ -106,6 +112,9 @@
 			case Request_STC::TYPE_NEW_TETROMINO :
 				serialize(r.newTetroMsg);
 				break;
+			case Request_STC::TYPE_UPDATE :
+				serialize(r.updateMsg);
+				break;
 			case Request_STC::TYPE_UPDATE_OTHER :
 				serialize(r.updateOtherMsg);
 				break;
@@ -120,7 +129,6 @@
 
 	void Serializer::serialize(const CTS_TetrominoPlaced r){
 		serialize(r.tetro);
-		serialize(r.grid);
 	}
 	
 	void Serializer::serialize(const CTS_GameOver r){

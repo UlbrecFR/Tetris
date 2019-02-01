@@ -2,6 +2,9 @@
 
 using boost::asio::ip::tcp;
 
+Grid grids[NB_PLAYERS];
+uint32_t scores[NB_PLAYERS];
+
 static void clientListener(tcp::socket & socketClient, gf::Queue<std::vector<uint8_t>> & queueClient) {
 
     for(;;) {
@@ -31,7 +34,7 @@ static void clientListener(tcp::socket & socketClient, gf::Queue<std::vector<uin
     } 
 }
 
-void sendNewTetro(tcp::socket & socketClient, int id) {
+void sendNewTetro(std::vector<tcp::socket> & socketClients, size_t id) {
     Serializer s;
     Tetromino t;
 
@@ -48,26 +51,37 @@ void sendNewTetro(tcp::socket & socketClient, int id) {
     rqSTC.newTetroMsg.newTetro = t;
 
     s.serialize(rqSTC);
-    boost::asio::write(socketClient, boost::asio::buffer(s.getData()));
-    printf("Sending a TYPE_NEW_TETROMINO msg to Client %d\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), rqSTC.newTetroMsg.newTetro.getRotation());
+    boost::asio::write(socketClients[id], boost::asio::buffer(s.getData()));
+    printf("Sending a TYPE_NEW_TETROMINO msg to Client %zu\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), rqSTC.newTetroMsg.newTetro.getRotation());
     s.clear();
 }
 
-void sendGrid(tcp::socket & socketClient, Grid & g, int id) {
+void sendGrids(std::vector<tcp::socket> & socketClients, size_t id) {
     Serializer s;
 
     Request_STC rqSTC;
-    rqSTC.type = Request_STC::TYPE_UPDATE_OTHER;
-    rqSTC.updateOtherMsg.grid = g;
 
-    s.serialize(rqSTC);
-    boost::asio::write(socketClient, boost::asio::buffer(s.getData()));
-    printf("Sending a TYPE_UPDATE_OTHER msg \n");
-    s.clear();
+    for (size_t i = 0; i < NB_PLAYERS; ++i){
+        if (i == id){
+            rqSTC.type = Request_STC::TYPE_UPDATE;
+            rqSTC.updateMsg.grid = grids[id];
+            rqSTC.updateMsg.score = scores[id];
+            printf("Sending a TYPE_UPDATE msg \n");
+        } else {
+            rqSTC.type = Request_STC::TYPE_UPDATE_OTHER;
+            rqSTC.updateOtherMsg.grid = grids[id];
+            rqSTC.updateOtherMsg.score = scores[id];
+            printf("Sending a TYPE_UPDATE_OTHER msg \n");
+        }
+
+        s.serialize(rqSTC);
+        boost::asio::write(socketClients[i], boost::asio::buffer(s.getData()));
+        s.clear();
+    }
 }
 
-void sendGameOver(tcp::socket & socketLooser, tcp::socket & socketWinner) {
-    Serializer s;
+void sendGameOver(std::vector<tcp::socket> & socketClients, size_t idWinner) {
+    /*Serializer s;
 
     Request_STC rqSTC;
     rqSTC.type = Request_STC::TYPE_GAME_OVER;
@@ -83,10 +97,23 @@ void sendGameOver(tcp::socket & socketLooser, tcp::socket & socketWinner) {
     s.serialize(rqSTC);
     boost::asio::write(socketLooser, boost::asio::buffer(s.getData()));
     printf("Sending a Loose message \n");
-    s.clear();
+    s.clear();*/
 }
 
-void exploitMessage(std::vector<uint8_t> & msg, tcp::socket & socketClient, tcp::socket & socketOtherClient, int id) {
+void updateGrid(Tetromino t, size_t id){
+    grids[id].addTetromino(t);
+    if (grids[id].gameOver()){
+        grids[id].clear();
+        scores[id] /= 2;
+    } else {
+        size_t nbLine = grids[id].deleteLines();
+        if(nbLine > 0){
+            scores[id] += nbLine * nbLine;
+        }  
+    }
+}
+
+void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id) {
 
     Deserializer d;
     Request_CTS rqFC;
@@ -97,20 +124,21 @@ void exploitMessage(std::vector<uint8_t> & msg, tcp::socket & socketClient, tcp:
 
     switch(rqFC.type) {
         case Request_CTS::TYPE_TETROMINO_PLACED : 
-            printf("Received a TYPE_TETROMINO_PLACED msg from Client %d\n\t placed-tetro : t%d r%d pos%d-%d\n", id, rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
-            sendNewTetro(socketClient, id);
-            sendGrid(socketOtherClient, rqFC.tetroMsg.grid, id);
+            printf("Received a TYPE_TETROMINO_PLACED msg from Client %zu\n\t placed-tetro : t%d r%d pos%d-%d\n", id, rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
+            updateGrid(rqFC.tetroMsg.tetro, id);
+            sendGrids(socketClients, id);
+            sendNewTetro(socketClients, id);
             break;
         case Request_CTS::TYPE_GAME_OVER :
             printf("Received a TYPE_GAME_OVER\n");   
-            sendGameOver(socketClient, socketOtherClient);
+            //sendGameOver(socketClient, socketOtherClient);
             break;        
         case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : 
             break;
     }
 }
 
-void sendGameStart(tcp::socket & socketClient, int id) {
+void sendGameStart(tcp::socket & socketClient, size_t id) {
         Serializer s;
 
         Tetromino firstTetro;
@@ -124,7 +152,7 @@ void sendGameStart(tcp::socket & socketClient, int id) {
         secondTetro.setPos({6,1});
         secondTetro.setType(rand()%7+1);
 
-        printf("Sending a TYPE_GAME_START msg to Client %d\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", id, firstTetro.getType(), firstTetro.getRotation(), secondTetro.getType(), secondTetro.getRotation());
+        printf("Sending a TYPE_GAME_START msg to Client %zu\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", id, firstTetro.getType(), firstTetro.getRotation(), secondTetro.getType(), secondTetro.getRotation());
 
         Request_STC rqSTC;
         rqSTC.type = Request_STC::TYPE_GAME_START;
@@ -148,17 +176,15 @@ int main(int argc, char* argv[]){
         boost::asio::io_service ioService;
         tcp::acceptor a(ioService, tcp::endpoint(tcp::v4(), std::atoi(argv[1])));
 
-        tcp::socket sock1(ioService);
-        tcp::socket sock2(ioService);
+        std::vector<tcp::socket> socketClients;
+        gf::Queue<std::vector<uint8_t>> queueClients[NB_PLAYERS];
 
-        a.accept(sock1);
-        a.accept(sock2);
-
-        gf::Queue<std::vector<uint8_t>> queueCli1;
-        gf::Queue<std::vector<uint8_t>> queueCli2;
-
-        std::thread(clientListener, std::ref(sock1), std::ref(queueCli1)).detach();
-        std::thread(clientListener, std::ref(sock2), std::ref(queueCli2)).detach();
+        for (size_t i = 0; i < NB_PLAYERS; ++i){
+            tcp::socket sock(ioService);
+            socketClients.push_back(std::move(sock));
+        }
+        for (size_t i = 0; i < NB_PLAYERS; ++i){a.accept(socketClients[i]);}
+        for (size_t i = 0; i < NB_PLAYERS; ++i){std::thread(clientListener, std::ref(socketClients[i]), std::ref(queueClients[i])).detach();}
 
         std::vector<uint8_t> msg;
 
@@ -166,26 +192,21 @@ int main(int argc, char* argv[]){
 
         printf("Waiting for clients...\n");
 
-        sendGameStart(sock1, 1);
-        sendGameStart(sock2, 2);
+        for (size_t i = 0; i < NB_PLAYERS; ++i){
+            sendGameStart(socketClients[i], i);
+        }
 
         for(;;) {
-            if (queueCli1.poll(msg)) {
-                exploitMessage(msg, std::ref(sock1), std::ref(sock2), 1);
-                printf("finExlpoit\n");
-            }
-
-            if (queueCli2.poll(msg)) {
-                exploitMessage(msg, std::ref(sock2), std::ref(sock1), 2);
+            for (size_t i = 0; i < NB_PLAYERS; ++i){
+                if (queueClients[i].poll(msg)) {
+                    exploitMessage(msg, socketClients, i);
+                }
             }
         }
 
     } catch (std::exception& e) {
         std::cerr << "Exception SERVER: " << e.what() << "\n";
     }
-    
-
-
     return 0;
 
 }

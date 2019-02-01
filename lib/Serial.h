@@ -12,7 +12,6 @@ const static size_t maxLength = 1024;
 
 struct CTS_TetrominoPlaced {
 	Tetromino tetro;
-	Grid grid;
 };
 
 
@@ -58,8 +57,14 @@ struct STC_GameStart {
 	Tetromino secondTetro;
 };
 
-struct STC_UpdateOtherPlayer {
+struct STC_UpdateGrid {
 	Grid grid;
+	uint32_t score;
+};
+
+struct STC_UpdateOtherGrid {
+	Grid grid;
+	uint32_t score;
 };
 
 struct STC_GameOver {
@@ -69,6 +74,7 @@ struct STC_GameOver {
 struct Request_STC{
 	enum Type : uint8_t {
 		TYPE_NEW_TETROMINO,
+		TYPE_UPDATE,
 		TYPE_UPDATE_OTHER,
 		TYPE_GAME_START,
 		TYPE_GAME_OVER
@@ -78,7 +84,8 @@ struct Request_STC{
 
 	union {
 		STC_NewTetromino newTetroMsg;
-		STC_UpdateOtherPlayer updateOtherMsg;
+		STC_UpdateGrid updateMsg;
+		STC_UpdateOtherGrid updateOtherMsg;
 		STC_GameStart gameStart;
 		STC_GameOver gameOver;
 	};

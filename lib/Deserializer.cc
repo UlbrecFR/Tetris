@@ -101,8 +101,14 @@
 		deserialize(r.secondTetro);
 	}
 
-	void Deserializer::deserialize(STC_UpdateOtherPlayer & r){
+	void Deserializer::deserialize(STC_UpdateGrid & r){
 		deserialize(r.grid);
+		deserialize(r.score);
+	}
+
+	void Deserializer::deserialize(STC_UpdateOtherGrid & r){
+		deserialize(r.grid);
+		deserialize(r.score);
 	}
 
 	void Deserializer::deserialize(STC_NewTetromino & r){
@@ -126,6 +132,9 @@
 			case Request_STC::TYPE_NEW_TETROMINO :
 				deserialize(r.newTetroMsg);
 				break;
+			case Request_STC::TYPE_UPDATE :
+				deserialize(r.updateMsg);
+				break;
 			case Request_STC::TYPE_UPDATE_OTHER :
 				deserialize(r.updateOtherMsg);
 				break;
@@ -140,7 +149,6 @@
 
 	void Deserializer::deserialize(CTS_TetrominoPlaced & r){
 		deserialize(r.tetro);
-		deserialize(r.grid);
 	}
 	
 	void Deserializer::deserialize(CTS_GameOver & r){

@@ -55,7 +55,7 @@ class Grid{
 
 		bool rotatePossible(Tetromino tetro) const;
 
-		bool gameOver(Tetromino & t) const;
+		bool gameOver() const;
 
 		void clear();
 

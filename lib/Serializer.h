@@ -46,8 +46,10 @@ class Serializer{
 		void serialize(const Tetromino t);
 
 		void serialize(const STC_GameStart r);
+
+		void serialize(const STC_UpdateGrid r);
 		
-		void serialize(const STC_UpdateOtherPlayer r);
+		void serialize(const STC_UpdateOtherGrid r);
 
 		void serialize(const STC_NewTetromino r);
 
