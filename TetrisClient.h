@@ -36,6 +36,8 @@
 #include "DisplayGame.h"
 #include "Controls.h"
 
+#define RETRY_CONNECTION_DELAY 3
+
 using boost::asio::ip::tcp;
 
 

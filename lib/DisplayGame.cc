@@ -79,8 +79,12 @@ void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, 
     renderer.draw(scoreText);
 }
 
-void DisplayGame::drawWait(gf::RenderWindow & renderer){
-	renderer.draw(spriteWait);
+void DisplayGame::drawWaitPlayer(gf::RenderWindow & renderer){
+	renderer.draw(spriteWaitPlayer);
+}
+
+void DisplayGame::drawWaitServer(gf::RenderWindow & renderer){
+    renderer.draw(spriteWaitServer);
 }
 
 void DisplayGame::drawWinLoose(bool win, gf::RenderWindow & renderer){

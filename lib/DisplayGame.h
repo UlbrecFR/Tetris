@@ -26,10 +26,12 @@ class DisplayGame{
 
 	gf::Texture textureWin;
 	gf::Texture textureLost;
-	gf::Texture textureWait;
+	gf::Texture textureWaitPlayer;
+	gf::Texture textureWaitServer;
 
 	gf::Sprite spriteGameOver;
-	gf::Sprite spriteWait;
+	gf::Sprite spriteWaitPlayer;
+	gf::Sprite spriteWaitServer;
 
 	gf::Sprite tabSprite[4][2];
 
@@ -43,8 +45,9 @@ class DisplayGame{
 			gaOther.loadTextures(tabTexture);
 
 			if (!textureWin.loadFromFile(gf::Path("../ressources/win.png"))) {exit(EXIT_FAILURE);}
-			if (!textureLost.loadFromFile(gf::Path("../ressources/lost.png"))) {exit(EXIT_FAILURE);}
-			if (!textureWait.loadFromFile(gf::Path("../ressources/waitingScreen.png"))) {exit(EXIT_FAILURE);}
+			if (!textureLost.loadFromFile(gf::Path("../ressources/loose.png"))) {exit(EXIT_FAILURE);}
+			if (!textureWaitPlayer.loadFromFile(gf::Path("../ressources/waitingForPlayer.png"))) {exit(EXIT_FAILURE);}
+			if (!textureWaitServer.loadFromFile(gf::Path("../ressources/waitingForServer.png"))) {exit(EXIT_FAILURE);}
 
 			gaSelf.setPosition({SIZE_CASE,SIZE_CASE});
 			gaOther.setPosition({15*SIZE_CASE,SIZE_CASE});
@@ -56,7 +59,8 @@ class DisplayGame{
 	        scoreText.setCharacterSize(10);
 	        scoreText.setColor(gf::Color::White);
 
-	        spriteWait.setTexture(textureWait);	
+	        spriteWaitPlayer.setTexture(textureWaitPlayer);	
+	        spriteWaitServer.setTexture(textureWaitServer);	
 
 	        for (size_t i = 0; i < 4; ++i){
 		    	for (size_t j = 0; j < 2; ++j){
@@ -67,7 +71,9 @@ class DisplayGame{
 		
 		void draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, gf::RenderWindow & renderer, gf::RenderStates & r_state);
 
-		void drawWait(gf::RenderWindow & renderer);
+		void drawWaitPlayer(gf::RenderWindow & renderer);
+
+		void drawWaitServer(gf::RenderWindow & renderer);
 
 		void drawWinLoose(bool win, gf::RenderWindow & renderer);
 

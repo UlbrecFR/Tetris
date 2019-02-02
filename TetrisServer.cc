@@ -210,7 +210,7 @@ int main(int argc, char* argv[]){
         }
 
         gf::Time time;
-        gf::Time gameDuration(gf::seconds(180.0f));
+        gf::Time gameDuration(gf::seconds(20.0f));
 
         for(;;) {
             for (size_t i = 0; i < NB_PLAYERS; ++i){
