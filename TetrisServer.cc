@@ -146,7 +146,7 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
     }
 }
 
-void sendGameStart(tcp::socket & socketClient, size_t id) {
+void sendGameStart(tcp::socket & socketClient, uint64_t time, size_t id) {
         Serializer s;
 
         Tetromino firstTetro;
@@ -171,6 +171,7 @@ void sendGameStart(tcp::socket & socketClient, size_t id) {
 
         rqSTC.gameStart.firstTetro = firstTetro;
         rqSTC.gameStart.secondTetro = secondTetro;
+        rqSTC.gameStart.time = time;
 
         s.serialize(rqSTC);
         boost::asio::write(socketClient, boost::asio::buffer(s.getData()));
@@ -179,8 +180,8 @@ void sendGameStart(tcp::socket & socketClient, size_t id) {
 
 int main(int argc, char* argv[]){
     try {
-        if (argc != 2) {
-            std::cerr << "Usage: blocking_tcp_echo_server <port>\n";
+        if (argc != 3) {
+            std::cerr << "Usage: ./TetrisServer <port> <gametime>\n";
             return 1;
         }
 
@@ -206,11 +207,11 @@ int main(int argc, char* argv[]){
         printf("Waiting for clients...\n");
 
         for (size_t i = 0; i < NB_PLAYERS; ++i){
-            sendGameStart(socketClients[i], i);
+            sendGameStart(socketClients[i], atoi(argv[2]), i);
         }
 
         gf::Time time;
-        gf::Time gameDuration(gf::seconds(180.0f));
+        gf::Time gameDuration(gf::seconds(static_cast<float>(atoi(argv[2]))));
 
         for(;;) {
             for (size_t i = 0; i < NB_PLAYERS; ++i){

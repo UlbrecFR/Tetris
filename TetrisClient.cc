@@ -169,7 +169,7 @@ int main(int argc, char* argv[]){
 
                 gf::Clock clock;
                 gf::Time pastTime;
-                gf::Time gameDuratiion = (gf::seconds(180.0f));
+                gf::Time gameDuratiion = (gf::seconds(static_cast<float>(rqFS.gameStart.time)));
                 gf::Time time;
 
                 while (enPartie) {

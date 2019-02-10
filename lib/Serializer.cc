@@ -81,6 +81,7 @@
 	void Serializer::serialize(const STC_GameStart r){
 		serialize(r.firstTetro);
 		serialize(r.secondTetro);
+		serialize(r.time);
 	}
 
 	void Serializer::serialize(const STC_UpdateGrid r){

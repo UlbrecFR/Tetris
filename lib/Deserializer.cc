@@ -99,6 +99,7 @@
 	void Deserializer::deserialize(STC_GameStart & r){
 		deserialize(r.firstTetro);
 		deserialize(r.secondTetro);
+		deserialize(r.time);
 	}
 
 	void Deserializer::deserialize(STC_UpdateGrid & r){

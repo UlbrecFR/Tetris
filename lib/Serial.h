@@ -55,6 +55,7 @@ struct STC_NewTetromino {
 struct STC_GameStart {
 	Tetromino firstTetro;
 	Tetromino secondTetro;
+	uint64_t time;
 };
 
 struct STC_UpdateGrid {
