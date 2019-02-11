@@ -29,11 +29,12 @@ class GameArea : public gf::Transformable {
 		gf::Sprite tabSprite[HEIGHT_G * WIDTH_G];
 		gf::Texture *tabTexture;
 		gf::Texture textureBackground;
+		gf::Texture textureBackgroundMalus;
         gf::Sprite background;
 
 	public :
 
-		void updateTextureBackground(Grid & gd);
+		void updateTextureBackground(Grid & gd, bool malus);
 
 		void updateTextureTetromino(Tetromino & tetro);
 

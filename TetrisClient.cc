@@ -274,7 +274,7 @@ int main(int argc, char* argv[]){
                         } 
 
                         if (controls("Down").isActive() && malus != 3) {
-                            periodChute.subTo(gf::seconds(0.1f));
+                            periodChute.subTo(gf::seconds(0.1f));   
                         } else {                                
                             if (malus == 1) {
                                 periodChute = gf::seconds(0.1f);
@@ -298,7 +298,7 @@ int main(int argc, char* argv[]){
                                 t = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
                                 if (malus == 1) {
-                                    periodChute = gf::seconds(0.1f);
+                                    periodChute = gf::seconds(0.2f);
                                 } else {
                                     periodChute = gf::seconds(1.0f);
                                 }
@@ -326,7 +326,7 @@ int main(int argc, char* argv[]){
                         renderer.clear();
                         renderer.setView(mainView);       
 
-                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, renderer, r_state);
+                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, (malus != 0), malus_other, renderer, r_state);
                  
                         renderer.display();
                         controls.reset();
@@ -349,8 +349,8 @@ int main(int argc, char* argv[]){
                         renderer.clear();
                         renderer.setView(mainView);
 
-                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, renderer, r_state);
-
+                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, (malus != 0), malus_other, renderer, r_state);
+                 
                         switch(win){
                             case STC_GameOver::TYPE_WIN:
                                 displayGame.drawWin(renderer);

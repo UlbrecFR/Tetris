@@ -69,7 +69,9 @@ class DisplayGame{
 		    }
 		}
 		
-		void draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, gf::RenderWindow & renderer, gf::RenderStates & r_state);
+		void draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, 
+			uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, bool malusSelf, bool malusOther,
+			gf::RenderWindow & renderer, gf::RenderStates & r_state);
 
 		void drawWaitPlayer(gf::RenderWindow & renderer);
 

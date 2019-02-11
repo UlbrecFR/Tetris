@@ -31,9 +31,13 @@ void DisplayGame::loadTextures(){
     }
 }
 
-void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, gf::RenderWindow & renderer, gf::RenderStates & r_state){
-	gaSelf.updateTextureBackground(gdSelf);
-    gaOther.updateTextureBackground(gdOther);
+    void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, 
+        uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, bool malusSelf, bool malusOther,
+        gf::RenderWindow & renderer, gf::RenderStates & r_state) {
+
+
+	gaSelf.updateTextureBackground(gdSelf, malusSelf);
+    gaOther.updateTextureBackground(gdOther, malusOther);
     gaSelf.updateTextureTetromino(currentTetro);
     gaSelf.draw(renderer, r_state);
     gaOther.draw(renderer, r_state);
