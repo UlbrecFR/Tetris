@@ -117,7 +117,31 @@ void sendGameOver(std::vector<tcp::socket> & socketClients) {
     }  
 }
 
-void updateGrid(Tetromino t, size_t id){
+void sendBonus(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClients){
+    Serializer s;
+
+    Request_STC rqSTC;
+    rqSTC.type = Request_STC::TYPE_BONUS;
+
+    rqSTC.bonus.typeBonus = nbLine;
+
+    for (size_t i = 0; i < NB_PLAYERS; ++i){
+        if (i == id){
+            rqSTC.bonus.target = 0;
+            printf("Sending a TYPE_BONUS msg \n");
+        } else {
+            rqSTC.bonus.target = 1;
+            printf("Sending a TYPE_BONUS_OTHER msg \n");
+        }
+
+        s.serialize(rqSTC);
+        boost::asio::write(socketClients[i], boost::asio::buffer(s.getData()));
+        s.clear();
+
+    }
+}
+
+void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients){
     grids[id].addTetromino(t);
     if (grids[id].gameOver()){
         grids[id].clear();
@@ -126,9 +150,12 @@ void updateGrid(Tetromino t, size_t id){
         size_t nbLine = grids[id].deleteLines();
         if(nbLine > 0){
             scores[id] += nbLine * nbLine;
+            sendBonus(nbLine, id, socketClients);
         }  
     }
 }
+
+
 
 void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id) {
 
@@ -142,7 +169,7 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
     switch(rqFC.type) {
         case Request_CTS::TYPE_TETROMINO_PLACED : 
             printf("Received a TYPE_TETROMINO_PLACED msg from Client %zu\n\t placed-tetro : t%d r%d pos%d-%d\n", id, rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
-            updateGrid(rqFC.tetroMsg.tetro, id);
+            updateGrid(rqFC.tetroMsg.tetro, id, socketClients);
             sendGrids(socketClients, id);
             sendNewTetro(socketClients, id);
             break;    

@@ -96,6 +96,11 @@
 		readPos += 2;
 	}
 
+	void Deserializer::deserialize(STC_Bonus & r){
+		deserialize(r.typeBonus);
+		deserialize(r.target);
+	}
+
 	void Deserializer::deserialize(STC_GameStart & r){
 		deserialize(r.firstTetro);
 		deserialize(r.secondTetro);
@@ -146,6 +151,9 @@
 				break;
 			case Request_STC::TYPE_GAME_OVER :
 				deserialize(r.gameOver);
+				break;
+			case Request_STC::TYPE_BONUS :
+				deserialize(r.bonus);
 				break;
 		}
 	}

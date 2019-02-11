@@ -98,6 +98,8 @@ int main(int argc, char* argv[]){
 
         // actions
         Controls controls;  
+        uint8_t malus = 0;
+        bool malus_other = false;
 
         //////////////////////////////////////////////////////////////
 
@@ -228,6 +230,7 @@ int main(int argc, char* argv[]){
                                 case Request_STC::TYPE_UPDATE_OTHER :
                                     gdOther = rqFS.updateOtherMsg.grid;
                                     scoreOther = rqFS.updateOtherMsg.score;
+                                    malus_other = false;
                                     printf("Received a TYPE_UPDATE_OTHER\n");
                                     break;
                                 case Request_STC::TYPE_GAME_START :
@@ -238,29 +241,36 @@ int main(int argc, char* argv[]){
                                     enPartie = false;
                                     win = rqFS.gameOver.results;
                                     break;
+                                case Request_STC::TYPE_BONUS :
+                                    if(rqFS.bonus.target == 0){
+                                        malus = rqFS.bonus.typeBonus;
+                                    }else{
+                                        malus_other = true;
+                                    }
+                                    break;
                             }
                         }
-                        if (controls("Right").isActive()) {
+                        if (controls("Right").isActive() && malus != 3) {
                             if(gdSelf.rightPossible(currentTetro)){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
                                 currentTetro.setX(currentTetro.getX() + 1);
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                             }
                             
-                        } else if (controls("Left").isActive()) {
+                        } else if (controls("Left").isActive() && malus != 3) {
                             if (gdSelf.leftPossible(currentTetro)){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
                                 currentTetro.setX(currentTetro.getX() - 1);
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                             }
                             
-                        } else if (controls("Rotate").isActive()) {
+                        } else if (controls("Rotate").isActive() && malus != 2) {
                             if (gdSelf.rotatePossible(currentTetro)) {
                                 currentTetro.rotate();
                             }
                         } 
 
-                        if (controls("Down").isActive()) {
+                        if (controls("Down").isActive() && malus != 3) {
                             periodChute.subTo(gf::seconds(0.1f));
                         } else {
                             periodChute = gf::seconds(1.0f);
@@ -277,6 +287,7 @@ int main(int argc, char* argv[]){
                             }
                         }else{
                             if(t > periodChute){
+                                malus = 0;
                                 t = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
                                 periodChute = gf::seconds(1.0f);

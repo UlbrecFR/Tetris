@@ -78,6 +78,11 @@
 		serialize(t.getRotation());
 	}
 
+	void Serializer::serialize(const STC_Bonus r){
+		serialize(r.typeBonus);
+		serialize(r.target);
+	}
+
 	void Serializer::serialize(const STC_GameStart r){
 		serialize(r.firstTetro);
 		serialize(r.secondTetro);
@@ -128,6 +133,9 @@
 				break;
 			case Request_STC::TYPE_GAME_OVER :
 				serialize(r.gameOver);
+				break;
+			case Request_STC::TYPE_BONUS :
+				serialize(r.bonus);
 				break;
 		}
 	}

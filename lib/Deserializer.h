@@ -57,6 +57,8 @@ class Deserializer{
 
 		void deserialize(STC_NewTetromino & r);
 
+		void deserialize(STC_Bonus & r);
+
 		void deserialize(STC_GameOver & r);
 		
 		void deserialize(Request_STC::Type & t);

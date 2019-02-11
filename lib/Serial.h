@@ -72,13 +72,19 @@ struct STC_GameOver {
 	Results results;
 };
 
+struct STC_Bonus{
+	uint8_t target;
+	uint8_t typeBonus;
+};
+
 struct Request_STC{
 	enum Type : uint8_t {
 		TYPE_NEW_TETROMINO,
 		TYPE_UPDATE,
 		TYPE_UPDATE_OTHER,
 		TYPE_GAME_START,
-		TYPE_GAME_OVER
+		TYPE_GAME_OVER,
+		TYPE_BONUS
 	};
 
 	Type type;
@@ -89,6 +95,7 @@ struct Request_STC{
 		STC_UpdateOtherGrid updateOtherMsg;
 		STC_GameStart gameStart;
 		STC_GameOver gameOver;
+		STC_Bonus bonus;
 	};
 };
 
