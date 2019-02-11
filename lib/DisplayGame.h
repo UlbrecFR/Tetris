@@ -75,7 +75,11 @@ class DisplayGame{
 
 		void drawWaitServer(gf::RenderWindow & renderer);
 
-		void drawWinLoose(bool win, gf::RenderWindow & renderer);
+		void drawWin(gf::RenderWindow & renderer);
+
+		void drawLoose(gf::RenderWindow & renderer);
+
+		void drawDraw(gf::RenderWindow & renderer);
 
 		void loadTextures();
 };

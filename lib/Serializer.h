@@ -53,6 +53,8 @@ class Serializer{
 
 		void serialize(const STC_NewTetromino r);
 
+		void serialize(const STC_GameOver::Results r);
+
 		void serialize(const STC_GameOver r);
 
 		void serialize(const Request_STC::Type t);
@@ -64,8 +66,6 @@ class Serializer{
 		void serialize(const CTS_ClientConnectionLost::ErrorType t);
 	
 		void serialize(const CTS_ClientConnectionLost r);
-
-		void serialize(const CTS_GameOver r);
 
 		void serialize(const Request_CTS::Type t);
 

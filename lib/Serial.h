@@ -17,21 +17,16 @@ struct CTS_TetrominoPlaced {
 
 struct CTS_ClientConnectionLost {
 	enum ErrorType : uint8_t {
-		ClientQuit,
-		ClientCrash
+		TYPE_CLIENT_QUIT,
+		TYPE_CLIENT_CRASH
 	};
 
 	ErrorType error;
 };
 
-struct CTS_GameOver {
-	Tetromino tetro;
-};
-
 struct Request_CTS{
 	enum Type : uint8_t {
 		TYPE_TETROMINO_PLACED,
-		TYPE_GAME_OVER,
 		TYPE_CLIENT_CONNECTION_LOST
 	};
 
@@ -39,7 +34,6 @@ struct Request_CTS{
 
 	union {
 		CTS_TetrominoPlaced tetroMsg;
-		CTS_GameOver gameOverMsg;
 		CTS_ClientConnectionLost discoMsg;
 	};
 };
@@ -69,7 +63,13 @@ struct STC_UpdateOtherGrid {
 };
 
 struct STC_GameOver {
-	uint8_t win;
+	enum Results : uint8_t {
+		TYPE_WIN,
+		TYPE_LOOSE,
+		TYPE_DRAW
+	};
+
+	Results results;
 };
 
 struct Request_STC{

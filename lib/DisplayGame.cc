@@ -87,14 +87,20 @@ void DisplayGame::drawWaitServer(gf::RenderWindow & renderer){
     renderer.draw(spriteWaitServer);
 }
 
-void DisplayGame::drawWinLoose(bool win, gf::RenderWindow & renderer){
-	
-	if(win){
-		spriteGameOver.setTexture(textureWin);
-	} else {
-		spriteGameOver.setTexture(textureLost);
-	}
-
-	renderer.draw(spriteGameOver);
+void DisplayGame::drawWin(gf::RenderWindow & renderer){
+    spriteGameOver.setTexture(textureWin);
+    spriteGameOver.setTexture(textureLost);     
+    renderer.draw(spriteGameOver);
 }
+
+void DisplayGame::drawLoose(gf::RenderWindow & renderer){
+    spriteGameOver.setTexture(textureLost);     
+    renderer.draw(spriteGameOver);
+}
+
+void DisplayGame::drawDraw(gf::RenderWindow & renderer){
+    spriteGameOver.setTexture(textureLost);     
+    renderer.draw(spriteGameOver);
+}
+
 

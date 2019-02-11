@@ -87,19 +87,28 @@ void sendGameOver(std::vector<tcp::socket> & socketClients) {
     rqSTC.type = Request_STC::TYPE_GAME_OVER;
 
     size_t winnerScore = 0;
+    size_t nbWinner = 0;
 
     for (size_t i = 0; i < NB_PLAYERS; ++i){
-        if (scores[i] >= winnerScore){
+        if (scores[i] > winnerScore){
             winnerScore = scores[i];
+            nbWinner = 1;
+        } else if (scores[i] == winnerScore){
+            ++nbWinner;
         }
     }
 
      for (size_t i = 0; i < NB_PLAYERS; ++i){
         if (scores[i] == winnerScore){
-            rqSTC.gameOver.win = true;
-            printf("Sending a win message at player %zu\n", i);
+            if (nbWinner > 1){
+               rqSTC.gameOver.results = STC_GameOver::TYPE_DRAW;
+               printf("Sending a draw message at player %zu\n", i); 
+            } else if (nbWinner == 1){
+               rqSTC.gameOver.results = STC_GameOver::TYPE_WIN;
+               printf("Sending a win message at player %zu\n", i); 
+            }    
         } else {
-            rqSTC.gameOver.win = false;            
+            rqSTC.gameOver.results = STC_GameOver::TYPE_LOOSE;           
             printf("Sending a loose message at player %zu\n", i);
         }
         s.serialize(rqSTC);
@@ -136,12 +145,11 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
             updateGrid(rqFC.tetroMsg.tetro, id);
             sendGrids(socketClients, id);
             sendNewTetro(socketClients, id);
-            break;
-        case Request_CTS::TYPE_GAME_OVER :
-            printf("Received a TYPE_GAME_OVER\n");   
-            //sendGameOver(socketClient, socketOtherClient);
-            break;        
-        case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : 
+            break;    
+        case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
+            printf("Received a TYPE_CLIENT_CONNECTION_LOST\n");   
+            sendGameOver(socketClients);
+            exit(0);
             break;
     }
 }

@@ -64,10 +64,6 @@ class Deserializer{
 		void deserialize(Request_STC & r);
 
 		void deserialize(CTS_TetrominoPlaced & r);
-
-		void deserialize(CTS_GameOver & r);
-
-		void deserialize(CTS_ClientConnectionLost::ErrorType & t);
 	
 		void deserialize(CTS_ClientConnectionLost & r);
 

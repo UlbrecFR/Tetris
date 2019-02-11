@@ -117,7 +117,9 @@
 	}
 
 	void Deserializer::deserialize(STC_GameOver & r){
-		deserialize(r.win);
+		uint8_t t;
+		deserialize(t);
+		r.results = (STC_GameOver::Results)t;
 	}
 
 	void Deserializer::deserialize(Request_STC::Type & t){
@@ -151,17 +153,11 @@
 	void Deserializer::deserialize(CTS_TetrominoPlaced & r){
 		deserialize(r.tetro);
 	}
-	
-	void Deserializer::deserialize(CTS_GameOver & r){
-		deserialize(r.tetro);
-	}
-
-	void Deserializer::deserialize(CTS_ClientConnectionLost::ErrorType & t){
-		deserialize(t);
-	}
 
 	void Deserializer::deserialize(CTS_ClientConnectionLost & r){
-		deserialize(r.error);
+		uint8_t t;
+		deserialize(t);
+		r.error = (CTS_ClientConnectionLost::ErrorType)t;
 	}
 
 	void Deserializer::deserialize(Request_CTS::Type & t){
@@ -177,10 +173,8 @@
 			case Request_CTS::TYPE_TETROMINO_PLACED :
 				deserialize(r.tetroMsg);
 				break;
-			case Request_CTS::TYPE_GAME_OVER :
-				deserialize(r.gameOverMsg);
-				break;
 			case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
+			printf("voui\n");
 				deserialize(r.discoMsg);
 				break;
 		}

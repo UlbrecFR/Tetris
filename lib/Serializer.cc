@@ -98,8 +98,12 @@
 		serialize(r.newTetro);
 	}
 
+	void Serializer::serialize(const STC_GameOver::Results r){
+		serialize((uint8_t)r);
+	}
+
 	void Serializer::serialize(const STC_GameOver r){
-		serialize(r.win);
+		serialize(r.results);
 	}
 
 	void Serializer::serialize(const Request_STC::Type t){
@@ -131,13 +135,9 @@
 	void Serializer::serialize(const CTS_TetrominoPlaced r){
 		serialize(r.tetro);
 	}
-	
-	void Serializer::serialize(const CTS_GameOver r){
-		serialize(r.tetro);
-	}
 
 	void Serializer::serialize(const CTS_ClientConnectionLost::ErrorType t){
-		serialize(t);
+		serialize((uint8_t)t);
 	}
 	
 	void Serializer::serialize(const CTS_ClientConnectionLost r){
@@ -157,9 +157,6 @@
 				break;
 			case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
 				serialize(r.discoMsg);
-				break;
-			case Request_CTS::TYPE_GAME_OVER :
-				serialize(r.gameOverMsg);
 				break;
 		}
 	}
