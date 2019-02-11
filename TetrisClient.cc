@@ -242,10 +242,13 @@ int main(int argc, char* argv[]){
                                     win = rqFS.gameOver.results;
                                     break;
                                 case Request_STC::TYPE_BONUS :
+                                    printf("%d\n", rqFS.bonus.target);
+                                    printf("%d\n", rqFS.bonus.typeBonus);
+                
                                     if(rqFS.bonus.target == 0){
-                                        malus = rqFS.bonus.typeBonus;
-                                    }else{
                                         malus_other = true;
+                                    }else{
+                                        malus = rqFS.bonus.typeBonus;
                                     }
                                     break;
                             }
