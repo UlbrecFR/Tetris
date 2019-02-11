@@ -275,8 +275,12 @@ int main(int argc, char* argv[]){
 
                         if (controls("Down").isActive() && malus != 3) {
                             periodChute.subTo(gf::seconds(0.1f));
-                        } else {
-                            periodChute = gf::seconds(1.0f);
+                        } else {                                
+                            if (malus == 1) {
+                                periodChute = gf::seconds(0.1f);
+                            } else {
+                                periodChute = gf::seconds(1.0f);
+                            }
                         }
 
                         t = clockChute.getElapsedTime();
@@ -293,8 +297,12 @@ int main(int argc, char* argv[]){
                                 malus = 0;
                                 t = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
-                                periodChute = gf::seconds(1.0f);
-
+                                if (malus == 1) {
+                                    periodChute = gf::seconds(0.1f);
+                                } else {
+                                    periodChute = gf::seconds(1.0f);
+                                }
+                                
                                 rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
                                 rqTS.tetroMsg.tetro = currentTetro;
 
