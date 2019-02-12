@@ -98,8 +98,9 @@ int main(int argc, char* argv[]){
 
         // actions
         Controls controls;  
+        uint8_t malusOther = 0;
         uint8_t malus = 0;
-        bool malus_other = false;
+        uint8_t malusNext = 0;
 
         //////////////////////////////////////////////////////////////
 
@@ -230,7 +231,10 @@ int main(int argc, char* argv[]){
                                 case Request_STC::TYPE_UPDATE_OTHER :
                                     gdOther = rqFS.updateOtherMsg.grid;
                                     scoreOther = rqFS.updateOtherMsg.score;
-                                    malus_other = false;
+                                    if (malusOther > 0) {
+                                        malusOther--;
+
+                                    }
                                     printf("Received a TYPE_UPDATE_OTHER\n");
                                     break;
                                 case Request_STC::TYPE_GAME_START :
@@ -242,13 +246,14 @@ int main(int argc, char* argv[]){
                                     win = rqFS.gameOver.results;
                                     break;
                                 case Request_STC::TYPE_BONUS :
-                                    printf("%d\n", rqFS.bonus.target);
-                                    printf("%d\n", rqFS.bonus.typeBonus);
-                
+                                    printf("Received a TYPE_GAME_OVER\n");
+  
                                     if(rqFS.bonus.target == 0){
-                                        malus_other = true;
+                                        malusOther = 2;
                                     }else{
-                                        malus = rqFS.bonus.typeBonus;
+                                        if (rqFS.bonus.typeBonus > malusNext) {
+                                            malusNext = rqFS.bonus.typeBonus;
+                                        }
                                     }
                                     break;
                             }
@@ -294,7 +299,8 @@ int main(int argc, char* argv[]){
                             }
                         }else{
                             if(t > periodChute){
-                                malus = 0;
+                                malus = malusNext;
+                                malusNext = 0;
                                 t = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
                                 if (malus == 1) {
@@ -324,9 +330,10 @@ int main(int argc, char* argv[]){
                         time = gameDuratiion-pastTime; 
 
                         renderer.clear();
-                        renderer.setView(mainView);       
+                        renderer.setView(mainView);
 
-                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, (malus != 0), malus_other, renderer, r_state);
+                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
+                            (malus != 0 || malusNext != 0), (malusOther > 0), renderer, r_state);
                  
                         renderer.display();
                         controls.reset();
@@ -349,7 +356,8 @@ int main(int argc, char* argv[]){
                         renderer.clear();
                         renderer.setView(mainView);
 
-                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, (malus != 0), malus_other, renderer, r_state);
+                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
+                            (malus != 0 || malusNext != 0), (malusOther > 0), renderer, r_state);
                  
                         switch(win){
                             case STC_GameOver::TYPE_WIN:

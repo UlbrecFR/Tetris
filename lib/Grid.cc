@@ -114,7 +114,18 @@ bool Grid::rotatePossible(Tetromino t) const{
         if (c.x < 0 || c.x >= getCols() || c.y < 0 || c.y >= getRows()) {
             return false;
         }
+
+        printf("LAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA\n");
+        printf("%d %d\n", c.x, c.y);
+        printf("%d %d\n", t.getX(), t.getY());
+        printf("%d\n", (*this)(c.x, c.y));
+
+        if ((c.x != t.getX() || c.y != t.getY()) && (*this)(c.x, c.y) != 0) {
+            printf("NOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOoo\n");
+            return false;
+        }
     }
+    printf("OUIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII\n");
     return true;
 }
 
