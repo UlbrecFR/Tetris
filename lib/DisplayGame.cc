@@ -93,7 +93,6 @@ void DisplayGame::drawWaitServer(gf::RenderWindow & renderer){
 
 void DisplayGame::drawWin(gf::RenderWindow & renderer){
     spriteGameOver.setTexture(textureWin);
-    spriteGameOver.setTexture(textureLost);     
     renderer.draw(spriteGameOver);
 }
 
