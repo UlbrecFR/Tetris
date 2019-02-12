@@ -333,7 +333,7 @@ int main(int argc, char* argv[]){
                         renderer.setView(mainView);
 
                         displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
-                            (malus != 0 || malusNext != 0), (malusOther > 0), renderer, r_state);
+                            (malus != 0), (malusNext != 0), (malusOther > 0), renderer, r_state);
                  
                         renderer.display();
                         controls.reset();
@@ -357,7 +357,7 @@ int main(int argc, char* argv[]){
                         renderer.setView(mainView);
 
                         displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
-                            (malus != 0 || malusNext != 0), (malusOther > 0), renderer, r_state);
+                            (malus != 0), (malusNext != 0), (malusOther > 0), renderer, r_state);
                  
                         switch(win){
                             case STC_GameOver::TYPE_WIN:

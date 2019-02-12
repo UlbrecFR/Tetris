@@ -26,6 +26,7 @@ class DisplayGame{
 
 	gf::Texture textureWin;
 	gf::Texture textureLost;
+	gf::Texture textureDraw;
 	gf::Texture textureWaitPlayer;
 	gf::Texture textureWaitServer;
 
@@ -46,6 +47,7 @@ class DisplayGame{
 
 			if (!textureWin.loadFromFile(gf::Path("../ressources/win.png"))) {exit(EXIT_FAILURE);}
 			if (!textureLost.loadFromFile(gf::Path("../ressources/loose.png"))) {exit(EXIT_FAILURE);}
+			if (!textureDraw.loadFromFile(gf::Path("../ressources/draw.png"))) {exit(EXIT_FAILURE);}
 			if (!textureWaitPlayer.loadFromFile(gf::Path("../ressources/waitingForPlayer.png"))) {exit(EXIT_FAILURE);}
 			if (!textureWaitServer.loadFromFile(gf::Path("../ressources/waitingForServer.png"))) {exit(EXIT_FAILURE);}
 
@@ -70,7 +72,7 @@ class DisplayGame{
 		}
 		
 		void draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, 
-			uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, bool malusSelf, bool malusOther,
+			uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, bool malusSelf, bool malusSelfNext, bool malusOther,
 			gf::RenderWindow & renderer, gf::RenderStates & r_state);
 
 		void drawWaitPlayer(gf::RenderWindow & renderer);

@@ -31,10 +31,11 @@ class GameArea : public gf::Transformable {
 		gf::Texture textureBackground;
 		gf::Texture textureBackgroundMalus;
         gf::Sprite background;
+        gf::Vector2f position;
 
 	public :
 
-		void updateTextureBackground(Grid & gd, bool malus);
+		void updateTextureBackground(Grid & gd, bool malus, bool malusNext);
 
 		void updateTextureTetromino(Tetromino & tetro);
 
