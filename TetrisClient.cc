@@ -281,7 +281,7 @@ int main(int argc, char* argv[]){
                         if (controls("Down").isActive() && malus != 3) {
                             periodChute.subTo(gf::seconds(0.1f));   
                         } else {                                
-                            if (malus == 1) {
+                            if (malus == 4) {
                                 periodChute = gf::seconds(0.1f);
                             } else {
                                 periodChute = gf::seconds(1.0f);
@@ -303,7 +303,7 @@ int main(int argc, char* argv[]){
                                 malusNext = 0;
                                 t = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
-                                if (malus == 1) {
+                                if (malus == 4) {
                                     periodChute = gf::seconds(0.2f);
                                 } else {
                                     periodChute = gf::seconds(1.0f);
