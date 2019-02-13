@@ -272,16 +272,16 @@ int main(int argc, char* argv[]){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                             }
                             
-                        } else if (controls("Rotate").isActive() && malus != 2) {
+                        } else if (controls("Rotate").isActive() && malus != 1) {
                             if (gdSelf.rotatePossible(currentTetro)) {
                                 currentTetro.rotate();
                             }
                         } 
 
-                        if (controls("Down").isActive() && malus != 3) {
+                        if (controls("Down").isActive()) {
                             periodChute.subTo(gf::seconds(0.1f));   
                         } else {                                
-                            if (malus == 4) {
+                            if (malus == 2) {
                                 periodChute = gf::seconds(0.1f);
                             } else {
                                 periodChute = gf::seconds(1.0f);

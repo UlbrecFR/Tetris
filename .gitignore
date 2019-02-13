@@ -5,3 +5,6 @@ lib/CMakeFiles/
 lib/Makefile
 lib/cmake_install.cmake
 TODO
+rapport/rapportTetris.aux
+rapport/rapportTetris.log
+rapport/rapportTetris.pdf

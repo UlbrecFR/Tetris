@@ -150,9 +150,9 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
         size_t nbLine = grids[id].deleteLines();
         if(nbLine > 0){
             scores[id] += nbLine * nbLine;
-            if (nbLine > 1) {
+            //if (nbLine > 1) {
                 sendBonus(nbLine, id, socketClients);
-            }
+            //}
         }  
     }
 }
