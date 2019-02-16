@@ -100,7 +100,8 @@ int main(int argc, char* argv[]){
         Controls controls;  
         uint8_t malusOther = 0;
         uint8_t malus = 0;
-        uint8_t malusNext = 0;
+        gf::Queue<uint8_t> queueMalus;
+
 
         //////////////////////////////////////////////////////////////
 
@@ -149,8 +150,11 @@ int main(int argc, char* argv[]){
 
                     // game loop
                     gf::Clock clockChute;
-                    gf::Time t;
+                    gf::Clock clockMalus;
+                    gf::Time tChute;
+                    gf::Time tMalus;
                     gf::Time periodChute = gf::seconds(1.0f);
+                    gf::Time periodMalus = gf::seconds(30.0f);
 
                 //////////////////////////////////////////////////////////
                     
@@ -231,10 +235,6 @@ int main(int argc, char* argv[]){
                                 case Request_STC::TYPE_UPDATE_OTHER :
                                     gdOther = rqFS.updateOtherMsg.grid;
                                     scoreOther = rqFS.updateOtherMsg.score;
-                                    if (malusOther > 0) {
-                                        malusOther--;
-
-                                    }
                                     printf("Received a TYPE_UPDATE_OTHER\n");
                                     break;
                                 case Request_STC::TYPE_GAME_START :
@@ -246,18 +246,19 @@ int main(int argc, char* argv[]){
                                     win = rqFS.gameOver.results;
                                     break;
                                 case Request_STC::TYPE_BONUS :
-                                    printf("Received a TYPE_GAME_OVER\n");
-  
-                                    if(rqFS.bonus.target == 0){
-                                        malusOther = 2;
-                                    }else{
-                                        if (rqFS.bonus.typeBonus > malusNext) {
-                                            malusNext = rqFS.bonus.typeBonus;
+                                    printf("Received a TYPE_BONUS\n");            
+                                    if(rqFS.bonus.target == 1){
+                                        if (malus == 0) {
+                                            malus = rqFS.bonus.typeBonus;
+                                            tMalus = clockMalus.restart();
+                                        } else {
+                                            queueMalus.push(rqFS.bonus.typeBonus);
                                         }
                                     }
                                     break;
                             }
                         }
+
                         if (controls("Right").isActive() && malus != 3) {
                             if(gdSelf.rightPossible(currentTetro)){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
@@ -288,20 +289,28 @@ int main(int argc, char* argv[]){
                             }
                         }
 
-                        t = clockChute.getElapsedTime();
+                        tMalus = clockMalus.getElapsedTime();
 
-                       if(gdSelf.downPossible(currentTetro)){
-                            if(t > periodChute){
+                        if (tMalus > periodMalus) {
+                                if(!queueMalus.poll(malus)) {
+                                    malus = 0;
+                                } else {
+                                    clockMalus.restart();
+                                }
+                        }
+
+                        tChute = clockChute.getElapsedTime();
+
+                        if(gdSelf.downPossible(currentTetro)){
+                            if(tChute > periodChute){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
-                                t = clockChute.restart();
+                                tChute = clockChute.restart();
                                 currentTetro.setY(currentTetro.getY() + 1);
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                             }
                         }else{
-                            if(t > periodChute){
-                                malus = malusNext;
-                                malusNext = 0;
-                                t = clockChute.restart();
+                            if(tChute > periodChute){
+                                tChute = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
                                 if (malus == 4) {
                                     periodChute = gf::seconds(0.2f);
@@ -314,11 +323,9 @@ int main(int argc, char* argv[]){
 
                                 currentTetro = nextTetro;
                                 
-                                t = clockChute.restart();
+                                tChute = clockChute.restart();
 
                                 s.serialize(rqTS);
-
-                                printf("Sending a TYPE_TETROMINO_PLACED msg\n\t placed-tetro : t%d r%d pos%d-%d\n", rqTS.tetroMsg.tetro.getType(), rqTS.tetroMsg.tetro.getRotation(), rqTS.tetroMsg.tetro.getX(), rqTS.tetroMsg.tetro.getY());
 
                                 request = s.getData();
                                 boost::asio::write(sock, boost::asio::buffer(request, request.capacity()));
@@ -333,7 +340,7 @@ int main(int argc, char* argv[]){
                         renderer.setView(mainView);
 
                         displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
-                            (malus != 0), (malusNext != 0), (malusOther > 0), renderer, r_state);
+                            (malus != 0), 0, 0, renderer, r_state);
                  
                         renderer.display();
                         controls.reset();
@@ -357,7 +364,7 @@ int main(int argc, char* argv[]){
                         renderer.setView(mainView);
 
                         displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
-                            (malus != 0), (malusNext != 0), (malusOther > 0), renderer, r_state);
+                            (malus != 0), 0, 0, renderer, r_state);
                  
                         switch(win){
                             case STC_GameOver::TYPE_WIN:
