@@ -29,11 +29,23 @@ void DisplayGame::loadTextures(){
     if (!tabTexture[6].loadFromFile(gf::Path("../ressources/6.png"))) {
         exit(EXIT_FAILURE);
     }
+
+    //texture icone malus
+
+    if (!textureMalus[0].loadFromFile(gf::Path("../ressources/malusNoRotate.png"))) {
+        exit(EXIT_FAILURE);
+    }
+
+    if (!textureMalus[1].loadFromFile(gf::Path("../ressources/malusSpeed.png"))) {
+        exit(EXIT_FAILURE);
+    }
+
+
 }
 
     void DisplayGame::draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, 
         uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, bool malusSelf,  bool malusSelfNext, bool malusOther,
-        gf::RenderWindow & renderer, gf::RenderStates & r_state) {
+        gf::RenderWindow & renderer, gf::RenderStates & r_state, uint8_t malus) {
 
 
 	gaSelf.updateTextureBackground(gdSelf, malusSelf, malusSelfNext);
@@ -81,6 +93,18 @@ void DisplayGame::loadTextures(){
         scoreText.setString(std::to_string(scoreOther) + "00");
     }
     renderer.draw(scoreText);
+
+
+
+    if(malus == 2 || malus == 3){
+        iconeMalus.setTexture(textureMalus[malus-2]);
+        iconeMalus.setPosition({10*SIZE_CASE,10*SIZE_CASE});
+        renderer.draw(iconeMalus);
+    }else{
+        iconeMalus.unsetTexture();
+    }
+
+
 }
 
 void DisplayGame::drawWaitPlayer(gf::RenderWindow & renderer){

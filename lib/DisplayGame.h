@@ -38,6 +38,9 @@ class DisplayGame{
 
 	gf::Texture tabTexture[7];
 
+	gf::Texture textureMalus[2];
+	gf::Sprite iconeMalus;
+
 	public:
 		DisplayGame(){
 
@@ -73,7 +76,7 @@ class DisplayGame{
 		
 		void draw(Grid & gdSelf, Grid & gdOther, Tetromino & currentTetro, Tetromino & nextTetro, 
 			uint32_t scoreSelf, uint32_t scoreOther, gf::Time time, bool malusSelf, bool malusSelfNext, bool malusOther,
-			gf::RenderWindow & renderer, gf::RenderStates & r_state);
+			gf::RenderWindow & renderer, gf::RenderStates & r_state, uint8_t malus);
 
 		void drawWaitPlayer(gf::RenderWindow & renderer);
 
