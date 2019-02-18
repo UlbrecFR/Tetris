@@ -46,32 +46,11 @@
 
 			{
 				{0,1},
-				{1,2},
+				{2,1},
 				{1,0},
 				{0,0}
 			}
 	};
-
-/*
-	Tetromino::Tetromino(){
-		rotation = 0;
-		type = 0;
-		pos.x = 6;
-		pos.y = 1;
-
-	}
-*/
-
-/*
-	Tetromino& Tetromino::operator=(const Tetromino& t) {
-		rotation = t.rotation;
-		type = t.type;
-		pos.x = t.pos.x;
-		pos.y = t.pos.y;
-
-		return *this;
-	}
-*/
 
 
 	void Tetromino::print(){

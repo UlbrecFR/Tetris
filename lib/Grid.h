@@ -5,6 +5,8 @@
 #include <iostream>
 #include <stdlib.h>
 #include <stdio.h>
+#include <random>
+
 #include "Tetromino.h"
 
 #define WIDTH 12

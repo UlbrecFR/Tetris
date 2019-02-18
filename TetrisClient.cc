@@ -155,6 +155,7 @@ int main(int argc, char* argv[]){
                     gf::Time tMalus;
                     gf::Time periodChute = gf::seconds(1.0f);
                     gf::Time periodMalus = gf::seconds(30.0f);
+                    gf::Time periodRotate;
 
                 //////////////////////////////////////////////////////////
                     
@@ -251,22 +252,28 @@ int main(int argc, char* argv[]){
                                         if (malus == 0) {
                                             malus = rqFS.bonus.typeBonus;
                                             tMalus = clockMalus.restart();
+                                            if (malus == 2) {
+                                                periodRotate = gf::seconds(1.5f);
+                                            }
                                         } else {
                                             queueMalus.push(rqFS.bonus.typeBonus);
                                         }
                                     }
+
+                                    //timer malus
+                                    //srpite malus
                                     break;
                             }
                         }
 
-                        if (controls("Right").isActive() && malus != 3) {
+                        if (controls("Right").isActive()) {
                             if(gdSelf.rightPossible(currentTetro)){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
                                 currentTetro.setX(currentTetro.getX() + 1);
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                             }
                             
-                        } else if (controls("Left").isActive() && malus != 3) {
+                        } else if (controls("Left").isActive()) {
                             if (gdSelf.leftPossible(currentTetro)){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = 0;
                                 currentTetro.setX(currentTetro.getX() - 1);
@@ -279,11 +286,11 @@ int main(int argc, char* argv[]){
                             }
                         } 
 
-                        if (controls("Down").isActive()) {
+                        if (controls("Down").isActive()) {  
                             periodChute.subTo(gf::seconds(0.1f));   
                         } else {                                
-                            if (malus == 2) {
-                                periodChute = gf::seconds(0.1f);
+                            if (malus == 3) {
+                                periodChute = gf::seconds(0.2f);
                             } else {
                                 periodChute = gf::seconds(1.0f);
                             }
@@ -291,12 +298,23 @@ int main(int argc, char* argv[]){
 
                         tMalus = clockMalus.getElapsedTime();
 
-                        if (tMalus > periodMalus) {
-                                if(!queueMalus.poll(malus)) {
-                                    malus = 0;
-                                } else {
-                                    clockMalus.restart();
+                        if (malus == 2) {
+                            if (tMalus > periodRotate) {
+                                periodRotate.addTo(gf::seconds(1.5f));
+                                if (gdSelf.rotatePossible(currentTetro)) {
+                                    currentTetro.rotate();
                                 }
+                            }
+                        }
+
+
+                        if (tMalus > periodMalus) {
+                            if(!queueMalus.poll(malus)) {
+                                malus = 0;
+                            } else {
+                                periodRotate = gf::seconds(1.5f);
+                                clockMalus.restart();
+                            }
                         }
 
                         tChute = clockChute.getElapsedTime();

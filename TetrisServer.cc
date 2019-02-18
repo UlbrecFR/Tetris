@@ -117,6 +117,27 @@ void sendGameOver(std::vector<tcp::socket> & socketClients) {
     }  
 }
 
+void destroyLineMalus(size_t id) {
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<size_t> dist(1, 7);
+    
+    Tetromino t;
+
+    t.setRotation(1);    
+    t.setType(dist(gen));
+    
+    std::uniform_int_distribution<size_t> distPos(1, WIDTH);
+    t.setPos({distPos(gen),HEIGHT-1});
+
+    std::vector<gf::Vector2u> cases = t.getCases();
+
+    for (gf::Vector2u c : cases) {
+        grids[id](c.x, c.y) = 0;
+    }
+
+}
+
 void sendBonus(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClients){
     Serializer s;
 
@@ -130,8 +151,14 @@ void sendBonus(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClient
             rqSTC.bonus.target = 0;
             printf("Sending a TYPE_BONUS msg \n");
         } else {
-            rqSTC.bonus.target = 1;
-            printf("Sending a TYPE_BONUS_OTHER msg \n");
+            if (nbLine == 4) {
+                destroyLineMalus(i);
+                sendGrids(socketClients, i);
+                return;
+            } else {
+                rqSTC.bonus.target = 1;
+                printf("Sending a TYPE_MALUS msg \n");
+            }
         }
 
         s.serialize(rqSTC);
