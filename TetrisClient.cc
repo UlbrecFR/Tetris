@@ -154,8 +154,7 @@ int main(int argc, char* argv[]){
                     gf::Time tChute;
                     gf::Time tMalus;
                     gf::Time periodChute = gf::seconds(1.0f);
-                    gf::Time periodMalus = gf::seconds(15.0f);
-
+                    gf::Time periodMalus = gf::seconds(7.0f);
                 //////////////////////////////////////////////////////////
                     
                     Deserializer d;
