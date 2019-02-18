@@ -154,8 +154,7 @@ int main(int argc, char* argv[]){
                     gf::Time tChute;
                     gf::Time tMalus;
                     gf::Time periodChute = gf::seconds(1.0f);
-                    gf::Time periodMalus = gf::seconds(30.0f);
-                    gf::Time periodRotate;
+                    gf::Time periodMalus = gf::seconds(15.0f);
 
                 //////////////////////////////////////////////////////////
                     
@@ -252,9 +251,6 @@ int main(int argc, char* argv[]){
                                         if (malus == 0) {
                                             malus = rqFS.bonus.typeBonus;
                                             tMalus = clockMalus.restart();
-                                            if (malus == 2) {
-                                                periodRotate = gf::seconds(1.5f);
-                                            }
                                         } else {
                                             queueMalus.push(rqFS.bonus.typeBonus);
                                         }
@@ -280,7 +276,7 @@ int main(int argc, char* argv[]){
                                 gdSelf(currentTetro.getX(), currentTetro.getY()) = currentTetro.getType();
                             }
                             
-                        } else if (controls("Rotate").isActive() && malus != 1) {
+                        } else if (controls("Rotate").isActive() && malus != 2) {
                             if (gdSelf.rotatePossible(currentTetro)) {
                                 currentTetro.rotate();
                             }
@@ -298,21 +294,10 @@ int main(int argc, char* argv[]){
 
                         tMalus = clockMalus.getElapsedTime();
 
-                        if (malus == 2) {
-                            if (tMalus > periodRotate) {
-                                periodRotate.addTo(gf::seconds(1.5f));
-                                if (gdSelf.rotatePossible(currentTetro)) {
-                                    currentTetro.rotate();
-                                }
-                            }
-                        }
-
-
                         if (tMalus > periodMalus) {
                             if(!queueMalus.poll(malus)) {
                                 malus = 0;
                             } else {
-                                periodRotate = gf::seconds(1.5f);
                                 clockMalus.restart();
                             }
                         }
