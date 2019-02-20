@@ -60,6 +60,7 @@ void DisplayGame::loadTextures(){
     		} else {
     			tabSprite[i][j].unsetTexture();
     		}
+            tabSprite[i][j].setScale(0.75);
     		renderer.draw(tabSprite[i][j]);
     	}
     }
@@ -98,7 +99,7 @@ void DisplayGame::loadTextures(){
 
     if(malus == 2 || malus == 3){
         iconeMalus.setTexture(textureMalus[malus-2]);
-        iconeMalus.setPosition({10*SIZE_CASE,10*SIZE_CASE});
+        iconeMalus.setPosition({15*SIZE_CASE,16.5*SIZE_CASE});
         renderer.draw(iconeMalus);
     }else{
         iconeMalus.unsetTexture();

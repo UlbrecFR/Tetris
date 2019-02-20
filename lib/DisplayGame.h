@@ -67,9 +67,11 @@ class DisplayGame{
 	        spriteWaitPlayer.setTexture(textureWaitPlayer);	
 	        spriteWaitServer.setTexture(textureWaitServer);	
 
+	        iconeMalus.setScale(0.6);
+
 	        for (size_t i = 0; i < 4; ++i){
 		    	for (size_t j = 0; j < 2; ++j){
-		    		tabSprite[i][j].setPosition({static_cast<float>((15+j)*SIZE_CASE),static_cast<float>((13+i)*SIZE_CASE)});
+		    		tabSprite[i][j].setPosition({static_cast<float>((15+(j*0.75))*SIZE_CASE),static_cast<float>((13+(i*0.75))*SIZE_CASE)});
 		    	}
 		    }
 		}
