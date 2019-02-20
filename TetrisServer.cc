@@ -5,6 +5,12 @@ using boost::asio::ip::tcp;
 Grid grids[NB_PLAYERS];
 uint32_t scores[NB_PLAYERS];
 
+struct PlayerMalusTimer {
+    gf::Time remainingTime;
+    gf::Time lastTime;
+    bool malusActive;
+};
+
 static void clientListener(tcp::socket & socketClient, gf::Queue<std::vector<uint8_t>> & queueClient) {
 
     for(;;) {
@@ -138,27 +144,30 @@ void destroyLineMalus(size_t id) {
 
 }
 
-void sendBonus(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClients){
+void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClients, std::vector<PlayerMalusTimer> & timersMalus, gf::Clock & clk){
     Serializer s;
 
     Request_STC rqSTC;
-    rqSTC.type = Request_STC::TYPE_BONUS;
+    rqSTC.type = Request_STC::TYPE_MALUS_START;
 
-    rqSTC.bonus.typeBonus = nbLine;
+    rqSTC.malusStart.typeMalus = nbLine;
 
     for (size_t i = 0; i < NB_PLAYERS; ++i){
         if (i == id){
-            rqSTC.bonus.target = 0;
-            printf("Sending a TYPE_BONUS msg \n");
+            rqSTC.malusStart.target = 0;
+            printf("Sending a TYPE_MALUS_START msg to %zu \n", i);
         } else {
             if (nbLine == 4) {
                 destroyLineMalus(i);
                 sendGrids(socketClients, i);
                 return;
-            } else {
-                rqSTC.bonus.target = 1;
-                printf("Sending a TYPE_MALUS msg \n");
             }
+
+            rqSTC.malusStart.target = 1;
+            timersMalus[i].remainingTime.addTo(gf::seconds(7.5f));
+            timersMalus[i].malusActive = true;
+            timersMalus[i].lastTime = clk.getElapsedTime();
+            printf("Sending a TYPE_MALUS_START msg to %zu \n", i);        
         }
 
         s.serialize(rqSTC);
@@ -168,7 +177,29 @@ void sendBonus(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClient
     }
 }
 
-void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients){
+void sendMalusEnd(size_t id, std::vector<tcp::socket> & socketClients){
+    Serializer s;
+
+    Request_STC rqSTC;
+    rqSTC.type = Request_STC::TYPE_MALUS_END;
+
+    for (size_t i = 0; i < NB_PLAYERS; ++i){
+        if (i == id){
+            rqSTC.malusEnd.target = 1;
+            printf("Sending a TYPE_MALUS_END OTHER msg to %zu \n", i);
+        } else {
+            rqSTC.malusEnd.target = 0;
+            printf("Sending a TYPE_MALUS_END SELF msg to %zu \n", i);        
+        }
+
+        s.serialize(rqSTC);
+        boost::asio::write(socketClients[i], boost::asio::buffer(s.getData()));
+        s.clear();
+
+    }
+}
+
+void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients, std::vector<PlayerMalusTimer> & timersMalus, gf::Clock & clk){
     grids[id].addTetromino(t);
     if (grids[id].gameOver()){
         grids[id].clear();
@@ -178,7 +209,7 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
         if(nbLine > 0){
             scores[id] += nbLine * nbLine;
             if (nbLine > 1) {
-                sendBonus(nbLine, id, socketClients);
+                sendMalusStart(nbLine, id, socketClients, timersMalus, clk);
             }
         }  
     }
@@ -186,7 +217,7 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
 
 
 
-void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id) {
+void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id, std::vector<PlayerMalusTimer> & timersMalus, gf::Clock & clk) {
 
     Deserializer d;
     Request_CTS rqFC;
@@ -198,7 +229,7 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
     switch(rqFC.type) {
         case Request_CTS::TYPE_TETROMINO_PLACED : 
             printf("Received a TYPE_TETROMINO_PLACED msg from Client %zu\n\t placed-tetro : t%d r%d pos%d-%d\n", id, rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
-            updateGrid(rqFC.tetroMsg.tetro, id, socketClients);
+            updateGrid(rqFC.tetroMsg.tetro, id, socketClients, timersMalus, clk);
             sendGrids(socketClients, id);
             sendNewTetro(socketClients, id);
             break;    
@@ -249,8 +280,6 @@ int main(int argc, char* argv[]){
             return 1;
         }
 
-        gf::Clock clock;
-
         boost::asio::io_service ioService;
         tcp::acceptor a(ioService, tcp::endpoint(tcp::v4(), std::atoi(argv[1])));
 
@@ -274,15 +303,45 @@ int main(int argc, char* argv[]){
             sendGameStart(socketClients[i], atoi(argv[2]), i);
         }
 
+        gf::Clock clock;
+
+        PlayerMalusTimer timerMalus1;
+        gf::Time timer1(gf::seconds(0.0f));
+        timerMalus1.malusActive = false;
+        timerMalus1.remainingTime = std::move(timer1);
+
+        PlayerMalusTimer timerMalus2;
+        gf::Time timer2(gf::seconds(0.0f));
+        timerMalus2.malusActive = false;
+        timerMalus2.remainingTime = std::move(timer2);
+
+        std::vector<PlayerMalusTimer> timersMalus;
+        timersMalus.push_back(timerMalus1);
+        timersMalus.push_back(timerMalus2);
+
+
         gf::Time time;
         gf::Time gameDuration(gf::seconds(static_cast<float>(atoi(argv[2]))));
+        gf::Time timeMalusI;
 
         for(;;) {
             for (size_t i = 0; i < NB_PLAYERS; ++i){
                 if (queueClients[i].poll(msg)) {
-                    exploitMessage(msg, socketClients, i);
+                    exploitMessage(msg, socketClients, i, timersMalus, clock);
+                }
+
+                if (timersMalus[i].malusActive) {
+                    timeMalusI = clock.getElapsedTime();
+                    timersMalus[i].remainingTime.subTo(timeMalusI - timersMalus[i].lastTime);
+                    timersMalus[i].lastTime = timeMalusI;
+
+                    if (timersMalus[i].remainingTime <= gf::seconds(0.0f)) {
+                        sendMalusEnd(i, socketClients);
+                        timersMalus[i].malusActive = false;
+                    }
                 }
             }
+
             time = clock.getElapsedTime();
             if (time >= gameDuration){
                 break;

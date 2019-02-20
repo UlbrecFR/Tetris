@@ -74,9 +74,13 @@ struct STC_GameOver {
 	Results results;
 };
 
-struct STC_Bonus{
+struct STC_MalusStart{
 	uint8_t target;
-	uint8_t typeBonus;
+	uint8_t typeMalus;
+};
+
+struct STC_MalusEnd{
+	uint8_t target;
 };
 
 struct Request_STC{
@@ -86,7 +90,8 @@ struct Request_STC{
 		TYPE_UPDATE_OTHER,
 		TYPE_GAME_START,
 		TYPE_GAME_OVER,
-		TYPE_BONUS
+		TYPE_MALUS_START,
+		TYPE_MALUS_END
 	};
 
 	Type type;
@@ -97,7 +102,8 @@ struct Request_STC{
 		STC_UpdateOtherGrid updateOtherMsg;
 		STC_GameStart gameStart;
 		STC_GameOver gameOver;
-		STC_Bonus bonus;
+		STC_MalusStart malusStart;
+		STC_MalusEnd malusEnd;
 	};
 };
 

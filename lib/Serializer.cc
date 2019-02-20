@@ -78,8 +78,12 @@
 		serialize(t.getRotation());
 	}
 
-	void Serializer::serialize(const STC_Bonus r){
-		serialize(r.typeBonus);
+	void Serializer::serialize(const STC_MalusStart r){
+		serialize(r.typeMalus);
+		serialize(r.target);
+	}
+
+	void Serializer::serialize(const STC_MalusEnd r){
 		serialize(r.target);
 	}
 
@@ -134,8 +138,11 @@
 			case Request_STC::TYPE_GAME_OVER :
 				serialize(r.gameOver);
 				break;
-			case Request_STC::TYPE_BONUS :
-				serialize(r.bonus);
+			case Request_STC::TYPE_MALUS_START :
+				serialize(r.malusStart);
+				break;			
+			case Request_STC::TYPE_MALUS_END :
+				serialize(r.malusEnd);
 				break;
 		}
 	}

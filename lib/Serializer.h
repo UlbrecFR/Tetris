@@ -53,7 +53,9 @@ class Serializer{
 
 		void serialize(const STC_NewTetromino r);
 
-		void serialize(const STC_Bonus r);
+		void serialize(const STC_MalusStart r);
+		
+		void serialize(const STC_MalusEnd r);
 		
 		void serialize(const STC_GameOver::Results r);
 

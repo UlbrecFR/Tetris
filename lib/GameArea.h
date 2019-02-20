@@ -35,7 +35,7 @@ class GameArea : public gf::Transformable {
 
 	public :
 
-		void updateTextureBackground(Grid & gd, bool malus, bool malusNext);
+		void updateTextureBackground(Grid & gd, bool malus);
 
 		void updateTextureTetromino(Tetromino & tetro);
 

@@ -57,7 +57,9 @@ class Deserializer{
 
 		void deserialize(STC_NewTetromino & r);
 
-		void deserialize(STC_Bonus & r);
+		void deserialize(STC_MalusStart & r);
+
+		void deserialize(STC_MalusEnd & r);
 
 		void deserialize(STC_GameOver & r);
 		

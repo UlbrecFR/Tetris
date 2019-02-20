@@ -98,7 +98,7 @@ int main(int argc, char* argv[]){
 
         // actions
         Controls controls;  
-        uint8_t malusOther = 0;
+        bool malusOther = false;
         uint8_t malus = 0;
         gf::Queue<uint8_t> queueMalus;
 
@@ -152,9 +152,7 @@ int main(int argc, char* argv[]){
                     gf::Clock clockChute;
                     gf::Clock clockMalus;
                     gf::Time tChute;
-                    gf::Time tMalus;
                     gf::Time periodChute = gf::seconds(1.0f);
-                    gf::Time periodMalus = gf::seconds(7.0f);
                 //////////////////////////////////////////////////////////
                     
                     Deserializer d;
@@ -244,19 +242,27 @@ int main(int argc, char* argv[]){
                                     enPartie = false;
                                     win = rqFS.gameOver.results;
                                     break;
-                                case Request_STC::TYPE_BONUS :
-                                    printf("Received a TYPE_BONUS\n");            
-                                    if(rqFS.bonus.target == 1){
+                                case Request_STC::TYPE_MALUS_START :
+                                    printf("Received a TYPE_MALUS_START\n");            
+                                    if(rqFS.malusStart.target == 1){
                                         if (malus == 0) {
-                                            malus = rqFS.bonus.typeBonus;
-                                            tMalus = clockMalus.restart();
+                                            malus = rqFS.malusStart.typeMalus;
                                         } else {
-                                            queueMalus.push(rqFS.bonus.typeBonus);
+                                            queueMalus.push(rqFS.malusStart.typeMalus);
                                         }
+                                    } else {
+                                        malusOther = true;
                                     }
-
-                                    //timer malus
-                                    //srpite malus
+                                    break;                                
+                                case Request_STC::TYPE_MALUS_END :
+                                    printf("Received a TYPE_MALUS_END\n");            
+                                    if(rqFS.malusEnd.target == 1){
+                                        if (!queueMalus.poll(malus)) {
+                                            malus = 0;
+                                        }
+                                    } else {
+                                        malusOther = false;
+                                    }
                                     break;
                             }
                         }
@@ -288,16 +294,6 @@ int main(int argc, char* argv[]){
                                 periodChute = gf::seconds(0.2f);
                             } else {
                                 periodChute = gf::seconds(1.0f);
-                            }
-                        }
-
-                        tMalus = clockMalus.getElapsedTime();
-
-                        if (tMalus > periodMalus) {
-                            if(!queueMalus.poll(malus)) {
-                                malus = 0;
-                            } else {
-                                clockMalus.restart();
                             }
                         }
 
@@ -341,8 +337,8 @@ int main(int argc, char* argv[]){
                         renderer.clear();
                         renderer.setView(mainView);
 
-                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
-                            (malus != 0), 0, 0, renderer, r_state, malus);
+                        displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time,
+                            malus, malusOther, renderer, r_state);
                  
                         renderer.display();
                         controls.reset();
@@ -366,7 +362,7 @@ int main(int argc, char* argv[]){
                         renderer.setView(mainView);
 
                         displayGame.draw(gdSelf, gdOther, currentTetro, nextTetro, scoreSelf, scoreOther, time, 
-                            (malus != 0), 0, 0, renderer, r_state, malus);
+                            malus, malusOther, renderer, r_state);
                  
                         switch(win){
                             case STC_GameOver::TYPE_WIN:

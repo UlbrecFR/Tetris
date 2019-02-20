@@ -1,20 +1,14 @@
 #include "GameArea.h"
 
-void GameArea::updateTextureBackground(Grid & grid, bool malus, bool malusNext){
+void GameArea::updateTextureBackground(Grid & grid, bool malus){
     if (malus) {
         background.setTexture(textureBackgroundMalus); 
-    } else if (malusNext){
-        background.setTexture(textureBackgroundMalus); 
-    } else {
-        background.setTexture(textureBackground);
-    }
-
-    if (malus || malusNext){
         background.setPosition(position - gf::Vector2f(10,10));
     } else {
+        background.setTexture(textureBackground);
         background.setPosition(position);
     }
-   
+
     for (size_t i = 0; i < WIDTH_G; ++i){
         for (size_t j = 0; j < HEIGHT_G; ++j){
             if(grid(i, j+HEIGHT-HEIGHT_G) > 0){
@@ -45,7 +39,7 @@ void GameArea::loadTextures(gf::Texture t[7]){
         exit(EXIT_FAILURE);
     }  
 
-    if (!textureBackgroundMalus.loadFromFile(gf::Path("../ressources/fondBonus.png"))) {
+    if (!textureBackgroundMalus.loadFromFile(gf::Path("../ressources/fondMalus.png"))) {
         exit(EXIT_FAILURE);
     }  
 

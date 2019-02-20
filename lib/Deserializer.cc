@@ -96,8 +96,12 @@
 		readPos += 2;
 	}
 
-	void Deserializer::deserialize(STC_Bonus & r){
-		deserialize(r.typeBonus);
+	void Deserializer::deserialize(STC_MalusStart & r){
+		deserialize(r.typeMalus);
+		deserialize(r.target);
+	}
+
+	void Deserializer::deserialize(STC_MalusEnd & r){
 		deserialize(r.target);
 	}
 
@@ -152,8 +156,11 @@
 			case Request_STC::TYPE_GAME_OVER :
 				deserialize(r.gameOver);
 				break;
-			case Request_STC::TYPE_BONUS :
-				deserialize(r.bonus);
+			case Request_STC::TYPE_MALUS_START :
+				deserialize(r.malusStart);
+				break;			
+			case Request_STC::TYPE_MALUS_END :
+				deserialize(r.malusEnd);
 				break;
 		}
 	}
