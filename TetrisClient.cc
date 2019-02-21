@@ -311,7 +311,7 @@ int main(int argc, char* argv[]){
                                 tChute = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
                                 if (malus == 4) {
-                                    periodChute = gf::seconds(0.2f);
+                                    periodChute = gf::seconds(0.1f);
                                 } else {
                                     periodChute = gf::seconds(1.0f);
                                 }

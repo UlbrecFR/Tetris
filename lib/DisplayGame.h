@@ -13,6 +13,7 @@
 #include <gf/Event.h>
 #include <gf/Text.h>
 #include <gf/Font.h>
+#include <gf/Shapes.h>
 
 #include "Tetromino.h"
 #include "Grid.h"
@@ -40,6 +41,10 @@ class DisplayGame{
 
 	gf::Texture textureMalus[2];
 	gf::Sprite iconeMalus;
+    gf::RectangleShape coolDown;
+
+    gf::Clock clkAnimCoolDown;
+    bool malusCoolDown;
 
 	public:
 		DisplayGame(){
@@ -68,6 +73,11 @@ class DisplayGame{
 	        spriteWaitServer.setTexture(textureWaitServer);	
 
 	        iconeMalus.setScale(0.6);
+	        coolDown.setSize({150.0f, 150.0f});
+	        coolDown.setColor(gf::Color::Red);
+	        coolDown.setScale(0.6);
+	        malusCoolDown = false;
+
 
 	        for (size_t i = 0; i < 4; ++i){
 		    	for (size_t j = 0; j < 2; ++j){
