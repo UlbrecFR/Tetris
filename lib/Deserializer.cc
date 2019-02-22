@@ -189,7 +189,6 @@
 				deserialize(r.tetroMsg);
 				break;
 			case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
-			printf("voui\n");
 				deserialize(r.discoMsg);
 				break;
 		}

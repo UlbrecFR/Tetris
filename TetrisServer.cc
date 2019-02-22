@@ -153,7 +153,6 @@ void destroyLineMalus(size_t id) {
 
 void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClients, std::vector<PlayerMalusTimer> & timersMalus, 
                     gf::Clock & clk, gf::Queue<uint8_t> queueMalus[2]){
-    printf("_______________ SEND MALUS START _______________\n");
     if (timersMalus[timersMalus[id].target].malusActive != 0) {
         queueMalus[timersMalus[id].target].push(nbLine);
         return;
@@ -171,7 +170,6 @@ void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketC
             if (nbLine != 4) {
                 rqSTC.malusStart.target = 0;
                 printf("Sending a TYPE_MALUS_START msg to %zu \n", i);   
-                printf("        OTHER\n");
             }
         } else {
             if (nbLine == 4) {
@@ -182,8 +180,7 @@ void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketC
                 timersMalus[i].remainingTime.addTo(gf::seconds(7.5f));
                 timersMalus[i].malusActive = true;
                 timersMalus[i].lastTime = clk.getElapsedTime();
-                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);    
-                printf("        SELF\n");    
+                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);       
             }
         }
 
@@ -380,11 +377,8 @@ int main(int argc, char* argv[]){
                         timersMalus[i].malusActive = 0;
                         uint8_t nextMalus;
                         if (queuesMalus[i].poll(nextMalus)) {
-                            printf("QUEUE))))))))))))))))))))))))))))\n");
                             sendMalusStart(nextMalus, timersMalus[i].target, socketClients, timersMalus, clock, queuesMalus);
                         }
-                        
-
                     }
                 }
             }
