@@ -44,7 +44,7 @@ class DisplayGame{
     gf::RectangleShape coolDown;
 
     gf::Clock clkAnimCoolDown;
-    bool malusCoolDown;
+    uint8_t nbMalusNext;
 
 	public:
 		DisplayGame(){
@@ -76,7 +76,6 @@ class DisplayGame{
 	        coolDown.setSize({150.0f, 150.0f});
 	        coolDown.setColor(gf::Color::Red);
 	        coolDown.setScale(0.6);
-	        malusCoolDown = false;
 
 
 	        for (size_t i = 0; i < 4; ++i){

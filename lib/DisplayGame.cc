@@ -96,24 +96,23 @@ void DisplayGame::loadTextures(){
     renderer.draw(scoreText);
 
 
-
     if(malus == 2 || malus == 3){
-        if (!malusCoolDown) {
-            clkAnimCoolDown.restart();
-            malusCoolDown = true;
-        }
         gf::Time timeCD = clkAnimCoolDown.getElapsedTime();
         coolDown.setSize({150.0f*(gf::seconds(7.5f).asSeconds()-timeCD.asSeconds())/gf::seconds(7.5f).asSeconds(),150.0f});
-
-        printf("%f - %f = %f\n", gf::seconds(7.5f).asSeconds(), timeCD.asSeconds(), gf::seconds(7.5f).asSeconds()-timeCD.asSeconds());
         coolDown.setPosition({15*SIZE_CASE, 16.5*SIZE_CASE});
         renderer.draw(coolDown);
+
+        if (coolDown.getSize().x <= 0) {
+            clkAnimCoolDown.restart();
+
+        }
+
         iconeMalus.setTexture(textureMalus[malus-2]);
         iconeMalus.setPosition({15*SIZE_CASE,16.5*SIZE_CASE});
         renderer.draw(iconeMalus);
     }else{
+        coolDown.setSize({0,0});
         iconeMalus.unsetTexture();
-        malusCoolDown = false;
     }
 
 
@@ -141,5 +140,6 @@ void DisplayGame::drawDraw(gf::RenderWindow & renderer){
     spriteGameOver.setTexture(textureDraw);     
     renderer.draw(spriteGameOver);
 }
+
 
 

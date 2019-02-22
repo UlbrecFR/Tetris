@@ -100,8 +100,6 @@ int main(int argc, char* argv[]){
         Controls controls;  
         bool malusOther = false;
         uint8_t malus = 0;
-        gf::Queue<uint8_t> queueMalus;
-
 
         //////////////////////////////////////////////////////////////
 
@@ -190,7 +188,8 @@ int main(int argc, char* argv[]){
                     if (rqFS.type == Request_STC::TYPE_GAME_START) {
                         currentTetro = rqFS.gameStart.firstTetro;
                         nextTetro=rqFS.gameStart.secondTetro;
-                        printf("Received a TYPE_GAME_START msg\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", currentTetro.getType(), currentTetro.getRotation(), nextTetro.getType(), nextTetro.getRotation());
+                        printf("Received a TYPE_GAME_START msg\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", 
+                            currentTetro.getType(), currentTetro.getRotation(), nextTetro.getType(), nextTetro.getRotation());
                     }
 
                     gf::Clock clock;
@@ -222,7 +221,8 @@ int main(int argc, char* argv[]){
                                     nextTetro.setPos(rqFS.newTetroMsg.newTetro.getPos());
                                     nextTetro.setRotation(rqFS.newTetroMsg.newTetro.getRotation());
                                     nextTetro.setType(rqFS.newTetroMsg.newTetro.getType());
-                                    printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", nextTetro.getType(), nextTetro.getRotation());
+                                    printf("Received a TYPE_NEW_TETROMINO msg\n\tnext-tetro : t%d-r%d\n", 
+                                        nextTetro.getType(), nextTetro.getRotation());
                                     break;
                                 case Request_STC::TYPE_UPDATE :
                                     gdSelf = rqFS.updateMsg.grid;
@@ -243,23 +243,20 @@ int main(int argc, char* argv[]){
                                     win = rqFS.gameOver.results;
                                     break;
                                 case Request_STC::TYPE_MALUS_START :
-                                    printf("Received a TYPE_MALUS_START\n");            
+                                    printf("Received a TYPE_MALUS_START\n");         
                                     if(rqFS.malusStart.target == 1){
+                                        printf("        MOI\n");
                                         if (malus == 0) {
                                             malus = rqFS.malusStart.typeMalus;
-                                        } else {
-                                            queueMalus.push(rqFS.malusStart.typeMalus);
                                         }
                                     } else {
+                                        printf("        AUTRE\n");
                                         malusOther = true;
                                     }
                                     break;                                
                                 case Request_STC::TYPE_MALUS_END :
-                                    printf("Received a TYPE_MALUS_END\n");            
                                     if(rqFS.malusEnd.target == 1){
-                                        if (!queueMalus.poll(malus)) {
                                             malus = 0;
-                                        }
                                     } else {
                                         malusOther = false;
                                     }
@@ -310,11 +307,8 @@ int main(int argc, char* argv[]){
                             if(tChute > periodChute){
                                 tChute = clockChute.restart();
                                 gdSelf.addTetromino(currentTetro);
-                                if (malus == 4) {
-                                    periodChute = gf::seconds(0.1f);
-                                } else {
-                                    periodChute = gf::seconds(1.0f);
-                                }
+                                periodChute = gf::seconds(1.0f);
+                                
                                 
                                 rqTS.type = Request_CTS::TYPE_TETROMINO_PLACED;
                                 rqTS.tetroMsg.tetro = currentTetro;

@@ -6,9 +6,15 @@ Grid grids[NB_PLAYERS];
 uint32_t scores[NB_PLAYERS];
 
 struct PlayerMalusTimer {
+    uint8_t malusActive;
     gf::Time remainingTime;
     gf::Time lastTime;
-    bool malusActive;
+    uint8_t target;
+};
+
+struct AntiCheat {
+    gf::Time sendTime;
+    uint8_t strikes;
 };
 
 static void clientListener(tcp::socket & socketClient, gf::Queue<std::vector<uint8_t>> & queueClient) {
@@ -58,7 +64,8 @@ void sendNewTetro(std::vector<tcp::socket> & socketClients, size_t id) {
 
     s.serialize(rqSTC);
     boost::asio::write(socketClients[id], boost::asio::buffer(s.getData()));
-    printf("Sending a TYPE_NEW_TETROMINO msg to Client %zu\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), rqSTC.newTetroMsg.newTetro.getRotation());
+    printf("Sending a TYPE_NEW_TETROMINO msg to Client %zu\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), 
+        rqSTC.newTetroMsg.newTetro.getRotation());
     s.clear();
 }
 
@@ -144,7 +151,14 @@ void destroyLineMalus(size_t id) {
 
 }
 
-void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClients, std::vector<PlayerMalusTimer> & timersMalus, gf::Clock & clk){
+void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketClients, std::vector<PlayerMalusTimer> & timersMalus, 
+                    gf::Clock & clk, gf::Queue<uint8_t> queueMalus[2]){
+    printf("_______________ SEND MALUS START _______________\n");
+    if (timersMalus[timersMalus[id].target].malusActive != 0) {
+        queueMalus[timersMalus[id].target].push(nbLine);
+        return;
+    } 
+
     Serializer s;
 
     Request_STC rqSTC;
@@ -154,20 +168,23 @@ void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketC
 
     for (size_t i = 0; i < NB_PLAYERS; ++i){
         if (i == id){
-            rqSTC.malusStart.target = 0;
-            printf("Sending a TYPE_MALUS_START msg to %zu \n", i);
+            if (nbLine != 4) {
+                rqSTC.malusStart.target = 0;
+                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);   
+                printf("        OTHER\n");
+            }
         } else {
             if (nbLine == 4) {
                 destroyLineMalus(i);
                 sendGrids(socketClients, i);
-                return;
+            } else {
+                rqSTC.malusStart.target = 1;
+                timersMalus[i].remainingTime.addTo(gf::seconds(7.5f));
+                timersMalus[i].malusActive = true;
+                timersMalus[i].lastTime = clk.getElapsedTime();
+                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);    
+                printf("        SELF\n");    
             }
-
-            rqSTC.malusStart.target = 1;
-            timersMalus[i].remainingTime.addTo(gf::seconds(7.5f));
-            timersMalus[i].malusActive = true;
-            timersMalus[i].lastTime = clk.getElapsedTime();
-            printf("Sending a TYPE_MALUS_START msg to %zu \n", i);        
         }
 
         s.serialize(rqSTC);
@@ -199,7 +216,8 @@ void sendMalusEnd(size_t id, std::vector<tcp::socket> & socketClients){
     }
 }
 
-void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients, std::vector<PlayerMalusTimer> & timersMalus, gf::Clock & clk){
+void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients, std::vector<PlayerMalusTimer> & timersMalus, 
+                    gf::Clock & clk, gf::Queue<uint8_t> queuesMalus[2]){
     grids[id].addTetromino(t);
     if (grids[id].gameOver()){
         grids[id].clear();
@@ -209,7 +227,8 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
         if(nbLine > 0){
             scores[id] += nbLine * nbLine;
             if (nbLine > 1) {
-                sendMalusStart(nbLine, id, socketClients, timersMalus, clk);
+                printf("UPDATEGRID))))))))))))))))))))))))))))\n");
+                sendMalusStart(nbLine, id, socketClients, timersMalus, clk, queuesMalus);
             }
         }  
     }
@@ -217,7 +236,8 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
 
 
 
-void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id, std::vector<PlayerMalusTimer> & timersMalus, gf::Clock & clk) {
+void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id, std::vector<PlayerMalusTimer> & timersMalus, 
+    gf::Queue<uint8_t> queuesMalus[2], gf::Clock & clk, std::vector<AntiCheat> antiCheats) {
 
     Deserializer d;
     Request_CTS rqFC;
@@ -228,8 +248,9 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
 
     switch(rqFC.type) {
         case Request_CTS::TYPE_TETROMINO_PLACED : 
-            printf("Received a TYPE_TETROMINO_PLACED msg from Client %zu\n\t placed-tetro : t%d r%d pos%d-%d\n", id, rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
-            updateGrid(rqFC.tetroMsg.tetro, id, socketClients, timersMalus, clk);
+            printf("Received a TYPE_TETROMINO_PLACED msg from Client %zu\n\t placed-tetro : t%d r%d pos%d-%d\n", id, 
+                rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
+            updateGrid(rqFC.tetroMsg.tetro, id, socketClients, timersMalus, clk, queuesMalus);
             sendGrids(socketClients, id);
             sendNewTetro(socketClients, id);
             break;    
@@ -259,7 +280,8 @@ void sendGameStart(tcp::socket & socketClient, uint64_t time, size_t id) {
         secondTetro.setPos({6,1});
         secondTetro.setType(dist(gen));
 
-        printf("Sending a TYPE_GAME_START msg to Client %zu\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", id, firstTetro.getType(), firstTetro.getRotation(), secondTetro.getType(), secondTetro.getRotation());
+        printf("Sending a TYPE_GAME_START msg to Client %zu\n \ttetro : t%d-r%d\n\tnext-tetro : t%d-r%d\n", id, firstTetro.getType(), 
+            firstTetro.getRotation(), secondTetro.getType(), secondTetro.getRotation());
 
         Request_STC rqSTC;
         rqSTC.type = Request_STC::TYPE_GAME_START;
@@ -295,6 +317,39 @@ int main(int argc, char* argv[]){
 
         std::vector<uint8_t> msg;
 
+        /////////////////////////// MALUS ///////////////////////
+        PlayerMalusTimer timerMalus1;
+        gf::Time timer1(gf::seconds(0.0f));
+        timerMalus1.malusActive = 0;
+        timerMalus1.remainingTime = std::move(timer1);
+        timerMalus1.target = 1;
+
+        PlayerMalusTimer timerMalus2;
+        gf::Time timer2(gf::seconds(0.0f));
+        timerMalus2.malusActive = 0;
+        timerMalus2.remainingTime = std::move(timer2);
+        timerMalus2.target = 0;
+
+        std::vector<PlayerMalusTimer> timersMalus;
+        timersMalus.push_back(timerMalus1);
+        timersMalus.push_back(timerMalus2);
+
+        gf::Queue<uint8_t> queuesMalus[NB_PLAYERS];
+
+        /////////////////VAC//////////////////
+
+        std::vector<AntiCheat> antiCheats;
+        AntiCheat VACpl1;
+        VACpl1.strikes = 0;
+        VACpl1.sendTime = gf::Time(gf::seconds(0.0f));
+
+        AntiCheat VACpl2;
+        VACpl2.strikes = 0;
+        VACpl2.sendTime = gf::Time(gf::seconds(0.0f));
+
+        antiCheats.push_back(VACpl1);
+        antiCheats.push_back(VACpl2);
+
         ////////////////    GAME START  //////////////////////
 
         printf("Waiting for clients...\n");
@@ -305,21 +360,6 @@ int main(int argc, char* argv[]){
 
         gf::Clock clock;
 
-        PlayerMalusTimer timerMalus1;
-        gf::Time timer1(gf::seconds(0.0f));
-        timerMalus1.malusActive = false;
-        timerMalus1.remainingTime = std::move(timer1);
-
-        PlayerMalusTimer timerMalus2;
-        gf::Time timer2(gf::seconds(0.0f));
-        timerMalus2.malusActive = false;
-        timerMalus2.remainingTime = std::move(timer2);
-
-        std::vector<PlayerMalusTimer> timersMalus;
-        timersMalus.push_back(timerMalus1);
-        timersMalus.push_back(timerMalus2);
-
-
         gf::Time time;
         gf::Time gameDuration(gf::seconds(static_cast<float>(atoi(argv[2]))));
         gf::Time timeMalusI;
@@ -327,17 +367,24 @@ int main(int argc, char* argv[]){
         for(;;) {
             for (size_t i = 0; i < NB_PLAYERS; ++i){
                 if (queueClients[i].poll(msg)) {
-                    exploitMessage(msg, socketClients, i, timersMalus, clock);
+                    exploitMessage(msg, socketClients, i, timersMalus, queuesMalus, clock, antiCheats);
                 }
 
-                if (timersMalus[i].malusActive) {
+                if (timersMalus[i].malusActive != 0) {  
                     timeMalusI = clock.getElapsedTime();
                     timersMalus[i].remainingTime.subTo(timeMalusI - timersMalus[i].lastTime);
                     timersMalus[i].lastTime = timeMalusI;
 
                     if (timersMalus[i].remainingTime <= gf::seconds(0.0f)) {
                         sendMalusEnd(i, socketClients);
-                        timersMalus[i].malusActive = false;
+                        timersMalus[i].malusActive = 0;
+                        uint8_t nextMalus;
+                        if (queuesMalus[i].poll(nextMalus)) {
+                            printf("QUEUE))))))))))))))))))))))))))))\n");
+                            sendMalusStart(nextMalus, timersMalus[i].target, socketClients, timersMalus, clock, queuesMalus);
+                        }
+                        
+
                     }
                 }
             }
