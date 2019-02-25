@@ -46,7 +46,7 @@ static void clientListener(tcp::socket & socketClient, gf::Queue<std::vector<uin
     } 
 }
 
-void sendNewTetro(std::vector<tcp::socket> & socketClients, size_t id) {
+void sendNewTetro(std::vector<tcp::socket> & socketClients, size_t id, std::vector<AntiCheat> & antiCheats, gf::Clock clk) {
     Serializer s;
     Tetromino t;
 
@@ -67,6 +67,7 @@ void sendNewTetro(std::vector<tcp::socket> & socketClients, size_t id) {
     printf("Sending a TYPE_NEW_TETROMINO msg to Client %zu\n \ttetro : t%d-r%d\n", id, rqSTC.newTetroMsg.newTetro.getType(), 
         rqSTC.newTetroMsg.newTetro.getRotation());
     s.clear();
+    antiCheats[id].sendTime = clk.getElapsedTime();
 }
 
 void sendGrids(std::vector<tcp::socket> & socketClients, size_t id) {
@@ -141,7 +142,7 @@ void destroyLineMalus(size_t id) {
     t.setType(dist(gen));
     
     std::uniform_int_distribution<size_t> distPos(1, WIDTH);
-    t.setPos({distPos(gen),HEIGHT-1});
+    t.setPos({static_cast<unsigned int>(distPos(gen)),HEIGHT-1});
 
     std::vector<gf::Vector2u> cases = t.getCases();
 
@@ -224,7 +225,6 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
         if(nbLine > 0){
             scores[id] += nbLine * nbLine;
             if (nbLine > 1) {
-                printf("UPDATEGRID))))))))))))))))))))))))))))\n");
                 sendMalusStart(nbLine, id, socketClients, timersMalus, clk, queuesMalus);
             }
         }  
@@ -234,7 +234,7 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
 
 
 void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id, std::vector<PlayerMalusTimer> & timersMalus, 
-    gf::Queue<uint8_t> queuesMalus[2], gf::Clock & clk, std::vector<AntiCheat> antiCheats) {
+    gf::Queue<uint8_t> queuesMalus[2], gf::Clock & clk, std::vector<AntiCheat> & antiCheats) {
 
     Deserializer d;
     Request_CTS rqFC;
@@ -243,19 +243,41 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
     d.deserialize(rqFC);
     d.clear();
 
+
     switch(rqFC.type) {
-        case Request_CTS::TYPE_TETROMINO_PLACED : 
+        case Request_CTS::TYPE_TETROMINO_PLACED : {
             printf("Received a TYPE_TETROMINO_PLACED msg from Client %zu\n\t placed-tetro : t%d r%d pos%d-%d\n", id, 
                 rqFC.tetroMsg.tetro.getType(), rqFC.tetroMsg.tetro.getRotation(), rqFC.tetroMsg.tetro.getX(), rqFC.tetroMsg.tetro.getY());
+            
+            gf::Time timeReceive = clk.getElapsedTime();
+
+            uint8_t bottom = 0;
+
+            for (auto c : rqFC.tetroMsg.tetro.getCases()) {
+                if (c.y > bottom) {
+                    bottom = c.y;
+                } 
+            }
+
+            if (timeReceive.asSeconds() - antiCheats[id].sendTime.asSeconds() > gf::seconds(1.0f).asSeconds() * bottom + gf::seconds(2.5f).asSeconds()) {
+                ++antiCheats[id].strikes;
+                if (antiCheats[id].strikes >= 3) {
+                    scores[id] = 0;
+                    sendGameOver(socketClients);
+                }
+            }
+
             updateGrid(rqFC.tetroMsg.tetro, id, socketClients, timersMalus, clk, queuesMalus);
             sendGrids(socketClients, id);
-            sendNewTetro(socketClients, id);
-            break;    
-        case Request_CTS::TYPE_CLIENT_CONNECTION_LOST :
+            sendNewTetro(socketClients, id, antiCheats, clk);
+            break;
+        }
+        case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : {
             printf("Received a TYPE_CLIENT_CONNECTION_LOST\n");   
             sendGameOver(socketClients);
             exit(0);
             break;
+        }
     }
 }
 

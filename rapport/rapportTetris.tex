@@ -21,17 +21,56 @@
 
 \section{Adaptation et modélisation}
 	\subsection{Tétris originel}
+		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétriminos », descendent du haut de l'écran. 
+		Durant la chute des tetrominos, le joueur peut déplacer les pièces latéralement, leur faire effectuer une rotation sur elles-mêmes et accélérer la vitesse de la descente dans certaines versions jusqu'à ce qu'elles se pose sur le bas de la zone de jeu ou sur une autre pièce. 
+		Le but pour le joueur est de réaliser le plus de lignes possibles. Une fois une ligne complétée, elle disparaît, et les blocs placés au-dessus chutent d'un rang. 
+		Lorsque le joueur accumule les pièce et remplie la zone de jeu jusqu’en haut, ce qui empêche l'arrivée de tétriminos supplémentaires, la partie se termine. Le joueur obtient un score, qui dépend essentiellement du nombre de lignes réalisées lors de la partie. On ne peut donc jamais gagner à Tetris, le but étant d’améliorer son précédent score.
+
+		Après la version originale du jeu sortie sur l'\textit{Elektronika 60}, le tétris a connu un succès mondial dans les années 1990 grâce à sa version Gameboy.
+
+		Le jeu a été adapté sur pratiquement toutes les consoles de toutes les générations, soit dans une version strictement identique soit dans une adaptation plus libre ne conservant que certains point du gameplay original. Au début des années 2010, on comptait plus de 65 plate-formes qui possaidait un portage du jeu.
+
+		Tétris s'est imposé comme l'un des plus grands succès de l'histoire du jeu vidéo et l'une de ces icones les plus mondialement connues.
 
 	\subsection{Notre adaptation}
+		Notre adaptation est un version multijoueur du Tétris, ou chaque joueur aurait un jeu qui tournerais sur son ordinateur, sur laquelle il jouerais seul avec son clavier. 
+
+		L'objectif hypotétique étant que pour jouer ensemble, deux joueurs puissent télécharger le client du jeu sur leurs ordinateur puis se connectent à un serveur en ligne qui gérerait le déroulement de la partie. Cette proposition pésente le risque qu'un joueur recode sa version du client et soit donc capable de tricher, car n'étant plus contraint aux même règles que son adversaire.
+
+		Cela nous a donné une contrainte à respecter : le serveur fait loi. Les clients ne servent qu'à l'affichage du jeu et à la réception des actions de l'utilisateur, mais ne contrôlent pas le déroulement de la partie.
+
+		Les joueurs joueront une partie de Tétris classique, chacun de leur coté. Cependant, pour ne pas limiter l'affrontement à un concours de score, nous avons choisi d'ajouter un système de malus : lorsqu'un joueur parvient à détruire des lignes, son adversaires se voit pénalisé plus ou moins sévérement en fonction du nombre de lignes détruites.
 
 	\subsection{Modélisation du jeu}
 
+		\subsubsection{Architecture réseau}
+
+			Nous avons déjà défini que nous avions besoin d'une architecture client-serveur.
+
+			La difficulté étant que les deux parties doivent pouvoir recevoir des messages et les traiter de manière asynchrone, tout en ayant une boucle qui s'éxecute simultanément - la fenêtre graphique pour les clients, la boucle de jeu pour le serveur.
+
+			Pour résoudre ce problèmes nous avons séparé la réception des messages dans un thread à part dans les clients et le serveur.
+
+			Ce thread attends la reception d'un message et le place dans une file. Le thread principal récupère ensuite les messages contenu dans cette file et les exploitent, comme on peut le voir sur la figure \ref{fig:rezo}.
+
+			\begin{figure}[bt]
+				\centering
+				\includegraphics[scale=0.35]{img/archi_reseau.png}
+				\caption{Représentation simplifiée des échanges de messages entre les clients et le serveur}
+				\label{fig:rezo}
+			\end{figure}
+
+
+		\subsubsection{Echanges entre les clients et le serveur}
+
+
 \section{Mise en oeuvre}
-	\subsection{L'architecture réseau}
+	\subsection{Le serveur}
+	
+	\subsection{Le client graphique}
 
 	\subsection{La sérialisation}
 
-	\subsection{Le client graphique}
 
 \section*{Conclusion}
 

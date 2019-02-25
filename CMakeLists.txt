@@ -26,3 +26,10 @@ add_executable(TetrisClient
 
 target_link_libraries(TetrisClient gf::gf0 ${Boost_LIBRARIES} TetrisClientLib)
 
+add_executable(TetrisCorrompu
+  TetrisCorrompu.cc
+  TetrisCorrompu.h
+)
+
+target_link_libraries(TetrisCorrompu gf::gf0 ${Boost_LIBRARIES} TetrisClientLib)
+
