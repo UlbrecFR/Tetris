@@ -15,6 +15,12 @@
 
 \maketitle
 
+\newpage
+
+\tableofcontents
+
+\newpage
+
 \section*{Remerciements}
 
 \section*{Introduction}
@@ -35,7 +41,10 @@
 	\subsection{Notre adaptation}
 		Notre adaptation est un version multijoueur du Tétris, ou chaque joueur aurait un jeu qui tournerais sur son ordinateur, sur laquelle il jouerais seul avec son clavier. 
 
-		L'objectif hypotétique étant que pour jouer ensemble, deux joueurs puissent télécharger le client du jeu sur leurs ordinateur puis se connectent à un serveur en ligne qui gérerait le déroulement de la partie. Cette proposition pésente le risque qu'un joueur recode sa version du client et soit donc capable de tricher, car n'étant plus contraint aux même règles que son adversaire.
+		L'objectif hypotétique étant que pour jouer ensemble, deux joueurs puissent télécharger le client du jeu sur leurs ordinateur puis se connectent à un serveur en ligne qui gérerait le déroulement de la partie. 
+		Ainsi, on pourrait imaginer que le joueur rédeveloppe son propre client avec son propre interface graphique, et il pourrait jouer sans problème, à condition de reproduire les échanges entre le client et le serveur prévus dans le protocole.
+
+		Cette proposition pésente le risque qu'un joueur recode sa version du client et soit donc capable de tricher, car n'étant plus contraint aux même règles que son adversaire.
 
 		Cela nous a donné une contrainte à respecter : le serveur fait loi. Les clients ne servent qu'à l'affichage du jeu et à la réception des actions de l'utilisateur, mais ne contrôlent pas le déroulement de la partie.
 
@@ -45,9 +54,10 @@
 
 		\subsubsection{Architecture réseau}
 
-			Nous avons déjà défini que nous avions besoin d'une architecture client-serveur.
+			Nous avons déjà défini que nous avions besoin d'une architecture client-serveur dans la partie précédente.
 
-			La difficulté étant que les deux parties doivent pouvoir recevoir des messages et les traiter de manière asynchrone, tout en ayant une boucle qui s'éxecute simultanément - la fenêtre graphique pour les clients, la boucle de jeu pour le serveur.
+			Un problème que nous avons rencontré est que les clients et le serveur doivent être capable d'attendre l'arrivé d'un message sur leur socket, tout en exécutant une boucle simultanément - la fenêtre graphique pour les clients et la boucle de jeu pour le serveur.
+
 
 			Pour résoudre ce problèmes nous avons séparé la réception des messages dans un thread à part dans les clients et le serveur.
 
@@ -60,8 +70,34 @@
 				\label{fig:rezo}
 			\end{figure}
 
+			Ainsi, les clients et le serveur vont pouvoir s'envoyer des messages sans problèmes, étant donné qu'il y a en permanence une socket qui écoute la réception de message. L'interprétation des messages est faites durant la boucle principale des deux applications, ce qui ne bloque pas leur exécution.
 
-		\subsubsection{Echanges entre les clients et le serveur}
+		\subsubsection{\'Echanges entre les clients et le serveur}
+
+			Notre protocole d'échange tel que l'avons défini implique que le serveur gère seul la partie, et les clients uniquement l'affichage et les interactions de l'utilisateur, par conséquent, les échanges vont consister en la mise à jour de l'état du jeu de la part du serveur et les actions du joueur de la part du client.
+
+			\subsubsection{Les messages du serveur vers le client}
+
+				\begin{itemize}
+					\item Game start : message de début de partie, signale le début de la partie aux clients lorsque les deux joueurs sont prêts à jouer
+					\item Game over : message de fin de partie, il indique au joueur s'il a gagné, perdu ou s'il y a une égalité
+					\item New tetromino : message contenant le prochaine tétromino qui sera utilisé par le client
+					\item Update Grid : message qui contient la grille de jeu du joueur
+					\item Update Other Grid : message qui contient la grille de l'adversaire, pour l'afficher
+					\item Malus start : signale le début d'une période malus pour le joueur ainsi que le type du malus qui s'applique
+					\item Malus end : signale la fin de la période de malus actuelle
+				\end{itemize}
+
+			\subsubsection{Les messages du serveur vers le client}
+
+				\begin{itemize}
+					\item Tétromino placed : contient le tétromino avec sa position et son orientation tel qu'il viens d'être placé par le joueur
+					\item Connection lost : message signalant une déconnexion du joueur
+				\end{itemize}
+
+
+
+
 
 
 \section{Mise en oeuvre}
