@@ -104,7 +104,6 @@ void DisplayGame::loadTextures(){
 
         if (coolDown.getSize().x <= 0) {
             clkAnimCoolDown.restart();
-
         }
 
         iconeMalus.setTexture(textureMalus[malus-2]);

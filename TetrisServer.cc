@@ -142,7 +142,7 @@ void destroyLineMalus(size_t id) {
     t.setType(dist(gen));
     
     std::uniform_int_distribution<size_t> distPos(1, WIDTH);
-    t.setPos({static_cast<unsigned int>(distPos(gen)),HEIGHT-1});
+    t.setPos({static_cast<unsigned int>(distPos(gen)),HEIGHT-2});
 
     std::vector<gf::Vector2u> cases = t.getCases();
 
@@ -176,13 +176,14 @@ void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketC
             if (nbLine == 4) {
                 destroyLineMalus(i);
                 sendGrids(socketClients, i);
+                timersMalus[i].remainingTime.addTo(gf::seconds(2.0f));
             } else {
+                timersMalus[i].remainingTime.addTo(gf::seconds(10.0f));
+            }
                 rqSTC.malusStart.target = 1;
-                timersMalus[i].remainingTime.addTo(gf::seconds(7.5f));
                 timersMalus[i].malusActive = true;
                 timersMalus[i].lastTime = clk.getElapsedTime();
-                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);       
-            }
+                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);
         }
 
         s.serialize(rqSTC);
