@@ -151,8 +151,12 @@
 				\end{itemize}
 
 
+
+
 \section{Mise en oeuvre}
 	\subsection{Le serveur}
+
+
 
 	\subsection{La sérialisation}
 
@@ -212,8 +216,79 @@ void Deserializer::deserializeAnyType(T & d){
 	
 	\subsection{Le client graphique}
 
+		\subsubsection{Tetromino}
+
+			crée a quel moment ?
+
+			L’objet de la classe Tétromino contient les informations sur le tetromino actuellement en jeu :
+			\begin{itemize}
+				\item son type
+				\item son sens de rotation actuel
+				\item sa forme représenté pas une matrice de 4x2
+				\item la position de son ancre représenté par un vecteur (x, y)
+			\end{itemize}
+
+			Explication des getter et setter ??
+
+			La fonction Tetromino::getCases permet de récupérer la [liste] a modifier, des vecteur représentant les coordonnées de toute les cases du tetromino en fonction de sa rotation, de sa forme et de la position de l’ancre.
+
+		\subsubsection{Grid}
+			Pour représenter la zone de jeu nous utilisons un tableau d’entier à une dimension. Une case vide est représenté par un 0. 
+			On crée le tableau avec l’objet Grid.
+
+			Fonction dans Grid :
+
+			les constructeur besoin d’en parler ?
+			IsValid ??
+			printGrid -> debug , besoin d’en parler ?
+
+			\paragraph{Vérification des déplacements}
+			La fonction Grid::movePossible permet de vérifier si l’action de déplacement faite par le joueur et valide. Elle prend en paramètre le Tétromino en jeu (tetromino qui chute et qui est contrôlé par le joueur) et un vecteur (x, y) pour savoir dans quel direction le mouvement est fait.
+
+			Cette fonction est appelé dans : 
+			\begin{itemize}
+				\item Grid::downPossible, avec le vecteur {0, 1}
+				\item Grid::rightPossible, avec le vecteur {1, 0}
+				\item Grid::leftPossible, avec le vecteur {-1, 0}
+			\end{itemize}
+
+			La fonction Grid::rotatePossible permet d’autorisé où non la rotation de la pièce en jeu. La rotation peut être par exemple refusé si le tetromino est bloqué entre 2 autres tétrominos ou si il est sur le bord de la zone de jeu. Dans ces 2 cas, la rotation du tétromino le ferait soit passé a travers d’autre pièce ce qui est impossible ou encore sortir de la zone de jeu. On vérifie donc si les case du tétromino après rotation sont bien dans la zone de jeu et si elle sont vide grâce à la fonction Tetromino::getCases.
+
+			\paragraph{Placement d’un tetromino}
+			Si la fonction Grid::downPossible renvoie false, le tetromino actuellement en jeu est placé. Hors, seul son ancre est visible dans le tableau lors de sa chute, il faut donc ajouter toute les cases qui compose le tetromino dans la zone de jeu afin d’envoyé un nouveau tetromino en jeu.
+			On appel la fonction Grid::printGrid qui remplis le tableau en faisant appel au fonction Tetromino::getCases et Tetromino::getType.
+
+			\paragraph{Suppression de lignes}
+			La fonction Grid::deleteLines parcours le tableau et détecte si des lignes sont pleine.
+			Si c’est le cas, elle appel la fonction Grid::fallLines sur la lignes correspondante.
+			Elle renvoie le nombre total de ligne pleine qui ont été supprimé pour effectué le calcul du score et l’envoie de malus à l’adversaire.
+
+			La fonction Grid::fallLines récupère en paramètre la ligne pleine, et fait descendre toutes les lignes au dessus de celle-ci d’une case vers le bas en commençant par le bas du tableau.
+
+			\paragraph{Vérification de l’état de la grille}
+
+			La fonction Grid::gameOver est appelé à chaque tétromino posé. Elle vérifie si les lignes du haut du tableau sont vide. Si une pièce est présente dans cette zone, on estime que la zone de jeu est complètement remplis et que l’arrive d’un prochain tétromino est impossible, dans ce cas elle renvoie true.
+
+			\paragraph{clear (titre a changer)}
+
+			Si l’appel à la fonction Grid::gameOver nous retourne true alors on vide entièrement la zone de jeu et le score du joueur subit un malus (score divisé par 2). 
+			Pour vidé la zone de jeu on utilise la fonction Grid::clear qui parcours tout le tableau est passe tout les case à 0.
+
+		\subsubsection{Les malus}
 
 
+			Présentation des différents malus:
+
+			Lorsque le joueur complète des lignes, celle ci sont supprimés. On calcul le nombre de lignes supprimé afin d’augmenté le score du joueur mais aussi d’envoyé des malus au joueur adverse.
+			Pour les malus nous avons choisis : 
+
+			\begin{itemize}
+				\item suppression de 2 lignes : le joueur adverse ne peut plus faire de rotation sur ses pièces pendant N secondes.
+				\item suppression de 3 lignes : la vitesse des chutes des pièce de l’adversaire augmente.
+				\item suppression de 4 lignes : certaines case sont enlevé du mur adverse pouvant l’empêcher de compléter certaine lignes.
+			\end{itemize}
+
+			Transmission des messages pour les malus ?
 
 \section*{Conclusion}
 
