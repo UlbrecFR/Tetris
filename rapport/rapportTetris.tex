@@ -98,7 +98,7 @@
 			\begin{figure}[bt]
 				\centering
 				\includegraphics[scale=0.35]{img/archi_reseau.png}
-				\caption{Représentation simplifiée des échanges de messages entre les clients et le serveur}
+				\caption{Représentation simplifiée de l'architecture réseau entre les clients et le serveur}
 				\label{fig:rezo}
 			\end{figure}
 
@@ -127,6 +127,7 @@
 					\item Connection lost : message signalant une déconnexion du joueur
 				\end{itemize}
 
+				La figure \ref{fig:rezo} représente une version simplifié des échanges entre les clients et le serveur. Pour des soucis de lisibilité, nous avons assumé que seul le premier joueur place des tétrominos.
 
 \section{Mise en oeuvre}
 	\subsection{Le serveur}
@@ -134,6 +135,13 @@
 	\subsection{La sérialisation}
 
 			Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
+
+			\begin{figure}[bt]
+				\centering
+				\includegraphics[scale=0.45]{img/echanges.png}
+				\caption{Représentation simplifiée des échanges de messages entre les clients et le serveur}
+				\label{fig:rezo}
+			\end{figure}
 
 			Pour ce projet, nous avons réalisé nos propres classes de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
 			Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le serialiseur et le deserialiseur. 
