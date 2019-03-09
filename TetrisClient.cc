@@ -23,7 +23,15 @@ static void serverListener(tcp::socket & socketServer, gf::Queue<std::vector<uin
         else if (error)
             throw boost::system::system_error(error); // Some other error.
 
+        ds.reset(msg);
+        Request_STC rqFS;
+        ds.deserialize(rqFS);
+
         queueServer.push(msg);
+
+        if (rqFS.type == Request_STC::TYPE_CONNECTION_LOST){
+            break;
+        }
     }
 }
 
@@ -100,19 +108,19 @@ int main(int argc, char* argv[]){
             displayGame.drawWaitServer(renderer);
             renderer.display();
 
+            gf::Event event;
+
+            while (window.pollEvent(event)) {
+                controls.processEvent(event);
+            }
+
+            if (controls("Close").isActive()) {
+                window.close();
+                return 0;
+            } 
+
             if (reconnectionClock.getElapsedTime() >= timeReconnection){
                 try {
-                    gf::Event event;
-
-                    while (window.pollEvent(event)) {
-                        controls.processEvent(event);
-                    }
-
-                    if (controls("Close").isActive()) {
-                        window.close();
-                        return 0;
-                    }  
-
                     boost::asio::io_service io_service;
 
                     tcp::socket sock(io_service);
@@ -126,7 +134,7 @@ int main(int argc, char* argv[]){
                     try {
                 
                         bool enPartie = true;
-                        uint8_t win = 0;     
+                        uint8_t win = 42;     
                         uint32_t scoreSelf = 0;
                         uint32_t scoreOther = 0;
                         Tetromino currentTetro;
@@ -160,8 +168,6 @@ int main(int argc, char* argv[]){
 
                             if (controls("Close").isActive()) {
                                 sendClientDisco(false, sock);
-                                window.close();
-                                return 0;
                             } 
 
                             mainView.onScreenSizeChange(window.getSize());
@@ -251,6 +257,10 @@ int main(int argc, char* argv[]){
                                             malusOther = false;
                                         }
                                         break;
+                                    case Request_STC::TYPE_CONNECTION_LOST :
+                                        printf("Received a TYPE_CONNECTION_LOST\n");
+                                        enPartie = false;
+                                        break;
                                 }
                             }
 
@@ -334,12 +344,16 @@ int main(int argc, char* argv[]){
 
                         while(!enPartie){
 
+                            if (win == 42){
+                                window.close();
+                                return 0;
+                            }
+
                             while (window.pollEvent(event)) {
                                 controls.processEvent(event);
                             }
 
                             if (controls("Close").isActive()) {
-                                sendClientDisco(false, sock);
                                 window.close();
                                 return 0;
                             } 

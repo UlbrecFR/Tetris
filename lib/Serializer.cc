@@ -142,6 +142,8 @@
 			case Request_STC::TYPE_MALUS_END :
 				serialize(r.malusEnd);
 				break;
+			case Request_STC::TYPE_CONNECTION_LOST :
+				break;
 		}
 	}
 

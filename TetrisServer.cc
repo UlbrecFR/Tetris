@@ -42,7 +42,15 @@ static void clientListener(tcp::socket & socketClient, gf::Queue<std::vector<uin
         else if (error)
             throw boost::system::system_error(error); // Some other error.
 
+        ds.reset(msg);
+        Request_CTS rqFC;
+        ds.deserialize(rqFC);
+
         queueClient.push(msg);
+
+        if (rqFC.type == Request_CTS::TYPE_CLIENT_CONNECTION_LOST){
+            break;
+        }
     } 
 }
 
@@ -127,6 +135,21 @@ void sendGameOver(std::vector<tcp::socket> & socketClients) {
         }
         s.serialize(rqSTC);
         boost::asio::write(socketClients[i], boost::asio::buffer(s.getData()));
+        s.clear();
+    }  
+}
+
+void sendConnectionLost(std::vector<tcp::socket> & socketClients) {
+    Serializer s;
+
+    Request_STC rqSTC;
+
+    for (size_t i = 0; i < NB_PLAYERS; ++i){
+        
+            rqSTC.type = Request_STC::TYPE_CONNECTION_LOST;
+            s.serialize(rqSTC);
+            boost::asio::write(socketClients[i], boost::asio::buffer(s.getData()));
+        
         s.clear();
     }  
 }
@@ -234,7 +257,7 @@ void updateGrid(Tetromino t, size_t id, std::vector<tcp::socket> & socketClients
 
 
 
-void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id, std::vector<PlayerMalusTimer> & timersMalus, 
+bool exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socketClients, size_t id, std::vector<PlayerMalusTimer> & timersMalus, 
     gf::Queue<uint8_t> queuesMalus[2], gf::Clock & clk, std::vector<AntiCheat> & antiCheats) {
 
     Deserializer d;
@@ -265,6 +288,7 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
                 if (antiCheats[id].strikes >= 3) {
                     scores[id] = 0;
                     sendGameOver(socketClients);
+                    sendConnectionLost(socketClients);
                 }
             }
 
@@ -275,11 +299,12 @@ void exploitMessage(std::vector<uint8_t> & msg, std::vector<tcp::socket> & socke
         }
         case Request_CTS::TYPE_CLIENT_CONNECTION_LOST : {
             printf("Received a TYPE_CLIENT_CONNECTION_LOST\n");   
-            sendGameOver(socketClients);
-            exit(0);
+            sendConnectionLost(socketClients);
+            return false;
             break;
         }
     }
+    return true;
 }
 
 void sendGameStart(tcp::socket & socketClient, uint64_t time, size_t id) {
@@ -387,7 +412,9 @@ int main(int argc, char* argv[]){
         for(;;) {
             for (size_t i = 0; i < NB_PLAYERS; ++i){
                 if (queueClients[i].poll(msg)) {
-                    exploitMessage(msg, socketClients, i, timersMalus, queuesMalus, clock, antiCheats);
+                    if (!exploitMessage(msg, socketClients, i, timersMalus, queuesMalus, clock, antiCheats)){
+                        return 0;
+                    }
                 }
 
                 if (timersMalus[i].malusActive != 0) {  
@@ -413,6 +440,7 @@ int main(int argc, char* argv[]){
         }
 
         sendGameOver(socketClients);
+        sendConnectionLost(socketClients);
 
     } catch (std::exception& e) {
         std::cerr << "Exception SERVER: " << e.what() << "\n";
