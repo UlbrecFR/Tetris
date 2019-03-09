@@ -27,7 +27,7 @@ struct CTS_ClientConnectionLost {
 struct Request_CTS{
 	enum Type : uint8_t {
 		TYPE_TETROMINO_PLACED,
-		TYPE_CLIENT_CONNECTION_LOST
+		TYPE_CLIENT_CONNECTION_LOST,
 	};
 
 	Type type;
@@ -91,7 +91,8 @@ struct Request_STC{
 		TYPE_GAME_START,
 		TYPE_GAME_OVER,
 		TYPE_MALUS_START,
-		TYPE_MALUS_END
+		TYPE_MALUS_END,
+		TYPE_CONNECTION_LOST,
 	};
 
 	Type type;

@@ -162,6 +162,8 @@
 			case Request_STC::TYPE_MALUS_END :
 				deserialize(r.malusEnd);
 				break;
+			case Request_STC::TYPE_CONNECTION_LOST :
+				break;
 		}
 	}
 
