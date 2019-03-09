@@ -4,9 +4,41 @@
 \usepackage[T1]{fontenc}
 \usepackage[english, francais]{babel}
 \usepackage{graphicx}
+\usepackage{listings}
+\usepackage{color}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
 
-
+\lstset{language=C++,
+    basicstyle=\small,
+    keywordstyle=\color{blue}\small,
+    stringstyle=\color{red}\small,
+    commentstyle=\color{green}\small,
+    morecomment=[l][\color{magenta}]{\#},
+    tabsize=2
+}
 \title{Le vouitris}
 \date{?? mars 2019}
 \author{Cynthia MAILLARD \and Alexandre DILLON \and Félix ROYER}
@@ -88,7 +120,7 @@
 					\item Malus end : signale la fin de la période de malus actuelle
 				\end{itemize}
 
-			\subsubsection{Les messages du serveur vers le client}
+			\subsubsection{Les messages du client vers le serveur}
 
 				\begin{itemize}
 					\item Tétromino placed : contient le tétromino avec sa position et son orientation tel qu'il viens d'être placé par le joueur
@@ -96,16 +128,67 @@
 				\end{itemize}
 
 
-
-
-
-
 \section{Mise en oeuvre}
 	\subsection{Le serveur}
+
+	\subsection{La sérialisation}
+
+			Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
+
+			Pour ce projet, nous avons réalisé nos propres classes de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
+			Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le serialiseur et le deserialiseur. 
+			
+			\subsubsection{Sérialisation des types simples}
+
+			Pour la sérailisation des type simple nous utilisons une méthode templatée privée qui peut sérialiser n'importe quel type simple. Cet sérialisation est ensuite appelé par d'autre méthode auxquelles sont assignés des types spécifiques afin d'éviter la sérialisation de type non-désiré.
+			L'endianess de cet méthode de sérialisation définit l'endianess de toute notre sérialisation, celle-ci est en big-endian pusique le format big-endian est le format le plus commun au infrastructure réseau.
+
+\begin{lstlisting}[language=C++, caption=Méthode de sérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à sérailiser et writePos la position d'écriture du sérialiseur]
+template <typename T>
+void Serializer::serializeAnyType(T d){
+	size_t size = sizeof(T);
+	for (size_t i = 0; i < size; ++i) {
+		data.push_back(static_cast<uint8_t>(d >> 8*(size-i-1))); 
+	}
+	writePos += sizeof(T);
+}\end{lstlisting}
+
+\begin{figure}[bt]
+	\centering
+	\includegraphics[scale=0.35]{img/serialisation.png}
+	\caption{Représentation simplifiée de la sérialisation d'un entier de 32bit, est ici représenté la sérialisation du second octet avec la position d'écriture égale à n.}
+	\label{fig:rezo}
+\end{figure}
+
+			\subsubsection{La sérialisation des messages}
+
+			Nos messages sont répartis en deux structures, une pour les échanges client vers serveur et une pour les échanges serveur vers client. Chacune de ces structures contient une union contenant les structures des messages ainsi que le type du message représenté par une énumération.
+			Les structures de messages contiennent ensuite ce que chaque message doit envoyer, des types simples ou des objets. La sérialisation des types simples étant réalisée, celles des objets ce fait par l'appel de la sérailisation de types simple pour chaque attribut de l'objet, sauf si l'attribut est lui-même un objet pour lequel on appelera la méthode de sérialisation adéquate, ceci jusqu'à la sérialisation complète de tout l'objet.
+			La sérialisation des messages est donc la suivante : on sérialise tout d'aboord le type de message puis la structure de message présente dans l'union correspondante au type du message.
+
+			\subsubsection{La déserialisation}
+
+			Comme précédemment évoquer, le Deserializer est le symétrique du Serializer, de ce fait la déserialisation va effectuer les opérations inverse de la sérialisation. Pour le cas des messages, le Deserializer va d'abord déserialiser la type du message pour savoir quelle methode appeler pour deserialiser le message.
+
+\begin{lstlisting}[language=C++, caption=Méthode de desérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à desérailiser et readPos la position de lecture du desérialiseur]
+template <typename T>
+void Deserializer::deserializeAnyType(T & d){
+	T res = 0;
+	for (size_t i = 0; i < sizeof(T); ++i) {
+		res = (res << 8) + data[readPos+i];
+	}
+	readPos += sizeof(T);
+	d = res;
+}\end{lstlisting}
+
+			\subsubsection{Une seule asymétrie entre Serializer et Deserializer}
+
+			Une seule asymétrie entre Serializer et Deserializer existe, il s'agit de la gestion de la taille du message. Car pour envoyé notre message sur une socket, nous devons connaitre sa taille et la spécifier. Pour cela le serialiseur garde toujours huit octets en debut de son tableau dynamique pour que lorsqu'on récupère le tableau d'octet, la taille du tableau soit insérée au debut de celui-ci. Ainsi cela permet lors de la réception du message, de lire les huit premiers octets pour connaitre la taille du message et alloué un tableau dynamique de la bonne taille pour enfin l'assigné à un deserailiseur.
+
 	
 	\subsection{Le client graphique}
 
-	\subsection{La sérialisation}
+
 
 
 \section*{Conclusion}

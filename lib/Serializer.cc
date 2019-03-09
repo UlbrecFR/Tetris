@@ -24,9 +24,9 @@
 
 	template <typename T>
 	void Serializer::serializeAnyType(T d){
-
-		for (size_t i = 0; i < sizeof(T); ++i) {
-	    	data.push_back((d >> 8*i)); 
+		size_t size = sizeof(T);
+		for (size_t i = 0; i < size; ++i) {
+	    	data.push_back(static_cast<uint8_t>(d >> 8*(size - i - 1))); 
 	    }
 	    writePos += sizeof(T);
 	}
@@ -50,7 +50,6 @@
 
 	template <typename T>
 	void Serializer::serialize(const T *d, uint64_t Size){
-
 		serialize(Size);
 
 		for (size_t i = 0; i < Size; ++i) {
@@ -59,7 +58,6 @@
 	}
 
 	void Serializer::serialize(const Grid g){
-		
 		for (size_t row = 0; row < g.getRows(); ++row){
 	        for (size_t col = 0; col < g.getCols(); ++col){
 	            serialize(g(col,row));
@@ -179,7 +177,7 @@
 	std::vector<uint8_t> Serializer::getData(){
 		size_t size = data.size()-sizeof(uint64_t);
 		for (size_t i = 0; i < sizeof(uint64_t); ++i) {
-	    	data[i] = static_cast<uint8_t>(size >> (8 * i));
+	    	data[i] = static_cast<uint8_t>(size >> (8 * (sizeof(uint64_t)-i-1)));
 	    }
 		return data;
 	}
