@@ -54,10 +54,24 @@
 \newpage
 
 \section*{Remerciements}
-
+	
 \section*{Introduction}
+	La réalisation de projet s'inscrit dans le cadre de projet intégrateur de notre troisième année de licence informatique à l'Université de Besançon. Pour ce projet, nous avons réalisé le projet proposé par Julien Bernard : un tétris multijoueur en réseau. 
 
-\section{Adaptation et modélisation}
+	\bigskip
+
+	Le développement devait être fait en C++, avec le bibliothèque Boost.asio pour la communication réseau et les parties graphiques devait être réalisées en utilisant la biliothèque Gamedev Framework, biliothèque conçu pour le développement de jeux vidéo, développée par Julien Bernard.
+	Le développement s'étendait d'octobre 2018 à mars 2019.
+
+	\bigskip
+	Nous étions intéressé par ce projet car nous voulions améliorer nos connaissances dans le language C++. De plus la simplicité de la conception d'un Tétris nous permettait d'approfondir certains domaines que le court temps de développement ne nous aurait pas permi d'aborder sur un jeu plus complexe. Notament, approfondir la programmation distribué et la sérialization nous motivait pour ce projet.
+
+	\bigskip
+	Ce rapport a pour but de rendre compte du travail que nous avons réalisé au cours du projet.
+
+	\newpage
+
+\section{Adaptation du jeu d'origine}
 	\subsection{Tétris originel}
 		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétriminos », descendent du haut de l'écran. 
 		Durant la chute des tetrominos, le joueur peut déplacer les pièces latéralement, leur faire effectuer une rotation sur elles-mêmes et accélérer la vitesse de la descente dans certaines versions jusqu'à ce qu'elles se pose sur le bas de la zone de jeu ou sur une autre pièce. 
@@ -82,9 +96,9 @@
 
 		Les joueurs joueront une partie de Tétris classique, chacun de leur coté. Cependant, pour ne pas limiter l'affrontement à un concours de score, nous avons choisi d'ajouter un système de malus : lorsqu'un joueur parvient à détruire des lignes, son adversaires se voit pénalisé plus ou moins sévérement en fonction du nombre de lignes détruites.
 
-	\subsection{Modélisation du jeu}
+	\section{Modélisation du jeu}
 
-		\subsubsection{Architecture réseau}
+		\subsection{Architecture réseau}
 
 			Nous avons déjà défini que nous avions besoin d'une architecture client-serveur dans la partie précédente.
 
@@ -104,9 +118,18 @@
 
 			Ainsi, les clients et le serveur vont pouvoir s'envoyer des messages sans problèmes, étant donné qu'il y a en permanence une socket qui écoute la réception de message. L'interprétation des messages est faites durant la boucle principale des deux applications, ce qui ne bloque pas leur exécution.
 
-		\subsubsection{\'Echanges entre les clients et le serveur}
+		\subsection{\'Echanges entre les clients et le serveur}
 
-			Notre protocole d'échange tel que l'avons défini implique que le serveur gère seul la partie, et les clients uniquement l'affichage et les interactions de l'utilisateur, par conséquent, les échanges vont consister en la mise à jour de l'état du jeu de la part du serveur et les actions du joueur de la part du client.
+			Notre protocole d'échange tel que l'avons défini implique que le serveur gère seul la partie, et les clients uniquement l'affichage et les interactions de l'utilisateur, par conséquent, les échanges vont consister en la mise à jour de l'état du jeu de la part du serveur et les actions du joueur de la part du client. 
+			La figure \ref{fig:echange} représente une version simplifié des échanges entre les clients et le serveur. Pour des soucis de lisibilité, nous avons assumé que seul le premier joueur place des tétrominos.
+
+			\begin{figure}[bt]
+				\centering
+				\includegraphics[scale=0.45]{img/echanges.png}
+				\caption{Représentation simplifiée des échanges de messages entre les clients et le serveur}
+				\label{fig:echange}
+			\end{figure}
+
 
 			\subsubsection{Les messages du serveur vers le client}
 
@@ -127,7 +150,6 @@
 					\item Connection lost : message signalant une déconnexion du joueur
 				\end{itemize}
 
-				La figure \ref{fig:rezo} représente une version simplifié des échanges entre les clients et le serveur. Pour des soucis de lisibilité, nous avons assumé que seul le premier joueur place des tétrominos.
 
 \section{Mise en oeuvre}
 	\subsection{Le serveur}
@@ -136,12 +158,6 @@
 
 			Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
 
-			\begin{figure}[bt]
-				\centering
-				\includegraphics[scale=0.45]{img/echanges.png}
-				\caption{Représentation simplifiée des échanges de messages entre les clients et le serveur}
-				\label{fig:rezo}
-			\end{figure}
 
 			Pour ce projet, nous avons réalisé nos propres classes de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
 			Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le serialiseur et le deserialiseur. 
@@ -165,7 +181,7 @@ void Serializer::serializeAnyType(T d){
 	\centering
 	\includegraphics[scale=0.35]{img/serialisation.png}
 	\caption{Représentation simplifiée de la sérialisation d'un entier de 32bit, est ici représenté la sérialisation du second octet avec la position d'écriture égale à n.}
-	\label{fig:rezo}
+	\label{fig:serial}
 \end{figure}
 
 			\subsubsection{La sérialisation des messages}
