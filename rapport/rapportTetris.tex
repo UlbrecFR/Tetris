@@ -56,7 +56,7 @@
 \section*{Remerciements}
 	
 \section*{Introduction}
-	La réalisation de projet s'inscrit dans le cadre de projet intégrateur de notre troisième année de licence informatique à l'Université de Besançon. Pour ce projet, nous avons réalisé le projet proposé par Julien Bernard : un tétris multijoueur en réseau. 
+	La réalisation de ce projet s'inscrit dans le cadre du projet intégrateur de notre troisième année de licence informatique à l'Université de Besançon. Pour ce projet, nous avons réalisé le sujet proposé par Julien Bernard, enseignant-chercheur en informatique à l'Université de Franche-Comté : un tétris multijoueur en réseau. 
 
 	\bigskip
 
@@ -64,7 +64,7 @@
 	Le développement s'étendait d'octobre 2018 à mars 2019.
 
 	\bigskip
-	Nous étions intéressé par ce projet car nous voulions améliorer nos connaissances dans le language C++. De plus la simplicité de la conception d'un Tétris nous permettait d'approfondir certains domaines que le court temps de développement ne nous aurait pas permi d'aborder sur un jeu plus complexe. Notament, approfondir la programmation distribué et la sérialization nous motivait pour ce projet.
+	Nous étions intéressé par ce projet car nous voulions améliorer nos connaissances dans le language C++. De plus la simplicité de la conception d'un Tétris nous permettait d'approfondir certains domaines que le court temps de développement ne nous aurait pas permi d'aborder sur un jeu plus complexe. Notamment, approfondir la programmation distribué et la sérialization nous motivait pour ce projet.
 
 	\bigskip
 	Ce rapport a pour but de rendre compte du travail que nous avons réalisé au cours du projet.
@@ -82,10 +82,10 @@
 
 		Le jeu a été adapté sur pratiquement toutes les consoles de toutes les générations, soit dans une version strictement identique soit dans une adaptation plus libre ne conservant que certains point du gameplay original. Au début des années 2010, on comptait plus de 65 plate-formes qui possaidait un portage du jeu.
 
-		Tétris s'est imposé comme l'un des plus grands succès de l'histoire du jeu vidéo et l'une de ces icones les plus mondialement connues.
+		Tétris s'est imposé comme l'un des plus grands succès de l'histoire du jeu vidéo et l'une de ces icones les plus mondialement connues. Il faut noter également que le jeu a connue des adaptations multijoueurs - notamment le projet \emph{Tétrinet} à la fin des années 1990 - et ce encore aujourd'hui, avec par exemple \emph{Tétris 99}, qui est sorti le 13 février 2019 sur Nintendo Switch.
 
 	\subsection{Notre adaptation}
-		Notre adaptation est un version multijoueur du Tétris, ou chaque joueur aurait un jeu qui tournerais sur son ordinateur, sur laquelle il jouerais seul avec son clavier. 
+		Notre adaptation est une version multijoueur du Tétris, où chaque joueur a un jeu qui tourne sur son ordinateur, sur lequel il joue seul avec son clavier. 
 
 		L'objectif hypotétique étant que pour jouer ensemble, deux joueurs puissent télécharger le client du jeu sur leurs ordinateur puis se connectent à un serveur en ligne qui gérerait le déroulement de la partie. 
 		Ainsi, on pourrait imaginer que le joueur rédeveloppe son propre client avec son propre interface graphique, et il pourrait jouer sans problème, à condition de reproduire les échanges entre le client et le serveur prévus dans le protocole.
@@ -158,6 +158,10 @@
 
 
 
+
+
+
+
 	\subsection{La sérialisation}
 
 			Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
@@ -169,6 +173,8 @@
 			\subsubsection{Sérialisation des types simples}
 
 			Pour la sérailisation des type simple nous utilisons une méthode templatée privée qui peut sérialiser n'importe quel type simple. Cet sérialisation est ensuite appelé par d'autre méthode auxquelles sont assignés des types spécifiques afin d'éviter la sérialisation de type non-désiré.
+
+			
 			L'endianess de cet méthode de sérialisation, c'est-à-dire l'ordre sequentiel dans lequel sont ranger nos données sérialisées, définit l'endianess de toute notre sérialisation, celle-ci est au format big-endian pusique celui-ci est le format le plus commun au infrastructure réseau. Cela signifie que l'octet le plus significatif (octet de poid fort) est stocker en premier dans notre sérialisation et est donc envoyé en premier lors des échanges.
 
 \begin{lstlisting}[language=C++, caption=Méthode de sérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à sérailiser et writePos la position d'écriture du sérialiseur]
@@ -191,7 +197,11 @@ void Serializer::serializeAnyType(T d){
 			\subsubsection{La sérialisation des messages}
 
 			Nos messages sont répartis en deux structures, une pour les échanges client vers serveur et une pour les échanges serveur vers client. Chacune de ces structures contient une union contenant les structures des messages ainsi que le type du message représenté par une énumération.
+
+
 			Les structures de messages contiennent ensuite ce que chaque message doit envoyer, des types simples ou des objets. La sérialisation des types simples étant réalisée, celles des objets ce fait par l'appel de la sérailisation de types simple pour chaque attribut de l'objet, sauf si l'attribut est lui-même un objet pour lequel on appelera la méthode de sérialisation adéquate, ceci jusqu'à la sérialisation complète de tout l'objet.
+			
+
 			La sérialisation des messages est donc la suivante : on sérialise tout d'aboord le type de message puis la structure de message présente dans l'union correspondante au type du message.
 
 			\subsubsection{La déserialisation}
