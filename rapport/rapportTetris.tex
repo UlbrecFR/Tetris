@@ -332,6 +332,29 @@ void Deserializer::deserializeAnyType(T & d){
 				\label{fig:grid}
 			\end{figure}
 
+			\paragraph{Le tableau de la zone de jeu}
+
+			Comme expliqué précédemment, notre zone de jeu est représenté par un tableau crée avec l’objet Grid de largeur 12 et de hauteur 21. Dans la figure ?? nous avons représenté de façon schématique les données stockés dans ce tableau à un instant T d’une partie.
+
+			Toute les case sans chiffres sont des cases contenant un 0. Nous voyons que le numéro stocké correspond au type du tetromino.
+
+			Encadré en rouge nous avons l’ancre du tetromino actuellement en chute. Ce n’est qu ‘au moment de l’affichage que toute les case du tetromino sont récupéré. Pour la gestion de la chute, il nous etait plus simple de n’avoir qu’une seul case à déplacer. 
+
+			Tout en haut du tableau de la zone de jeu, encadré en bleu, nous retrouvons 4 lignes qui n’apparaissent pas dans l’affichage pour le joueur.
+
+			C’est 4 lignes nous permettent de faire apparaître le nouveau tetromino depuis le dessus de la zone de jeu et ce sont sur ces lignes que s’effectue le test Grid::gameOver pour savoir si la zone de jeu est entièrement remplie.
+
+
+			\paragraph{GameArea}
+
+			La classe GameArea est uniquement utilisé par le client. Elle contient tout les chargements des textures pour les sprites des différentes pièces.
+
+			Nous avons un tableau de Sprite de largeur 12 et de hauteur 17 (on ne retrouve pas ici les 4 lignes du haut du tableau de la zone de jeu puisqu’elles ne sont pas affichée.
+
+			On récupère les données stocké dans le tableau de la zone de jeu (Grid) à partie de la 5ème lignes et on modifie les sprite contenue dans le tableau de gameArea.
+
+			La fonction GameArea::setScale utilise la classe gf::Transformable afin de modifié la taille de l’affichage en fonction de vecteur et ainsi nous permettre d’utilisé les même sprite pour la zone de jeu du joueur et celle du joueur adverse.
+
 
 		\subsubsection{La fenêtre graphiques}
 
@@ -341,6 +364,23 @@ void Deserializer::deserializeAnyType(T & d){
 				\caption{Différentes zone d'affichage de la fenêtre du jeu}
 				\label{fig:fen}
 			\end{figure}
+
+			Les différents element composant notre ecran de jeu : 
+
+			En rouge : Zone du jeu du joueur. On y trouve les tetromino déjà posé ainsi que le tetromino en jeu en train de chuté. C’est avec cette fenetre que le joueur va intéragir.
+
+			En jaune : Zone du joueur de l’adversaire. On ne vois pas la piece en jeu mais on voit les piece déjà posé. Le joueur peut alors voir si son adversaire est en difficulté ou si au contraire une ligne est sur le point d’etre formée.
+
+
+			Ces 2 zones sont crée grace au classe Grid, et Game Area ainsi qu’en utilisant la classe Transformable de la bibliothèque gf nous permettant facilement de rendre la vision de la zone de jeu adverse plus petit que celle du joueur.
+
+			En vert : Prochaine pièce
+
+			En blanc : le timer
+
+			En violet : Les scores des 2 joueurs
+
+			En noir : Affichage du malus en cours. Si aucun malus n’est actif cette partie de l’écran est vide. Une jauge de couleur rouge permet de savoir approximativement le temps qu’il reste pour que le malus se termine
 
 
 
