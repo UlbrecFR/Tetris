@@ -156,8 +156,21 @@
 \section{Mise en oeuvre}
 	\subsection{Le serveur}
 
+		Le serveur est la clé de voute du jeu. Il fait le lien entre les deux clients et gère l'évolutions du jeu.
 
-	\subsubsection{Les malus}
+		\subsubsection{La structure du serveur}
+
+			\paragraph{Les threads}
+
+			Le serveur doit écouter les messages de la part des deux clients. Cependant, l'éxecution du serveur ne peut être interomput en attendant la reception d'un message. Nous avons donc créé deux threads d'écoute, chacun attendant les message d'un des client. Lors qu'un message est réceptionné, il est stocké dans une file. La file est partagée entre le thread d'écoute et le thread principal. \'A chaque tour de boucle, le thread principal regarde s'il y a un message stocké dans le file. Si c'est le cas, il interprète ce dernier, met à jour les données du client et renvoit des message aux deux clients si besoin est.
+
+
+			\paragraph{L'interprétation des messages}
+
+				
+
+
+		\subsubsection{Les malus}
 
 
 			Présentation des différents malus:
@@ -268,8 +281,43 @@ void Deserializer::deserializeAnyType(T & d){
 			IsValid ??
 			printGrid -> debug , besoin d’en parler ?
 
+			\paragraph{Vérification des déplacements}
+				La fonction Grid::movePossible permet de vérifier si l’action de déplacement faite par le joueur et valide. Elle prend en paramètre le Tétromino en jeu (tetromino qui chute et qui est contrôlé par le joueur) et un vecteur (x, y) pour savoir dans quel direction le mouvement est fait.
+
+				Cette fonction est appelé dans : 
+				\begin{itemize}
+					\item Grid::downPossible, avec le vecteur {0, 1}
+					\item Grid::rightPossible, avec le vecteur {1, 0}
+					\item Grid::leftPossible, avec le vecteur {-1, 0}
+				\end{itemize}
+
+				La fonction Grid::rotatePossible permet d’autorisé où non la rotation de la pièce en jeu. La rotation peut être par exemple refusé si le tetromino est bloqué entre 2 autres tétrominos ou si il est sur le bord de la zone de jeu. Dans ces 2 cas, la rotation du tétromino le ferait soit passé a travers d’autre pièce ce qui est impossible ou encore sortir de la zone de jeu. On vérifie donc si les case du tétromino après rotation sont bien dans la zone de jeu et si elle sont vide grâce à la fonction Tetromino::getCases.
+
+			\paragraph{Placement d’un tetromino}
+				Si la fonction Grid::downPossible renvoie false, le tetromino actuellement en jeu est placé. Hors, seul son ancre est visible dans le tableau lors de sa chute, il faut donc ajouter toute les cases qui compose le tetromino dans la zone de jeu afin d’envoyé un nouveau tetromino en jeu.
+				On appel la fonction Grid::printGrid qui remplis le tableau en faisant appel au fonction Tetromino::getCases et Tetromino::getType.
+
+			\paragraph{Suppression de lignes}
+				La fonction Grid::deleteLines parcours le tableau et détecte si des lignes sont pleine.
+				Si c’est le cas, elle appel la fonction Grid::fallLines sur la lignes correspondante.
+				Elle renvoie le nombre total de ligne pleine qui ont été supprimé pour effectué le calcul du score et l’envoie de malus à l’adversaire.
+
+				La fonction Grid::fallLines récupère en paramètre la ligne pleine, et fait descendre toutes les lignes au dessus de celle-ci d’une case vers le bas en commençant par le bas du tableau.
+
+			\paragraph{Vérification de l’état de la grille}
+
+				La fonction Grid::gameOver est appelé à chaque tétromino posé. Elle vérifie si les lignes du haut du tableau sont vide. Si une pièce est présente dans cette zone, on estime que la zone de jeu est complètement remplis et que l’arrive d’un prochain tétromino est impossible, dans ce cas elle renvoie true.
+
+			\paragraph{clear (titre a changer)}
+
+				Si l’appel à la fonction Grid::gameOver nous retourne true alors on vide entièrement la zone de jeu et le score du joueur subit un malus (score divisé par 2). 
+				Pour vidé la zone de jeu on utilise la fonction Grid::clear qui parcours tout le tableau est passe tout les case à 0.
+
+
 
 	\subsection{Le client graphique}
+
+		Le client est la partie visible de l’application pour les joueurs. Son rôle est de recevoir les messages envoyé par le serveur, de capter les interaction du joueur sur la partie et de les transmettre au server et d’afficher les différents éléments composant la fenêtre de jeu.
 
 		\subsubsection{Les structures de données locales}
 
@@ -299,38 +347,26 @@ void Deserializer::deserializeAnyType(T & d){
 
 		\subsubsection{Les actions du joueur}
 
-			\paragraph{Vérification des déplacements}
-			La fonction Grid::movePossible permet de vérifier si l’action de déplacement faite par le joueur et valide. Elle prend en paramètre le Tétromino en jeu (tetromino qui chute et qui est contrôlé par le joueur) et un vecteur (x, y) pour savoir dans quel direction le mouvement est fait.
+			Lors de la chute du tetromino en jeu, le joueur peu intéragir sur celui ci avec les touche du clavier :
 
-			Cette fonction est appelé dans : 
-			\begin{itemize}
-				\item Grid::downPossible, avec le vecteur {0, 1}
-				\item Grid::rightPossible, avec le vecteur {1, 0}
-				\item Grid::leftPossible, avec le vecteur {-1, 0}
-			\end{itemize}
+			Les flèches gauche et droite et les touche Q et D permettent de déplacer latéralement le tétromino.
+			La flèche du bas et la touche S permettent d’accélérer la chute si on reste appuyé dessus.
+			La barre d’espace permet de faire tourné le tetromino sur lui même.
 
-			La fonction Grid::rotatePossible permet d’autorisé où non la rotation de la pièce en jeu. La rotation peut être par exemple refusé si le tetromino est bloqué entre 2 autres tétrominos ou si il est sur le bord de la zone de jeu. Dans ces 2 cas, la rotation du tétromino le ferait soit passé a travers d’autre pièce ce qui est impossible ou encore sortir de la zone de jeu. On vérifie donc si les case du tétromino après rotation sont bien dans la zone de jeu et si elle sont vide grâce à la fonction Tetromino::getCases.
+			De plus, la fermeture de la fenêtre étant aussi une action du joueur sur le jeu, elle fait partie de la liste des contrôle.
 
-			\paragraph{Placement d’un tetromino}
-			Si la fonction Grid::downPossible renvoie false, le tetromino actuellement en jeu est placé. Hors, seul son ancre est visible dans le tableau lors de sa chute, il faut donc ajouter toute les cases qui compose le tetromino dans la zone de jeu afin d’envoyé un nouveau tetromino en jeu.
-			On appel la fonction Grid::printGrid qui remplis le tableau en faisant appel au fonction Tetromino::getCases et Tetromino::getType.
 
-			\paragraph{Suppression de lignes}
-			La fonction Grid::deleteLines parcours le tableau et détecte si des lignes sont pleine.
-			Si c’est le cas, elle appel la fonction Grid::fallLines sur la lignes correspondante.
-			Elle renvoie le nombre total de ligne pleine qui ont été supprimé pour effectué le calcul du score et l’envoie de malus à l’adversaire.
+			Pour capter les actiosn réalisés par le joueur nous avons crée une classe Controls.
 
-			La fonction Grid::fallLines récupère en paramètre la ligne pleine, et fait descendre toutes les lignes au dessus de celle-ci d’une case vers le bas en commençant par le bas du tableau.
+			Dans cette classe nous définissons des objets de classe Action de GF.
 
-			\paragraph{Vérification de l’état de la grille}
+			Pour les actions lié à une touche de clavier nous utilisons la fonction gf::Action ::addScancodeKeyControl avec le gf::Scancode correspondant à la touche voulue.
 
-			La fonction Grid::gameOver est appelé à chaque tétromino posé. Elle vérifie si les lignes du haut du tableau sont vide. Si une pièce est présente dans cette zone, on estime que la zone de jeu est complètement remplis et que l’arrive d’un prochain tétromino est impossible, dans ce cas elle renvoie true.
+			Nous avons aussi une fonction reset qui permet de stoppé toute les actions en cours. Nous l’utilisons dans la boucle de jeu.
 
-			\paragraph{clear (titre a changer)}
+			+ d’explication sur le fonctionnement des classe Action et Event ?
 
-			Si l’appel à la fonction Grid::gameOver nous retourne true alors on vide entièrement la zone de jeu et le score du joueur subit un malus (score divisé par 2). 
-			Pour vidé la zone de jeu on utilise la fonction Grid::clear qui parcours tout le tableau est passe tout les case à 0.
-
+		
 	
 
 \section*{Conclusion}
