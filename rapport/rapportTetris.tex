@@ -157,6 +157,22 @@
 	\subsection{Le serveur}
 
 
+	\subsubsection{Les malus}
+
+
+			Présentation des différents malus:
+
+			Lorsque le joueur complète des lignes, celle ci sont supprimés. On calcul le nombre de lignes supprimé afin d’augmenté le score du joueur mais aussi d’envoyé des malus au joueur adverse.
+			Pour les malus nous avons choisis : 
+
+			\begin{itemize}
+				\item suppression de 2 lignes : le joueur adverse ne peut plus faire de rotation sur ses pièces pendant N secondes.
+				\item suppression de 3 lignes : la vitesse des chutes des pièce de l’adversaire augmente.
+				\item suppression de 4 lignes : certaines case sont enlevé du mur adverse pouvant l’empêcher de compléter certaine lignes.
+			\end{itemize}
+
+			Transmission des messages pour les malus ?
+
 
 
 
@@ -164,18 +180,18 @@
 
 	\subsection{La sérialisation}
 
-			Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
+		Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
 
 
-			Pour ce projet, nous avons réalisé nos propres classes de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
-			Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le serialiseur et le deserialiseur. 
-			
-			\subsubsection{Sérialisation des types simples}
+		Pour ce projet, nous avons réalisé nos propres classes de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
+		Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le serialiseur et le deserialiseur. 
+		
+		\subsubsection{Sérialisation des types simples}
 
-			Pour la sérailisation des type simple nous utilisons une méthode templatée privée qui peut sérialiser n'importe quel type simple. Cet sérialisation est ensuite appelé par d'autre méthode auxquelles sont assignés des types spécifiques afin d'éviter la sérialisation de type non-désiré.
+		Pour la sérailisation des type simple nous utilisons une méthode templatée privée qui peut sérialiser n'importe quel type simple. Cet sérialisation est ensuite appelé par d'autre méthode auxquelles sont assignés des types spécifiques afin d'éviter la sérialisation de type non-désiré.
 
-			
-			L'endianess de cet méthode de sérialisation, c'est-à-dire l'ordre sequentiel dans lequel sont ranger nos données sérialisées, définit l'endianess de toute notre sérialisation, celle-ci est au format big-endian pusique celui-ci est le format le plus commun au infrastructure réseau. Cela signifie que l'octet le plus significatif (octet de poid fort) est stocker en premier dans notre sérialisation et est donc envoyé en premier lors des échanges.
+		
+		L'endianess de cet méthode de sérialisation, c'est-à-dire l'ordre sequentiel dans lequel sont ranger nos données sérialisées, définit l'endianess de toute notre sérialisation, celle-ci est au format big-endian pusique celui-ci est le format le plus commun au infrastructure réseau. Cela signifie que l'octet le plus significatif (octet de poid fort) est stocker en premier dans notre sérialisation et est donc envoyé en premier lors des échanges.
 
 \begin{lstlisting}[language=C++, caption=Méthode de sérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à sérailiser et writePos la position d'écriture du sérialiseur]
 template <typename T>
@@ -224,7 +240,7 @@ void Deserializer::deserializeAnyType(T & d){
 			Une seule asymétrie entre Serializer et Deserializer existe, il s'agit de la gestion de la taille du message. Car pour envoyé notre message sur une socket, nous devons connaitre sa taille et la spécifier. Pour cela le serialiseur garde toujours huit octets en debut de son tableau dynamique pour que lorsqu'on récupère le tableau d'octet, la taille du tableau soit insérée au debut de celui-ci. Ainsi cela permet lors de la réception du message, de lire les huit premiers octets pour connaitre la taille du message et alloué un tableau dynamique de la bonne taille pour enfin l'assigné à un deserailiseur.
 
 	
-	\subsection{Le client graphique}
+	\subsection{Les structures de données communes}
 
 		\subsubsection{Tetromino}
 
@@ -251,6 +267,37 @@ void Deserializer::deserializeAnyType(T & d){
 			les constructeur besoin d’en parler ?
 			IsValid ??
 			printGrid -> debug , besoin d’en parler ?
+
+
+	\subsection{Le client graphique}
+
+		\subsubsection{Les structures de données locales}
+
+			%les données stockés dans le clients, 
+			%comment elles ont mises à joru par les messages du serveur
+			%
+
+			\begin{figure}[bt]
+				\centering
+				\includegraphics[scale=0.35]{img/grid.png}
+				\caption{Représentation numérique des données dans le tableau de jeu}
+				\label{fig:grid}
+			\end{figure}
+
+
+		\subsubsection{La fenêtre graphiques}
+
+			\begin{figure}[bt]
+				\centering
+				\includegraphics[scale=0.35]{img/fenetre.png}
+				\caption{Différentes zone d'affichage de la fenêtre du jeu}
+				\label{fig:fen}
+			\end{figure}
+
+
+
+
+		\subsubsection{Les actions du joueur}
 
 			\paragraph{Vérification des déplacements}
 			La fonction Grid::movePossible permet de vérifier si l’action de déplacement faite par le joueur et valide. Elle prend en paramètre le Tétromino en jeu (tetromino qui chute et qui est contrôlé par le joueur) et un vecteur (x, y) pour savoir dans quel direction le mouvement est fait.
@@ -284,21 +331,7 @@ void Deserializer::deserializeAnyType(T & d){
 			Si l’appel à la fonction Grid::gameOver nous retourne true alors on vide entièrement la zone de jeu et le score du joueur subit un malus (score divisé par 2). 
 			Pour vidé la zone de jeu on utilise la fonction Grid::clear qui parcours tout le tableau est passe tout les case à 0.
 
-		\subsubsection{Les malus}
-
-
-			Présentation des différents malus:
-
-			Lorsque le joueur complète des lignes, celle ci sont supprimés. On calcul le nombre de lignes supprimé afin d’augmenté le score du joueur mais aussi d’envoyé des malus au joueur adverse.
-			Pour les malus nous avons choisis : 
-
-			\begin{itemize}
-				\item suppression de 2 lignes : le joueur adverse ne peut plus faire de rotation sur ses pièces pendant N secondes.
-				\item suppression de 3 lignes : la vitesse des chutes des pièce de l’adversaire augmente.
-				\item suppression de 4 lignes : certaines case sont enlevé du mur adverse pouvant l’empêcher de compléter certaine lignes.
-			\end{itemize}
-
-			Transmission des messages pour les malus ?
+	
 
 \section*{Conclusion}
 
