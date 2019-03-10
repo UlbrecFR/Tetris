@@ -355,6 +355,39 @@ void Deserializer::deserializeAnyType(T & d){
 
 			La fonction GameArea::setScale utilise la classe gf::Transformable afin de modifié la taille de l’affichage en fonction de vecteur et ainsi nous permettre d’utilisé les même sprite pour la zone de jeu du joueur et celle du joueur adverse.
 
+			\paragraph{Initialisation de la partie}
+
+				Au tout début de la partie nous initialisons certains paramètre.
+
+				Les score des 2 joueurs sont à 0
+				Toute les cases des grilles de zone de jeu des 2 joueurs sont initialisés à 0
+				Le booléen « enPartie » de notre boucle de jeu est passé a true
+				Le client reçois le premier tetromino en jeu et le prochain tetromino
+				Le timer est initialisé avec la duré de la partie
+
+
+			\paragraph{Boucle de jeu}
+
+Notre boucle de jeu se repose sur le booléen « enPartie »
+
+Il passe à false si : 
+    Un des joueur quitte la partie
+    Le timer tombe à zero
+
+Pendant la boucle de jeu le client:
+
+	\begin{itemize}
+		\item Recois les messages du server
+		\item Récupère les actions du joueur
+		\item Vérifie que les action faites par le joueur sont réalisable et mets a jour la position et la rotation du tetromino en jeu
+		\item Si le tetromino est posé alors il envoie un message au serveur pour lancer le prochain tetromino
+	\end{itemize}
+
+		Une fois toute les donnée mises a jour, l’affichage est réalisé et la boucle suivant commence
+
+		Si le message concernant les malus est reçu alors certaine des données sont modifié jusqu’à ce que le temps de ce malus soit terminée.
+
+		Si le booléen « enPartie » passe a false alors on sort de la boucle de jeu et on entre dans une autre boucle qui permet l’affichage final pour indiqué si le joueur à gagné ou perdu.
 
 		\subsubsection{La fenêtre graphiques}
 
@@ -381,8 +414,6 @@ void Deserializer::deserializeAnyType(T & d){
 			En violet : Les scores des 2 joueurs
 
 			En noir : Affichage du malus en cours. Si aucun malus n’est actif cette partie de l’écran est vide. Une jauge de couleur rouge permet de savoir approximativement le temps qu’il reste pour que le malus se termine
-
-
 
 
 		\subsubsection{Les actions du joueur}
