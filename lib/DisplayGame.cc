@@ -98,7 +98,7 @@ void DisplayGame::loadTextures(){
 
     if(malus == 2 || malus == 3){
         gf::Time timeCD = clkAnimCoolDown.getElapsedTime();
-        coolDown.setSize({150.0f*(gf::seconds(7.5f).asSeconds()-timeCD.asSeconds())/gf::seconds(7.5f).asSeconds(),150.0f});
+        coolDown.setSize({150.0f*(gf::seconds(10.0f).asSeconds()-timeCD.asSeconds())/gf::seconds(10.0f).asSeconds(),150.0f});
         coolDown.setPosition({15*SIZE_CASE, 16.5*SIZE_CASE});
         renderer.draw(coolDown);
 
