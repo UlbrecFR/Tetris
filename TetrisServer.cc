@@ -191,10 +191,9 @@ void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketC
 
     for (size_t i = 0; i < NB_PLAYERS; ++i){
         if (i == id){
-            if (nbLine != 4) {
-                rqSTC.malusStart.target = 0;
-                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);   
-            }
+            rqSTC.malusStart.target = 0;
+            timersMalus[i].malusActive = false;
+            printf("Sending a TYPE_MALUS_START msg to %zu \n", i);   
         } else {
             if (nbLine == 4) {
                 destroyLineMalus(i);
@@ -203,10 +202,10 @@ void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketC
             } else {
                 timersMalus[i].remainingTime.addTo(gf::seconds(10.0f));
             }
-                rqSTC.malusStart.target = 1;
-                timersMalus[i].malusActive = true;
-                timersMalus[i].lastTime = clk.getElapsedTime();
-                printf("Sending a TYPE_MALUS_START msg to %zu \n", i);
+            rqSTC.malusStart.target = 1;
+            timersMalus[i].malusActive = true;
+            timersMalus[i].lastTime = clk.getElapsedTime();
+            printf("Sending a TYPE_MALUS_START msg to %zu \n", i);
         }
 
         s.serialize(rqSTC);
