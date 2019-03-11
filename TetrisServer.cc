@@ -192,7 +192,6 @@ void sendMalusStart(size_t nbLine, size_t id, std::vector<tcp::socket> & socketC
     for (size_t i = 0; i < NB_PLAYERS; ++i){
         if (i == id){
             rqSTC.malusStart.target = 0;
-            timersMalus[i].malusActive = false;
             printf("Sending a TYPE_MALUS_START msg to %zu \n", i);   
         } else {
             if (nbLine == 4) {
