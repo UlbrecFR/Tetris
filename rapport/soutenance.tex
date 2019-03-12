@@ -235,11 +235,11 @@
 			\end{block}
 		\end{frame}
 
-\section{Mise en oeuvre}
+\section{La communication}
 
 	\subsection{Le serveur}
 
-	\begin{frame}{Mise en oeuvre}{Le serveur}
+	\begin{frame}{La communication}{Le serveur}
 		\begin{columns}
 
 			\begin{column}{0.4\textwidth}
@@ -272,7 +272,7 @@
 
 
 
-	\begin{frame}[fragile]{Mise en oeuvre}{Le serveur}
+	\begin{frame}{La communication}{Le serveur}
 		\begin{block}{L'exploitation des messages}
 			\begin{enumerate}
 				\item{Reception message TetrominoPlaced}
@@ -287,10 +287,19 @@
 	\end{frame}
 
 
-	\begin{frame}{Mise en oeuvre}{Le serveur}
+	\begin{frame}{La communication}{Le serveur}
 		\begin{block}{Le vérificateur de triche}
-			\item vérifie 
+			\begin{itemize}
+				\item vérifie que les données renvoyé par le client sont cohérentes
+				\begin{itemize}
+					\item le temps pour jouer la pièce n'est pas trop long
+					\item que les malus sont bien appliqués
+				\end{itemize}
+				\item trois fautes autorisée
+			\end{itemize}
 		\end{block}
+
+
 	\end{frame}
 
 
@@ -316,12 +325,59 @@
 
 
 
-	\subsection{La sérialisation}
+\subsection{La sérialisation}
 
-		\begin{frame}{Sérialisation}{Motivations}
+		\begin{frame}{La communication}{La sérialisation}
 	        \begin{block}{Objectif}
 	            Permettre les échanges de structures complexes entre clients et serveur via des messages standardisés.
 	        \end{block}
+
+	        \begin{block}{Modèles}
+	            \begin{itemize}
+	                \item GamedevFramework
+	                \item SFML/Packet
+	            \end{itemize}
+	        \end{block}
+
+	        \begin{block}{Structures de sérialisation}
+	            Deux classes symétriques communes aux clients et au serveur : 
+	            \begin{itemize}
+	                \item Serializer
+	                \item Deserializer
+	            \end{itemize}
+	        \end{block}     
+
+	    \end{frame}
+
+		\begin{frame}{La communication}{La sérialisation}
+	        \begin{columns}
+		        \begin{column}{0.65\textwidth}
+			    	\begin{block}{Sérialisation templatée}
+			            Utilisation d'une méthode templatée pour sérialiser tout type simple.
+
+			        \end{block}
+			        
+			         \begin{block}{Endianess}
+			            Ordre sequentiel dans lequel sont ranger nos données sérialisées.
+			            \newline Endianess de format Big-Endian : par défaut sur les structures réseaux.
+			        \end{block}
+
+			       	\begin{block}{Sérialisation d'objet}
+			            Sérialisation des attributs de l'objet que l'on souhaite communiquer.
+			        \end{block}
+				\end{column}
+
+				\begin{column}{0.25\textwidth}
+			        \begin{center}
+			        	\includegraphics[scale=0.11]{img/endianess1.png}
+			        	\includegraphics[scale=0.11]{img/endianess2.png}
+			    	\end{center}
+				\end{column}
+			\end{columns}
+
+	    \end{frame}
+
+	    \begin{frame}{La communication}{La sérialisation}
 
 	        \begin{block}{Les messages}
 	            Deux types de messages :
@@ -338,135 +394,138 @@
 	            \end{itemize}
 	        \end{block}
 
-	    \end{frame}
-
-	    \begin{frame}{Sérialisation}{La structure}
-	        \begin{block}{Modèles}
-	            \begin{itemize}
-	                \item GamedevFramework
-	                \item SFML/Packet
-	            \end{itemize}
-	        \end{block}
-	        \begin{block}{Structures de sérialisation}
-	            Deux classes symétriques communes aux clients et au serveur : Serializer et Deserializer.
-	        \end{block}
-	    \end{frame}
-
-		\begin{frame}[fragile]{Sérialisation}{Les types simples}
-	        \begin{block}{Sérialisation templatée}
-	            Utilisation du méthode privée templatée permettant de sérialiser tout type simple.
-
-	            \begin{lstlisting}[language=C++, caption=Méthode de sérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à sérailiser et writePos la position d'écriture du sérialiseur]
-template <typename T>
-void Serializer::serializeAnyType(T d){
-    size_t size = sizeof(T);
-    for (size_t i = 0; i < size; ++i) {
-	    data.push_back(static_cast<uint8_t>
-	    						(d >> 8*(size-i-1))); 
-    }
-    writePos += sizeof(T);
-}\end{lstlisting}
-
-	        \end{block}
-	    \end{frame}
-
-	    \begin{frame}[fragile]{Sérialisation}{Les types simples}
-	        \begin{block}{Endianess}
-	            Ordre sequentiel dans lequel sont ranger nos données sérialisées.
-	            Ici, endianess de format Big-Endian.
-	        \end{block}
-
-	        \begin{center}
-	        	\includegraphics[scale=0.25]{img/endianess.png}
-	    	\end{center}
-	    \end{frame}
-
-	    \begin{frame}[fragile]{Sérialisation}{Les objets et les messages}
-	        \begin{block}{Sérialisation d'objet}
-	            Sérialisation des attributs de l'objet que l'on souhaite communiquer.
-	        \end{block}
-
 	        \begin{block}{Sérialisation de message}
-	            Sérialisation du type de message.
-	            \newline
-	            Sérialisation des élémenets de la structure du message.
+	        	\begin{itemize}
+	                \item Sérialisation du type de message.
+	                \item Sérialisation des éléments de la structure du message.
+	            \end{itemize}            
 	        \end{block}
 	    \end{frame}
 
 
 
-	\subsection{Les structures de données communes}
 
-			\begin{frame}{Les structures de données communes}{Tetromino}	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	\section{La jouabilité}
+		\subsection{Les structures de données}
+
+			\begin{frame}{La jouabilité}{Les structures de données}	
+
+				\begin{block}{La représentation d'un tetromino}
+					\begin{itemize}
+						\item type
+						\item position abscisse/ordonnée
+						\item rotation
+						\item matrices<2,4> des différents types de tétromino
+					\end{itemize}
+				\end{block}
 
 				\begin{columns}
-					\begin{column}{0.45\textwidth}
-						\begin{block}{La classe Tetromino}
-							\begin{itemize}
-								\item type
-								\item position abscisse/ordonnée
-								\item rotation
-								\item matrices<2,4> des tétromino
-								\item getCases()
-								\item rotate()
-							\end{itemize}
-						\end{block}
+					\begin{column}{0.1\textwidth}
+						\begin{center}
+							\includegraphics[scale=0.5]{img/2.png}
+						\end{center}
 					\end{column}
-					\begin{column}{0.35\textwidth}
-
+					\begin{column}{0.1\textwidth}
+						\begin{center}
+							\includegraphics[scale=0.1]{img/tetro.png}
+						\end{center}
 					\end{column}
 				\end{columns}
 				
 			\end{frame}
 
 
-			\begin{frame}{Les structures de données communes}{Grid}	
+			\begin{frame}{La jouabilité}{Les structures de données}	
 
-				\begin{block}{Les vérification des intéractions}
-					\begin{itemize}
-						\item rotatePossible()
-						\item rightPossible()
-						\item leftPossible()
-						\item downPossible()
-					\end{itemize}
-				\end{block}
-
-				\begin{block}{Les vérification de l'état du jeu}
-					\begin{itemize}
-						\item suppression ligne
-						\item grille complète
-						\item ajout de tétromino à la grille
-					\end{itemize}
+				\begin{block}{Récupérer les cases à partir de l'ancre}
+					\begin{enumerate}
+						\item parcours de la matrice
+						\item déterminisation de l'ancre
+						\item renvoi la liste de cases occupées par le tétromino
+						\item la rotation du tétromino change le sens de parcours
+					\end{enumerate}
 				\end{block}
 				
+				\begin{columns}
+					\begin{column}{0.1\textwidth}
+						\begin{center}
+							\includegraphics[scale=0.5]{img/2.png}
+						\end{center}
+					\end{column}
+					\begin{column}{0.1\textwidth}
+						\begin{center}
+							\includegraphics[scale=0.1]{img/tetro.png}
+						\end{center}
+					\end{column}
+				\end{columns}
 			\end{frame}
 
 		
+			\begin{frame}{La jouabilité}{Les structures de données}
+				\begin{columns}
+					\begin{column}{0.6\textwidth}
+						\begin{block}{Vérifier les actions}
+							\begin{itemize}
+								\item rotation possible
+								\item déplacement possible
+								\item descente possible
+							\end{itemize}
+						\end{block}
 
-
+						\begin{block}{Vérifier l'état du jeu}
+							\begin{itemize}
+								\item ligne complète
+								\item grille complète
+								\item nouveau tétromino en jeu
+							\end{itemize}
+						\end{block}
+					\end{column}
+					\begin{column}{0.3\textwidth}
+						\begin{center}
+							\includegraphics[scale=0.2]{img/gridNB.png}
+						\end{center}
+					\end{column}
+				\end{columns}
+			\end{frame}
 
 	\subsection{Le client graphique}
 
-		\begin{frame}{Mise en oeuvre}{Le client graphique}
-			\begin{columns}
-				\begin{column}{0.35\textwidth}
-					\begin{block}{Le rôle du client}
-						\begin{itemize}
-							\item afficher le jeu
-							\item recevoir les messages du serveur
-							\item gérer les interactions du joueur
-						\end{itemize}
-					\end{block}
-				\end{column}
-
-				\begin{column}{0.45\textwidth}
-					\includegraphics[scale=0.175]{img/vouitris.png}
-				\end{column}
-
-			\end{columns}
+		\begin{frame}{La jouabilité}{Le client graphique}
+			\begin{block}{Le rôle du client}
+				\begin{itemize}
+					\item afficher le jeu
+					\item recevoir les messages du serveur
+					\item gérer les interactions du joueur
+				\end{itemize}
+			\end{block}
+			\begin{center}
+				\includegraphics[scale=0.175]{img/vouitris.png}
+			\end{center}
 		\end{frame}
 
-		\begin{frame}{Mise en oeuvre}{Le client graphique}
+		\begin{frame}{La jouabilité}{Le client graphique}
+			\begin{center}
+				\includegraphics[scale=0.25]{img/bla.png}
+			\end{center}
+		\end{frame}
+
+		\begin{frame}{La jouabilité}{Le client graphique}
 			\begin{block}{La zone de jeu}
 				\begin{center}
 					\includegraphics[scale=0.2]{img/grid.png}
@@ -475,47 +534,59 @@ void Serializer::serializeAnyType(T d){
 		\end{frame}
 
 
-		\begin{frame}[fragile]{Mise en oeuvre}{Le client graphique}
+		\begin{frame}{La jouabilité}{Le client graphique}
 			\begin{block}{La boucle de jeu}				
-				\begin{verbatim}
-					TANT QUE enPartie :
-					    SI message dans File :
-					        interpreteMessage()
+				\begin{enumerate}
+					\item vérifier si un message est présent dans le file
+						\begin{itemize}
+							\item interpreter le message
+						\end{itemize}
+					\item recevoir les actions du joueur
+						\begin{itemize}
+							\item vérifier si elles sont possibles
+							\begin{itemize}
+								\item executer l'action
+							\end{itemize}
+						\end{itemize}
 
-					    SI actionJoueur :
-					        SI actionPossible :
-					            faireAction()
+					\item verifier si un tétromino est placé
+						\begin{itemize}
+							\item le signaler au serveur
+						\end{itemize}
 
-					    SI tetromino posé : 
-					        envoiMessage(TetrominoPlaced)
-
-					    MettreAJourFenetre
-
-					FIN TANT QUE
-				\end{verbatim}
-
+					\item mettre à jour l'affichage
+				\end{enumerate}
 			\end{block}
 		\end{frame}
 
-		\begin{frame}[fragile]{Mise en oeuvre}{Le client graphique}
+		\begin{frame}{La jouabilité}{Le client graphique}
 			\begin{block}{L'interprétation des messages}				
-			\begin{verbatim}
-				SI GameStart : 
-				    lancerHorloge()
+				\begin{enumerate}
+					\item GameStart
+				    	\begin{itemize}
+				    		\item lancer l'horloge
+				    	\end{itemize}
+				   	
+				   	\item NewTetromino
+				   		\begin{itemize}
+				   			\item place le prochain tétromino en jeu
+				   		\end{itemize}
 
-				SI NewTetromino :
-				    currentTetro = nextTetro; nextTetro = newTetro
+					\item UpdateGrid
+				    	\begin{itemize}
+				    		\item met à jour les grilles des joueurs
+				    	\end{itemize}
 
-				SI UpdateGrid :
-				    miseAJourGrid()
+				    \item Malus
+				    	\begin{itemize}
+				    		\item applique le malus
+				    	\end{itemize}
 
-				SI Malus :
-				    appliqueMalus(nbLigne)
-
-				SI GameOver : 
-				    messageFin()
-				\end{verbatim}
-
+					\item GameOver
+				    	\begin{itemize}
+				    		\item affiche le message de fin
+				    	\end{itemize}
+				\end{enumerate}
 			\end{block}
 		\end{frame}
 
@@ -537,7 +608,7 @@ void Serializer::serializeAnyType(T d){
 			\end{block}
 		\end{frame}
 
-		\begin{frame}{Conclusion}
+		\begin{frame}{Merci de votre attention}
 			\begin{center}
 				\Large{Avez-vous des questions ?}
 			\end{center}
