@@ -12,6 +12,8 @@
 \definecolor{codepurple}{rgb}{0.58,0,0.82}
 \definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
+\newcommand{\Hrule}{\rule{\linewidth}{0.5mm}}
+
 \lstdefinestyle{mystyle}{
     backgroundcolor=\color{backcolour},   
     commentstyle=\color{codegreen},
@@ -39,13 +41,58 @@
     morecomment=[l][\color{magenta}]{\#},
     tabsize=2
 }
-\title{Le vouitris}
-\date{?? mars 2019}
+
+\title{Le Vouitris}
+\date{13 mars 2019}
 \author{Cynthia MAILLARD \and Alexandre DILLON \and Félix ROYER}
 
 \begin{document}
 
-\maketitle
+\begin{titlepage}
+        
+    \begin{figure}
+       \begin{minipage}[c]{.46\linewidth}
+            \includegraphics[scale=0.5]{img/logU.png} 
+       \end{minipage} \hfill
+       \begin{minipage}[c]{.46\linewidth}
+              \includegraphics[scale=0.08]{img/logF.jpg} 
+       \end{minipage}
+    \end{figure}
+
+    \begin{sffamily}
+    \begin{center}
+
+    \textsc{Université de Franche-Comté}\\[0.2cm]
+     L3 CMI Informatique\\[0.5cm]
+
+    \textsc{Projet intégrateur}\\[0.5cm]
+
+    \Hrule \\[0.2mm]
+
+    { \huge \bfseries Tétris en réseau - Le Vouitris\\[0.8mm]}
+
+    \Hrule\\[1cm]
+
+    \includegraphics[scale=0.30]{img/vouitris.png} 
+
+    \vspace{1cm}
+
+    \Large{Cynthia MAILLARD, Alexandre DILLON, Félix ROYER} \\
+
+    \vspace{0.25cm}
+
+    \Large{\underline{Tuteur de projet} : Julien BERNARD}
+    
+    \vspace{0.5cm}
+
+    {\large Année universitaire 2018-2019}
+
+    \end{center}
+    \end{sffamily}
+    \thispagestyle{empty}% Ne numérote pas la page
+
+
+\end{titlepage}
 
 \newpage
 
@@ -187,14 +234,9 @@
 			Transmission des messages pour les malus ?
 
 
-
-
-
-
 	\subsection{La sérialisation}
 
 		Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
-
 
 		Pour ce projet, nous avons réalisé nos propres classes de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
 		Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le serialiseur et le deserialiseur. 
