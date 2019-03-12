@@ -102,13 +102,17 @@
 \newpage
 
 \section*{Remerciements}
+
+Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le soutient qu'il nous apporter tout au long du développement ainsi que l'aide pour la préparation de la soutenance et de ce rapport.
+
+\newpage
 	
 \section*{Introduction}
 	La réalisation de ce projet s'inscrit dans le cadre du projet intégrateur de notre troisième année de licence informatique à l'Université de Besançon. Pour ce projet, nous avons réalisé le sujet proposé par Julien Bernard, enseignant-chercheur en informatique à l'Université de Franche-Comté : un tétris multijoueur en réseau.
 
 	\bigskip
 
-	Le but est de développer notre version du célèbre jeu de puzzle, en faisant s'affronter deux joueurs l'un contre l'autre. Nous devons donc concevoir des interfaces graphiques pour les joueurs et créer un réseau pour permettre au joueurs de communiquer entre eux.
+	Le but est de développer notre version du célèbre jeu de puzzle, en faisant s'affronter deux joueurs l'un contre l'autre. Nous devons donc concevoir des interfaces graphiques pour les joueurs et créer un réseau pour permettre aux joueurs de jouer ensemble.
 
 	\bigskip
 
@@ -125,14 +129,23 @@
 
 \section{Adaptation du jeu d'origine}
 	\subsection{Tétris originel}
-		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétriminos », descendent du haut de l'écran. 
+		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétrominos », descendent du haut de l'écran. 
 		
 		Durant la chute des tetrominos, le joueur peut déplacer les pièces latéralement, leur faire effectuer une rotation sur elles-mêmes et dans certaines versions, accélérer la vitesse de chute jusqu'à ce qu'elles se pose sur le bas de la zone de jeu ou sur une autre pièce. 
 		
 		Le but pour le joueur est de réaliser le plus de lignes possibles. Une fois une ligne complétée, elle disparaît, et les blocs placés au-dessus chutent d'un rang. 
 		Lorsque le joueur accumule les pièce et remplie la zone de jeu jusqu’en haut, ce qui empêche l'arrivée de tétriminos supplémentaires, la partie se termine. Le joueur obtient un score, qui dépend essentiellement du nombre de lignes réalisées lors de la partie. On ne peut donc jamais gagner à Tetris, le but étant d’améliorer son précédent score.
 
-		Après la version originale du jeu sortie sur l'\textit{Elektronika 60}, le tétris a connu un succès mondial dans les années 1990 grâce à sa version Gameboy.
+		Après la version originale du jeu sortie sur l'\textit{Elektronika 60}, le tétris a connu un succès mondial dans les années 1990 grâce à sa version Gameboy, dont on voit une capture d'écran sur la figure .
+
+		\begin{figure}[tb]
+			\centering
+			\includegraphics[scale=0.45]{img/Tetris8.jpg}
+			\caption{Interface de tétris sur Gameboy}
+			\label{fig:rezo}
+		\end{figure}
+
+		
 
 		Le jeu a été adapté sur pratiquement toutes les consoles de toutes les générations, soit dans une version strictement identique soit dans une adaptation plus libre ne conservant que certains point du gameplay original. Au début des années 2010, on comptait plus de 65 plate-formes qui possaidait un portage du jeu.
 
