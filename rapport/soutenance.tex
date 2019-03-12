@@ -5,7 +5,43 @@
 \usepackage[english,french]{babel}
 \usepackage{graphicx}
 \usepackage{amsmath}
+\usepackage{fancyvrb}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{enumerate}
+ 
+\definecolor{codegreen}{rgb}{0,0.6,0}
+\definecolor{codegray}{rgb}{0.5,0.5,0.5}
+\definecolor{codepurple}{rgb}{0.58,0,0.82}
+\definecolor{backcolour}{rgb}{0.95,0.95,0.92}
 
+\lstdefinestyle{mystyle}{
+    backgroundcolor=\color{backcolour},   
+    commentstyle=\color{codegreen},
+    keywordstyle=\color{magenta},
+    numberstyle=\tiny\color{codegray},
+    stringstyle=\color{codepurple},
+    basicstyle=\footnotesize,
+    breakatwhitespace=false,         
+    breaklines=true,                 
+    captionpos=b,                    
+    keepspaces=true,                 
+    numbers=left,                    
+    numbersep=5pt,                  
+    showspaces=false,                
+    showstringspaces=false,
+    showtabs=false,                  
+    tabsize=2
+}
+
+\lstset{language=C++,
+    basicstyle=\small,
+    keywordstyle=\color{blue}\small,
+    stringstyle=\color{red}\small,
+    commentstyle=\color{green}\small,
+    morecomment=[l][\color{magenta}]{\#},
+    tabsize=2
+}
 
 \definecolor{darkBlue}{RGB}{20,20,195}
 
@@ -48,13 +84,11 @@
 
 	\vspace{-0.15cm}
 
-	\center{\textsc{\huge \color{darkBlue} Tétris multijoueur}}
+	\center{\textsc{\Huge \color{darkBlue} Le Vouitris}}
 
-	\vspace{-0.5cm}
+	\vspace{0.2cm}
 
-	\center{\textsc{\color{gray}Soutenance de projet}}
-
-	\includegraphics[scale=0.125]{img/vouitris.png}
+	\includegraphics[scale=0.15]{img/vouitris.png}
 
 	\center{\textsc{Cynthia MAILLARD, Félix ROYER, Alexandre DILLON}}
 	\vspace{-0.20cm}
@@ -63,7 +97,7 @@
 
 	\vspace{0.20cm}
 
-	\textsc{\underline{Tuteur de projet} : \textbf{Julien BERNARD}}
+	\textsc{\underline{Tuteur de projet} : Julien BERNARD}
 
 \hspace{2cm}
 
@@ -80,30 +114,43 @@
 	\subsection{Le jeu originel}
 
 \begin{frame}{Adaptation du jeu d'origine}{Le jeu originel}
-	
-	\begin{columns}
 
-		\begin{column}{0.5\textwidth}
+	\begin{block}{Le premier Tétris (1984) - Alekseï Pajitnov}
+		\begin{itemize}
+			\item jeu de puzzle
+			\item succès mondial dans les années 1990
+			\item adapté sur pratiquement toutes les consoles
+			\item certaines versions mutlijoueurs
+		\end{itemize}
 
-			\begin{block}{Le premier Tétris (1984) \\Alekseï Pajitnov}
-				\begin{itemize}
-					\item jeu de puzzle
-					\item réaliser le plus de lignes possibles avec les tétrominos
-					\item succès mondial dans les années 1990
-					\item adapté sur pratiquement toutes les consoles
-				\end{itemize}
+	\end{block}
 
-			\end{block}
+	\begin{center}
+		\includegraphics[scale=0.25]{img/Tetris8.jpg}
+	\end{center}
+\end{frame}
 
-		\end{column}
 
-		\begin{column}{0.4\textwidth}
-				\begin{center}
-					\includegraphics[scale=0.25]{img/Tetris8.jpg}
-				\end{center}
-		\end{column}
+\begin{frame}{Adaptation du jeu d'origine}{Le jeu originel}
+	\begin{block}{La jouabilité}
+		\begin{itemize}
+			\item déplacement latéral et rotation des tétrominos, chute accélerée des tétromino
+			\item agencer les tétromino en ligne
+			\item les lignes disparaissent, rapportant du score
+			\item la partie s'arrête quand les tétromino touche le plafond
+		\end{itemize}
 
-	\end{columns}
+	\end{block}
+
+	\begin{center}
+		\includegraphics[scale=0.3]{img/1.png}
+		\includegraphics[scale=0.4]{img/2.png}
+		\includegraphics[scale=0.4]{img/3.png}
+		\includegraphics[scale=0.4]{img/4.png}
+		\includegraphics[scale=0.3]{img/5.png}
+		\includegraphics[scale=0.3]{img/6.png}
+		\includegraphics[scale=0.3]{img/7.png}
+	\end{center}
 \end{frame}
 
 	\subsection{Notre adaptation}
@@ -112,10 +159,19 @@
 	
 	\begin{block}{Le cahier des charges}
 		\begin{itemize}
-			\item client à télécharger et compiler
-			\item serveur en ligne
-			\item possibilité de redévelopper sa propre interface
-			\item chaque joueur joue sur son propre clavier
+			\item architecture client-serveur
+			\item un joueur, un client, un ordinateur
+			\item développement en C++ / Gamedev Framework / Boost::Asio
+			\item développement de notre propre bibliothèque de sérialisation
+		\end{itemize}
+	\end{block}
+	
+	\begin{block}{Les objectifs}
+		\begin{itemize}
+			\item approfondir la programmation répartie
+			\item établir un protocole réseau
+			\item découvrir la sérialisation
+			\item se familiariser aux bibliothèque graphiques
 		\end{itemize}
 	\end{block}
 
@@ -123,13 +179,34 @@
 
 \begin{frame}{Adaptation du jeu d'origine}{Notre adaptation}
 	
-	\begin{exampleblock}{Les choix d'implémentation}
+	\begin{block}{Les choix d'implémentation}
 		\begin{itemize}
 			\item le serveur fait loi
-			\item le protocole d'échange doit être respecté
+			\item le client envoi les actions du joueur au serveur
+			\item le serveur lui renvoi l'état du jeu mis à jour
 			\item détruire des lignes inflige des malus à l'adversaire
+			\begin{itemize}
+				\item 1 ligne : pas de malus
+				\item 2 lignes : empèche la rotation
+				\item 3 lignes : accèlération de la chute
+				\item 4 lignes : suppression de block en bas du tableau
+			\end{itemize}
 		\end{itemize}
-	\end{exampleblock}
+	\end{block}
+
+
+\end{frame}
+
+\begin{frame}{Adaptation du jeu d'origine}{Notre adaptation}
+	\begin{block}{Les contrôles}
+		\begin{itemize}
+			\item $\gets$ : gauche
+			\item $\to$ : droite
+			\item $\downarrow$ : chute rapide
+			\item \emph{SPACE} : rotation
+		\end{itemize}
+	\end{block}
+
 \end{frame}
 
 
@@ -145,9 +222,17 @@
 	\subsection{Protocole d'échange de messages}
 
 		\begin{frame}{Modélisation du jeu}{Protocole d'échange de messages}
-			\begin{center}
-				\includegraphics[scale=0.35]{img/ech.png}
-			\end{center}
+			\begin{block}{Les messages}
+				\begin{enumerate}
+					\item S $\to$ C : StartGame : début de la partie
+					\item S $\gets$ C : TétrominoPlaced : position et rotation du tétromino placé
+					\item S $\to$ C : MalusStart : signal le début d'un malus
+					\item S $\to$ C : UpdateGrid : nouvelle version des grilles
+					\item S $\to$ C : NewTetromino : nouveau tétromino utilisé par le joueur
+					\item S $\to$ C : MalusEnd : signal la fin d'un malus
+					\item S $\to$ C : GameOver : signal la fin de le partie et donne le gagnant
+				\end{enumerate}
+			\end{block}
 		\end{frame}
 
 \section{Mise en oeuvre}
@@ -173,8 +258,12 @@
 						\item un vérificateur de triche
 						\item un gestionnaire de malus
 					\end{itemize}
-
 				\end{block}
+
+				\begin{center}
+					\includegraphics[scale=0.25]{img/legende.png}
+				\end{center}
+
 			\end{column}
 
 		\end{columns}
@@ -185,56 +274,274 @@
 
 	\begin{frame}[fragile]{Mise en oeuvre}{Le serveur}
 		\begin{block}{L'exploitation des messages}
-			\begin{verbatim}
-			Message(TetrominoPlaced (type, x, y)) :
-				VérificationTriche(y)
-				MettreAJourGrille(type, x, y) :
-					SuppressionLignesPleines()
-					MiseAJourScore()
-
-					SI nbLignesSupprimées > 1 :
-						EnvoiMalus(autreJoueur, nbLigne)
-					FINSI
-
-					EnvoiNouvelleGrilleAuxJoueurs()
-			\end{verbatim}
+			\begin{enumerate}
+				\item{Reception message TetrominoPlaced}
+				\item{Vérification triche}
+				\item{Mise à jour de la grille}
+				\item{Mise à jour du score}
+				\item{Envoi de malus à l'adversaire}
+				\item{Envoi grille mise à jour aux joueurs}
+			\end{enumerate}
 		\end{block}
 
 	\end{frame}
 
 
-
 	\begin{frame}{Mise en oeuvre}{Le serveur}
-			\begin{columns}
-
-			\begin{column}{0.5\textwidth}
-				\begin{block}{Les malus}
-					\begin{itemize}
-						\item 1 ligne : pas de malus
-						\item 2 lignes : empèche la rotation
-						\item 3 lignes : accèlération de la chute
-						\item 4 lignes : suppression de block en bas du tableau 
-					\end{itemize}
-				\end{block}
-			\end{column}
-
-
-			\begin{column}{0.3\textwidth}
-				\includegraphics[scale=0.3]{../ressources/malusNoRotate.png}
-				\includegraphics[scale=0.3]{../ressources/malusSpeed.png}
-			\end{column}
-
-		\end{columns}
-
-
+		\begin{block}{Le vérificateur de triche}
+			\item vérifie 
+		\end{block}
 	\end{frame}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 	\subsection{La sérialisation}
 
+		\begin{frame}{Sérialisation}{Motivations}
+	        \begin{block}{Objectif}
+	            Permettre les échanges de structures complexes entre clients et serveur via des messages standardisés.
+	        \end{block}
+
+	        \begin{block}{Les messages}
+	            Deux types de messages :
+	            \begin{itemize}
+	                \item Du client au serveur : structure Request\_CTS
+	                \item Du serveur au client : structure Request\_STC
+	            \end{itemize}
+	        \end{block}
+
+	        \begin{block}{Contenu des messages}
+	            \begin{itemize}
+	                \item Un type enum correspondant au type du message
+	                \item Une union des différentes structures de message
+	            \end{itemize}
+	        \end{block}
+
+	    \end{frame}
+
+	    \begin{frame}{Sérialisation}{La structure}
+	        \begin{block}{Modèles}
+	            \begin{itemize}
+	                \item GamedevFramework
+	                \item SFML/Packet
+	            \end{itemize}
+	        \end{block}
+	        \begin{block}{Structures de sérialisation}
+	            Deux classes symétriques communes aux clients et au serveur : Serializer et Deserializer.
+	        \end{block}
+	    \end{frame}
+
+		\begin{frame}[fragile]{Sérialisation}{Les types simples}
+	        \begin{block}{Sérialisation templatée}
+	            Utilisation du méthode privée templatée permettant de sérialiser tout type simple.
+
+	            \begin{lstlisting}[language=C++, caption=Méthode de sérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à sérailiser et writePos la position d'écriture du sérialiseur]
+template <typename T>
+void Serializer::serializeAnyType(T d){
+    size_t size = sizeof(T);
+    for (size_t i = 0; i < size; ++i) {
+	    data.push_back(static_cast<uint8_t>
+	    						(d >> 8*(size-i-1))); 
+    }
+    writePos += sizeof(T);
+}\end{lstlisting}
+
+	        \end{block}
+	    \end{frame}
+
+	    \begin{frame}[fragile]{Sérialisation}{Les types simples}
+	        \begin{block}{Endianess}
+	            Ordre sequentiel dans lequel sont ranger nos données sérialisées.
+	            Ici, endianess de format Big-Endian.
+	        \end{block}
+
+	        \begin{center}
+	        	\includegraphics[scale=0.25]{img/endianess.png}
+	    	\end{center}
+	    \end{frame}
+
+	    \begin{frame}[fragile]{Sérialisation}{Les objets et les messages}
+	        \begin{block}{Sérialisation d'objet}
+	            Sérialisation des attributs de l'objet que l'on souhaite communiquer.
+	        \end{block}
+
+	        \begin{block}{Sérialisation de message}
+	            Sérialisation du type de message.
+	            \newline
+	            Sérialisation des élémenets de la structure du message.
+	        \end{block}
+	    \end{frame}
+
+
+
 	\subsection{Les structures de données communes}
 
+			\begin{frame}{Les structures de données communes}{Tetromino}	
+
+				\begin{columns}
+					\begin{column}{0.45\textwidth}
+						\begin{block}{La classe Tetromino}
+							\begin{itemize}
+								\item type
+								\item position abscisse/ordonnée
+								\item rotation
+								\item matrices<2,4> des tétromino
+								\item getCases()
+								\item rotate()
+							\end{itemize}
+						\end{block}
+					\end{column}
+					\begin{column}{0.35\textwidth}
+
+					\end{column}
+				\end{columns}
+				
+			\end{frame}
+
+
+			\begin{frame}{Les structures de données communes}{Grid}	
+
+				\begin{block}{Les vérification des intéractions}
+					\begin{itemize}
+						\item rotatePossible()
+						\item rightPossible()
+						\item leftPossible()
+						\item downPossible()
+					\end{itemize}
+				\end{block}
+
+				\begin{block}{Les vérification de l'état du jeu}
+					\begin{itemize}
+						\item suppression ligne
+						\item grille complète
+						\item ajout de tétromino à la grille
+					\end{itemize}
+				\end{block}
+				
+			\end{frame}
+
+		
+
+
+
 	\subsection{Le client graphique}
+
+		\begin{frame}{Mise en oeuvre}{Le client graphique}
+			\begin{columns}
+				\begin{column}{0.35\textwidth}
+					\begin{block}{Le rôle du client}
+						\begin{itemize}
+							\item afficher le jeu
+							\item recevoir les messages du serveur
+							\item gérer les interactions du joueur
+						\end{itemize}
+					\end{block}
+				\end{column}
+
+				\begin{column}{0.45\textwidth}
+					\includegraphics[scale=0.175]{img/vouitris.png}
+				\end{column}
+
+			\end{columns}
+		\end{frame}
+
+		\begin{frame}{Mise en oeuvre}{Le client graphique}
+			\begin{block}{La zone de jeu}
+				\begin{center}
+					\includegraphics[scale=0.2]{img/grid.png}
+				\end{center}
+			\end{block}
+		\end{frame}
+
+
+		\begin{frame}[fragile]{Mise en oeuvre}{Le client graphique}
+			\begin{block}{La boucle de jeu}				
+				\begin{verbatim}
+					TANT QUE enPartie :
+					    SI message dans File :
+					        interpreteMessage()
+
+					    SI actionJoueur :
+					        SI actionPossible :
+					            faireAction()
+
+					    SI tetromino posé : 
+					        envoiMessage(TetrominoPlaced)
+
+					    MettreAJourFenetre
+
+					FIN TANT QUE
+				\end{verbatim}
+
+			\end{block}
+		\end{frame}
+
+		\begin{frame}[fragile]{Mise en oeuvre}{Le client graphique}
+			\begin{block}{L'interprétation des messages}				
+			\begin{verbatim}
+				SI GameStart : 
+				    lancerHorloge()
+
+				SI NewTetromino :
+				    currentTetro = nextTetro; nextTetro = newTetro
+
+				SI UpdateGrid :
+				    miseAJourGrid()
+
+				SI Malus :
+				    appliqueMalus(nbLigne)
+
+				SI GameOver : 
+				    messageFin()
+				\end{verbatim}
+
+			\end{block}
+		\end{frame}
+
+\section*{Conclusion}
+
+		\begin{frame}{Conclusion}
+			\begin{block}{Un projet complet...}
+				\begin{itemize}
+					\item jeu fonctionnel
+					\item cahier des charges respecté
+				\end{itemize}
+			\end{block}
+
+			\begin{block}{... avec des améliorations possibles}
+				\begin{itemize}
+					\item mode de jeu avec plus de joueurs
+					\item système anti-triche plus performant
+				\end{itemize}
+			\end{block}
+		\end{frame}
+
+		\begin{frame}{Conclusion}
+			\begin{center}
+				\Large{Avez-vous des questions ?}
+			\end{center}
+		\end{frame}
 
 
 
