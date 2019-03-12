@@ -134,7 +134,7 @@
 \begin{frame}{Adaptation du jeu d'origine}{Le jeu originel}
 	\begin{block}{La jouabilité}
 		\begin{itemize}
-			\item déplacement latéral et rotation des tétrominos, chute accélerée des tétromino
+			\item déplacement latéral et rotation des tétrominos, chute accélerée des tétrominos
 			\item agencer les tétrominos en ligne
 			\item les lignes disparaissent, augmentant le score
 			\item la partie s'arrête quand les tétrominos touchent le plafond
@@ -182,14 +182,14 @@
 	\begin{block}{Les choix d'implémentation}
 		\begin{itemize}
 			\item le serveur fait loi
-			\item le client envoi les actions du joueur au serveur
-			\item le serveur lui renvoi l'état du jeu mis à jour
+			\item le client envoie les actions du joueur au serveur
+			\item le serveur lui renvoie l'état du jeu mis à jour
 			\item détruire des lignes inflige des malus à l'adversaire
 			\begin{itemize}
 				\item 1 ligne : pas de malus
 				\item 2 lignes : empèche la rotation
-				\item 3 lignes : accèlération de la chute
-				\item 4 lignes : suppression de block en bas du tableau
+				\item 3 lignes : accélération de la chute
+				\item 4 lignes : suppression de blocs en bas du tableau
 			\end{itemize}
 		\end{itemize}
 	\end{block}
@@ -286,12 +286,12 @@
 	\begin{frame}{La communication}{Le serveur}
 		\begin{block}{Le vérificateur de triche}
 			\begin{itemize}
-				\item Vérifie que les données renvoyé par le client sont cohérentes
+				\item Vérifie que les données renvoyées par le client sont cohérentes
 				\begin{itemize}
 					\item Le temps pour jouer la pièce n'est pas trop long
 					\item Les malus sont bien appliqués
 				\end{itemize}
-				\item Trois fautes autorisée
+				\item Trois fautes autorisées
 			\end{itemize}
 		\end{block}
 
@@ -354,7 +354,7 @@
 			        \end{block}
 			        
 			         \begin{block}{Endianess}
-			            Ordre sequentiel dans lequel sont ranger nos données sérialisées.
+			            Ordre séquentiel dans lequel sont ranger nos données sérialisées.
 			            \newline Endianess de format Big-Endian : par défaut sur les structures réseaux.
 			        \end{block}
 
@@ -510,7 +510,7 @@
 					\begin{enumerate}
 						\item parcours de la matrice
 						\item déterminisation de l'ancre
-						\item renvoi la liste de cases occupées par le tétromino
+						\item renvoi de la liste de cases occupées par le tétromino
 						\item la rotation du tétromino change le sens de parcours
 					\end{enumerate}
 				\end{block}
@@ -533,7 +533,7 @@
 			\begin{frame}{La jouabilité}{Les structures de données}
 				\begin{columns}
 					\begin{column}{0.6\textwidth}
-						\begin{block}{Vérifier les actions}
+						\begin{block}{La grille permet de vérifier les actions}
 							\begin{itemize}
 								\item rotation possible
 								\item déplacement possible
@@ -541,7 +541,7 @@
 							\end{itemize}
 						\end{block}
 
-						\begin{block}{Vérifier l'état du jeu}
+						\begin{block}{et de vérifier l'état du jeu}
 							\begin{itemize}
 								\item ligne complète
 								\item grille complète
@@ -573,9 +573,11 @@
 		\end{frame}
 
 		\begin{frame}{La jouabilité}{Le client graphique}
-			\begin{center}
-				\includegraphics[scale=0.25]{img/bla.png}
-			\end{center}
+			\begin{block}{L'interface}
+				\begin{center}
+					\includegraphics[scale=0.25]{img/bla.png}
+				\end{center}
+			\end{block}
 		\end{frame}
 
 		\begin{frame}{La jouabilité}{Le client graphique}
@@ -653,9 +655,9 @@
 				\end{itemize}
 			\end{block}
 
-			\begin{block}{... avec des améliorations possibles}
+			\begin{block}{...avec des améliorations possibles}
 				\begin{itemize}
-					\item mode de jeu avec plus de joueurs
+					\item mode de jeu avec plus de deux joueurs
 					\item système anti-triche plus performant
 				\end{itemize}
 			\end{block}
