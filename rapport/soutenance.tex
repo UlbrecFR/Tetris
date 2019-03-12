@@ -226,17 +226,9 @@
 	\subsection{Protocole d'échange de messages}
 
 		\begin{frame}{Modélisation du jeu}{Protocole d'échange de messages}
-			\begin{block}{Les messages}
-				\begin{enumerate}
-					\item S $\to$ C : StartGame : début de la partie
-					\item S $\gets$ C : TétrominoPlaced : position et rotation du tétromino placé
-					\item S $\to$ C : MalusStart : signal le début d'un malus
-					\item S $\to$ C : UpdateGrid : nouvelle version des grilles
-					\item S $\to$ C : NewTetromino : nouveau tétromino utilisé par le joueur
-					\item S $\to$ C : MalusEnd : signal la fin d'un malus
-					\item S $\to$ C : GameOver : signal la fin de le partie et donne le gagnant
-				\end{enumerate}
-			\end{block}
+			\begin{center}
+				\includegraphics[scale=0.3]{img/ech.png}
+			\end{center}
 		\end{frame}
 
 \section{La communication}
@@ -598,24 +590,24 @@
 		\begin{frame}{La jouabilité}{Le client graphique}
 			\begin{block}{La boucle de jeu}				
 				\begin{enumerate}
-					\item vérifier si un message est présent dans le file
+					\item Vérifier si un message est présent dans la file
 						\begin{itemize}
-							\item interpreter le message
+							\item Interpréter le message
 						\end{itemize}
-					\item recevoir les actions du joueur
+					\item Recevoir les actions du joueur
 						\begin{itemize}
-							\item vérifier si elles sont possibles
+							\item Vérifier si elles sont possibles
 							\begin{itemize}
-								\item executer l'action
+								\item \'Executer l'action
 							\end{itemize}
 						\end{itemize}
 
-					\item verifier si un tétromino est placé
+					\item Vérifier si un tétromino est placé
 						\begin{itemize}
-							\item le signaler au serveur
+							\item Le signaler au serveur
 						\end{itemize}
 
-					\item mettre à jour l'affichage
+					\item Mettre à jour l'affichage
 				\end{enumerate}
 			\end{block}
 		\end{frame}
@@ -625,27 +617,27 @@
 				\begin{enumerate}
 					\item GameStart
 				    	\begin{itemize}
-				    		\item lancer l'horloge
+				    		\item Lance l'horloge
 				    	\end{itemize}
 				   	
 				   	\item NewTetromino
 				   		\begin{itemize}
-				   			\item place le prochain tétromino en jeu
+				   			\item Place le prochain tétromino en jeu
 				   		\end{itemize}
 
 					\item UpdateGrid
 				    	\begin{itemize}
-				    		\item met à jour les grilles des joueurs
+				    		\item Met à jour les grilles des joueurs
 				    	\end{itemize}
 
 				    \item Malus
 				    	\begin{itemize}
-				    		\item applique le malus
+				    		\item Applique le malus
 				    	\end{itemize}
 
 					\item GameOver
 				    	\begin{itemize}
-				    		\item affiche le message de fin
+				    		\item Affiche le message de fin
 				    	\end{itemize}
 				\end{enumerate}
 			\end{block}
