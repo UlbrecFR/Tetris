@@ -133,7 +133,7 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 
 		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétrominos » --- dont les différentes formes sont représentée sur la figure \ref{fig:tetros} ---, descendent du haut de l'écran. 
 		
-		\begin{figure}[tb]
+		\begin{figure}[b]
 			\centering
 			\includegraphics[scale=0.2]{img/tetros.png}
 			\caption{Les différentes formes de tétromino}
@@ -147,7 +147,7 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 
 		Après la version originale du jeu sortie sur l'\textit{Elektronika 60}, le tétris a connu un succès mondial dans les années 1990 grâce à sa version Gameboy, dont on voit une capture d'écran sur la figure \ref{fig:tetris}.
 
-		\begin{figure}[b]
+		\begin{figure}[tb]
 			\centering
 			\includegraphics[scale=0.3]{img/Tetris8.jpg}
 			\caption{Interface de tétris sur Gameboy}
@@ -416,7 +416,7 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 
 			Le tirage au sort de tétromino se fait du coté serveur. Le serveur envoie ensuite les données concernant les tétrominos aux clients.
 			
-			Au début de la partie, le client récupère les données du premier tétromino en jeu, \texttt{currentTetro} et les données du tétromino suivant, appelé \texttt{nextTetro} grâce au message GameStart.
+			Au début de la partie, le client récupère les données du premier tétromino en jeu, \texttt{currentTetro} et les données du tétromino suivant, appelé \texttt{nextTetro} grâce au message \texttt{Game\_Start}.
 			Pour la suite de la partie, lorsque le tétromino en jeu se pose, le client le signal au serveur, avec le message \texttt{Tetromino\_Placed}. Le serveur renvoie le message \texttt{New\_Tetromino} au client contenant les données d’un nouveau tétromino. Ce nouveau tétromino prend la place du tétromino de prédiction ( \texttt{nextTetro}) alors que l’ancien \texttt{nextTetro} devient le \texttt{currentTetro} et entre en jeu.
 
 			La classe Tétromino contient les informations sur un tetromino :
@@ -428,7 +428,7 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 			\end{itemize}
 
 
-			\begin{figure}[bt]
+			\begin{figure}[b]
 				\centering
 				\includegraphics[scale=0.15]{img/ancre.png}
 				\caption{Représentation numérique d'un tétromino}
@@ -517,7 +517,7 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 
 			La fonction \texttt{GameArea::setScale} utilise la classe \texttt{gf::Transformable} afin de modifié la taille de l’affichage en fonction de vecteur et ainsi nous permettre d’utilisé les même sprite pour la zone de jeu du joueur et celle du joueur adverse.
 
-			\paragraph{Initialisation de la partie}
+			\subsubsection{Initialisation de la partie}
 
 				Au tout début de la partie nous initialisons certains paramètre.
 
@@ -528,7 +528,7 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 				Le timer est initialisé avec la duré de la partie
 
 
-			\paragraph{Boucle de jeu}
+			\subsubsection{Boucle de jeu}
 
 			Notre boucle de jeu se repose sur le booléen \texttt{enPartie}
 
@@ -582,13 +582,6 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 
 		\subsubsection{La fenêtre graphiques}
 
-			\begin{figure}[bt]
-				\centering
-				\includegraphics[scale=0.35]{img/fenetre.png}
-				\caption{Différentes zone d'affichage de la fenêtre du jeu}
-				\label{fig:fen}
-			\end{figure}
-
 			Les différents element composant notre ecran de jeu, tel qu'on peut les voir sur la figure \ref{fig:fen} : 
 
 			En rouge : Zone du jeu du joueur. On y trouve les tetromino déjà posé ainsi que le tetromino en jeu en train de chuté. C’est avec cette fenetre que le joueur va intéragir.
@@ -605,7 +598,15 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 			En violet : Les scores des 2 joueurs
 
 			En noir : Affichage du malus en cours. Si aucun malus n’est actif cette partie de l’écran est vide. Une jauge de couleur rouge permet de savoir approximativement le temps qu’il reste pour que le malus se termine
+			
+			\begin{figure}[!h]
+				\centering
+				\includegraphics[scale=0.35]{img/fenetre.png}
+				\caption{Différentes zone d'affichage de la fenêtre du jeu}
+				\label{fig:fen}
+			\end{figure}
 
+			\newpage
 
 		\subsubsection{Les actions du joueur}
 
@@ -626,6 +627,8 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 
 			Nous avons aussi une fonction \texttt{reset} qui permet de stoppé toute les actions en cours. Nous l’utilisons dans la boucle de jeu.
 	
+
+	\newpage
 	
 
 \section*{Conclusion}
@@ -633,9 +636,15 @@ Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet
 Le jeu que nous avons développé est fonctionnel et il remplit le cahier des charges fixé au début du projet. 
 Nous avons trouvé le projet très intéressant et il nous a permis d’acquérir de multiples connaissances et compétences. 
 
+	\bigskip
+
 Nous avons pu notamment découvrir les bibliothèque Gamedev Framework et Boost::asio. Nous n’avions que très peu de connaissances en C++ en commençant le projet, la prise en main de ces bibliothèques n’a donc pas était facile au début. De plus, le principe de sérialisation ainsi que les méthodes utilisées nous étaient inconnues.
 
+	\bigskip
+
 Grâce à ce projet nous avons donc pu mettre en pratique les connaissances et compétences de certaines matières de licence 2 et licence 3 (Algorithme et Programmation, Système, Système et Réseaux, Théorie des langages, Programmation Multi-Paradigmes) mais aussi les améliorer.
+
+	\bigskip
 
 Les objectifs principaux de notre projets ont été remplis, or des améliorations sont encore possibles.
 Nous pourrions par exemple améliorer le système anti-triche ou encore créer un systèmes de personnalisation de partie permettant de jouer à plus de 2 joueurs.
