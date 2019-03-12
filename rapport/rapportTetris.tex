@@ -103,7 +103,7 @@
 
 \section*{Remerciements}
 
-Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le soutient qu'il nous apporter tout au long du développement ainsi que l'aide pour la préparation de la soutenance et de ce rapport.
+Nous tenons à remercier Monsieur Julien Bernard, notre encadrant pour ce projet, pour le soutien qu'il nous apporté tout au long du développement ainsi que l'aide pour la préparation de la soutenance et de ce rapport.
 
 \newpage
 	
@@ -116,11 +116,11 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 
 	\bigskip
 
-	Le développement devait être fait en C++, avec le bibliothèque Boost.asio pour la communication réseau et les parties graphiques devait être réalisées en utilisant la biliothèque Gamedev Framework, biliothèque conçu pour le développement de jeux vidéo, développée par Julien Bernard.
+	Le développement devait être fait en C++, avec la bibliothèque Boost.asio pour la communication réseau et les parties graphiques devait être réalisées en utilisant la bibliothèque Gamedev Framework, bibliothèque conçue pour le développement de jeux vidéo, développée par Julien Bernard.
 	Le développement s'étendait d'octobre 2018 à mars 2019.
 
 	\bigskip
-	Nous étions intéressé par ce projet car nous voulions améliorer nos connaissances dans le language C++. De plus la simplicité de la conception d'un Tétris nous permettait d'approfondir certains domaines spécifiques liés au développement, tel que approfondir la programmation distribuée et la sérialisation nous motivait pour ce projet.
+	Nous étions intéressés par ce projet car nous voulions améliorer nos connaissances dans le language C++. De plus la simplicité de la conception d'un Tétris nous permettait d'approfondir certains domaines spécifiques liés au développement, tel que approfondir la programmation distribuée et la sérialisation nous motivait pour ce projet.
 
 	\bigskip
 	Ce rapport a pour but de rendre compte du travail que nous avons réalisé au cours du projet.
@@ -130,13 +130,7 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 \section{Adaptation du jeu d'origine}
 	\subsection{Tétris originel}		
 
-		\begin{figure}[b]
-			\centering
-			\includegraphics[scale=0.3]{img/Tetris8.jpg}
-			\caption{Interface de tétris sur Gameboy}
-			\label{fig:tetris}
-		\end{figure}
-		
+
 		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétrominos » --- dont les différentes formes sont représentée sur la figure \ref{fig:tetros} ---, descendent du haut de l'écran. 
 		
 		\begin{figure}[tb]
@@ -153,23 +147,28 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 
 		Après la version originale du jeu sortie sur l'\textit{Elektronika 60}, le tétris a connu un succès mondial dans les années 1990 grâce à sa version Gameboy, dont on voit une capture d'écran sur la figure \ref{fig:tetris}.
 
-
-
+		\begin{figure}[b]
+			\centering
+			\includegraphics[scale=0.3]{img/Tetris8.jpg}
+			\caption{Interface de tétris sur Gameboy}
+			\label{fig:tetris}
+		\end{figure}
+		
 
 		Le jeu a été adapté sur pratiquement toutes les consoles de toutes les générations, soit dans une version strictement identique soit dans une adaptation plus libre ne conservant que certains point du gameplay original. Au début des années 2010, on comptait plus de 65 plate-formes qui possaidait un portage du jeu.
 
-		Tétris s'est imposé comme l'un des plus grands succès de l'histoire du jeu vidéo et l'une de ces icones les plus mondialement connues. Il faut noter également que le jeu a connue des adaptations multijoueurs - notamment le projet \emph{Tétrinet} à la fin des années 1990 - et ce encore aujourd'hui, avec par exemple \emph{Tétris 99}, qui est sorti le 13 février 2019 sur Nintendo Switch.
+		Tétris s'est imposé comme l'un des plus grands succès de l'histoire du jeu vidéo et l'une de ces icones les plus mondialement connues. Il faut noter également que le jeu a connue des adaptations multijoueurs --- notamment le projet \emph{Tétrinet} à la fin des années 1990 --- et ce encore aujourd'hui, avec par exemple \emph{Tétris 99}, qui est sorti le 13 février 2019 sur Nintendo Switch.
 
 	\subsection{Notre adaptation}
 		\subsubsection{Les objectifs du développement}
 			Notre adaptation est une version multijoueur du Tétris, où chaque joueur a un jeu qui tourne sur son ordinateur, sur lequel il joue seul avec son clavier. 
-			
-
-			Le but est que chaque joueur puisse se connecter sur un serveur qui gérerait le déroulement du jeu.
-			Les joueurs n'aurait accès qu'aux minimum requises pour afficher le jeu et communiquer leurs action aux serveur. 
 
 
-			Nous devions donc développer un serveur capable de gérer le jeu et de communiquer à des clients et des clients capables d'afficher l'état du jeu tel qu'il est sur le serveur et de lui renvoyer les interactions du joueur.
+			Le but est que chaque joueur possède un client sur son ordinateur, qu'il se connecte en réseau sur un serveur. Le serveur gérerait le déroulement du jeu, servirait d'intermédiaire entre les deux joueurs et centraliserais les données de la partie.
+			Les clients n'aurait accès qu'aux données minimum requises pour afficher le jeu et communiquer leurs actions au serveur. 
+
+
+			Nous devions donc développer un serveur capable de gérer le jeu et de communiquer son évolution à des clients et des clients capables d'afficher l'état du jeu tel qu'il est sur le serveur et de lui renvoyer les interactions des joueur.
 
 
 		\subsubsection{Les contraintes de développement}
@@ -195,7 +194,7 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 
 			Nous avons déjà défini que nous avions besoin d'une architecture client-serveur dans la partie précédente.
 
-			La difficultée etant que les clients et le serveur doivent être capable d'attendre l'arrivé d'un message sur leur socket, tout en exécutant une boucle simultanément - la fenêtre graphique pour les clients et la boucle de jeu pour le serveur.
+			La difficultée etant que les clients et le serveur doivent être capable d'attendre l'arrivé d'un message sur leur socket, tout en exécutant une boucle simultanément --- la fenêtre graphique pour les clients et la boucle de jeu pour le serveur.
 
 
 			Pour résoudre ce problèmes nous avons séparé la réception des messages dans un thread à part dans les clients et le serveur.
@@ -204,7 +203,7 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 
 			\begin{figure}[bt]
 				\centering
-				\includegraphics[scale=0.35]{img/archi_reseau.png}
+				\includegraphics[scale=0.3]{img/archi_reseau.png}
 				\caption{Représentation simplifiée de l'architecture réseau entre les clients et le serveur}
 				\label{fig:rezo}
 			\end{figure}
@@ -218,11 +217,11 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 			Notre protocole d'échange tel que l'avons défini implique que le serveur gère seul la partie, et les clients uniquement l'affichage et les interactions de l'utilisateur.
 
 			Par conséquent, les échanges vont consister en la mise à jour de l'état du jeu de la part du serveur et les actions du joueur de la part du client. 
-			La figure \ref{fig:echange} représente une version simplifié des échanges entre les clients et le serveur. Pour des soucis de lisibilité, nous avons concidérer que seul le premier joueur place des tétrominos.
+			La figure \ref{fig:echange} représente une version simplifié des échanges entre les clients et le serveur. Pour des soucis de lisibilité, nous n'avons représenté qu'un seul client.
 
 			\begin{figure}[bt]
 				\centering
-				\includegraphics[scale=0.45]{img/ech.png}
+				\includegraphics[scale=0.35]{img/ech.png}
 				\caption{Représentation simplifiée des échanges de messages entre les clients et le serveur}
 				\label{fig:echange}
 			\end{figure}
@@ -230,49 +229,58 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 
 			\subsubsection{Les messages du serveur vers le client}
 
-				\begin{itemize}
-					\item Game start : message de début de partie, signale le début de la partie aux clients lorsque les deux joueurs sont prêts à jouer
-					\item Game over : message de fin de partie, il indique au joueur s'il a gagné, perdu ou s'il y a une égalité
-					\item New tetromino : message contenant le prochaine tétromino qui sera utilisé par le client
-					\item Update Grid : message qui contient la grille de jeu du joueur
-					\item Update Other Grid : message qui contient la grille de l'adversaire, pour l'afficher
-					\item Malus start : signale le début d'une période malus pour le joueur ainsi que le type du malus qui s'applique
-					\item Malus end : signale la fin de la période de malus actuelle
-				\end{itemize}
+				\paragraph{\texttt{Game\_start}} : message de début de partie, signale le début de la partie aux clients lorsque les deux joueurs sont prêts à jouer. Contient : 
+					\begin{itemize}
+						\item un tétromino qui sera mis en jeu par le clients
+						\item un tétromino de prédication qui sera le prochain joué par le client
+						\item la durée de la partie
+					\end{itemize}
+
+				\paragraph{\texttt{Game\_over}} : message de fin de partie, il indique au joueur s'il a gagné, perdu ou s'il y a une égalité. Contient :
+					\begin{itemize}
+						\item les scores des deux joueurs
+						\item si la partie est gagnée, perdue ou s'il y a égalité
+					\end{itemize}
+
+				\paragraph{\texttt{New\_tetromino}} : message contenant le prochaine tétromino qui sera utilisé par le client. Contient :
+					\begin{itemize}
+						\item prochain tétromino utilisé par le client
+					\end{itemize}
+
+				\paragraph{\texttt{Update\_Grid}} : message qui contient la grille de jeu du joueur. Contient :
+					\begin{itemize}
+						\item la grille de jeu du joueur qui remplacera la précédente contenue dans le client
+						\item le score
+					\end{itemize}
+
+				\paragraph{\texttt{Update\_Other\_Grid}} : message qui contient la grille de l'adversaire, pour l'afficher. Contient :
+					\begin{itemize}
+						\item la grille de jeu de l'adversaire, qui sera affiché à la place de l'ancienne
+						\item le score de l'adversaire
+					\end{itemize}
+
+				\paragraph{\texttt{Malus\_start}} : signale le début d'une période malus pour le joueur ainsi que le type du malus qui s'applique. Contient :
+					\begin{itemize}
+						\item type du malus, indiquant ses effets
+						\item la cible, indiquant si le client doit appliquer les effets ou s'il doit simplement indiquer que son adversaire est sous l'effet d'un malus
+					\end{itemize}
+
+				\paragraph{\texttt{Malus\_End}} : signale la fin de la période de malus actuelle. Contient : 
+					\begin{itemize}
+						\item la cible, indiquant si le client doit arreter d'appliquer les effets, ou si il doit arreter l'affichage du malus adverse
+					\end{itemize}
 
 			\subsubsection{Les messages du client vers le serveur}
 
-				\begin{itemize}
-					\item Tétromino placed : contient le tétromino avec sa position et son orientation tel qu'il viens d'être placé par le joueur
-					\item Connection lost : message signalant une déconnexion du joueur
-				\end{itemize}
-
-
-Game\_Start : 
-    Contient les données des 2 premier tétromino de la partie et le temps total de la partie.
-
-New\_Tetromino :
-    Contient les données d’un nouveau tétromino choisi au hasard par le serveur
-
-Update : 
-    Contient la grille de la zone de jeu et le score du joueur
-
-Update\_Other :
-    Contient la grille de la zone de jeu et le score du joueur adverse
-
-Malus\_Start : 
-    Contient le type du malus et à quel joueur il est appliqué
-
-Malus\_End :
-    Contient un identifiant pour savoir quel joueur est concerné par la fin d’un des malus
-
-Game\_Over :
-    Contient les scores finaux des 2 joueurs
-
-Connection\_Lost : 
-    
-
-
+				\paragraph{\texttt{Tetromino\_placed}} : contient le tétromino avec sa position et son orientation tel qu'il viens d'être placé par le joueur. Contient :
+					\begin{itemize}
+						\item un tétromino qui vient d'être placé par le joueur
+					\end{itemize}
+				\paragraph{\texttt{Connection\_lost}} : message signalant une déconnexion du joueur. Contient :
+					\begin{itemize}
+						\item la raison de la déconnexion
+					\end{itemize}
+			
 
 \section{La communication}
 	\subsection{Le serveur}
@@ -299,20 +307,20 @@ Connection\_Lost :
 
 		\begin{figure}[bt]
 			\centering
-			\includegraphics[scale=0.45]{img/ser.png}
+			\includegraphics[scale=0.3]{img/ser.png}
 			\caption{Représentation simplifiée de la structure du serveur}
 			\label{fig:ser}
 		\end{figure}
 
 		\subsubsection{Le traitement des messages}
-			Le serveur peut recevoir deux messages de la part du client : Connection lost et Tetromino placed.
+			Le serveur peut recevoir deux messages de la part du client : \texttt{Connection\_Lost} et \texttt{Tetromino\_placed}.
 
-			Le message Connection lost sert à indiquer que le client se déconnecte du serveur, la partie est donc terminée et permet au serveur et au client de se fermer correctement. Dans ce cas, le serveur envoit un message GameOver à l'autre client - le désignant comme le vainqueur - et arrête son exécution.
+			Le message \texttt{Connection\_Lost} sert à indiquer que le client se déconnecte du serveur, la partie est donc terminée et permet au serveur et au client de se fermer correctement. Dans ce cas, le serveur envoit un message \texttt{Game\_over} à l'autre client --- le désignant comme le vainqueur --- et arrête son exécution.
 
  
-			Le message le plus fréquent sera Tetromino Placed. Sa réception indique que le joueur viens de placer le tétromino avec lequel il jouait. Ce message contient le type de tétromino, sa position et sa rotation. 
+			Le message le plus fréquent sera \texttt{Tetromino\_Placed}. Sa réception indique que le joueur viens de placer le tétromino avec lequel il jouait. Ce message contient le type de tétromino, sa position et sa rotation. 
 
-			D'abord le serveur vas commencer par vérifier qu'il n'y a pas eu de triche - ce procédé sera décrit en détail dans la partie suivante. 
+			D'abord le serveur vas commencer par vérifier qu'il n'y a pas eu de triche --- ce procédé sera décrit en détail dans la partie suivante. 
 
 
 			La grille du joueur correspondant est ensuite mise à jour avec le tétromino reçu.
@@ -323,7 +331,7 @@ Connection\_Lost :
 
 			Si une ligne est détruite, aucun malus n'est envoyé.
 
-			Si le joueur détruit deux lignes, le serveur envoi à chacun des joueurs un message Send Malus Start, avec le type de malus "rotation".
+			Si le joueur détruit deux lignes, le serveur envoi à chacun des joueurs un message \texttt{Send\_Malus\_Start}, avec le type de malus "rotation".
 
 			\begin{itemize}
 				\item le joueur reçoit un message indiquant que l'adversaire est le cible du malus
@@ -332,9 +340,9 @@ Connection\_Lost :
 
 			Le cas est similaire si trois lignes détruites, avec simplement le type du message, qui sera "accéleration".
 
-			Dans ces deux cas, une horloge se lancera au moment de l'envoi du message. Au bout de 10 seconde, un message Send Malus End sera envoyé de manière similaire aux deux clients.
+			Dans ces deux cas, une horloge se lancera au moment de l'envoi du message. Au bout de 10 seconde, un message \texttt{Send\_Malus\_End} sera envoyé de manière similaire aux deux clients.
 
-			Si le joueur a effectué un tétris - quatres lignes détruites - un tétromino de type aléatoire est généré et placé aléatoirement en bas de grille de l'autre joueur. Les cases qui correspondent à ce tétromino seront supprimé de la grille l'empéchant de compléter des lignes.
+			Si le joueur a effectué un tétris --- quatres lignes détruites --- un tétromino de type aléatoire est généré et placé aléatoirement en bas de grille de l'autre joueur. Les cases qui correspondent à ce tétromino seront supprimé de la grille l'empéchant de compléter des lignes.
 
 			Après la gestion des malus, les deux grilles mises à jour seront envoyées aux deux clients.
 				
@@ -347,13 +355,13 @@ Connection\_Lost :
 
 			A partir de la position du tétromino qui vient d'être placé, on calcul le temps maximum que celui-ci peut prendre pour arrivé à cet endroit. Donc sa hauteur multiplié par le temps de chute normal.
 			S'il dépasse le mouvement est concidéré comme suspicieux.
-			La vérification inclue aussi les potentiels malus en cours - délai plus court en cas de malus d'accélération et vérification sur la rotation pour le malus rotation.
+			La vérification inclue aussi les potentiels malus en cours --- délai plus court en cas de malus d'accélération et vérification sur la rotation pour le malus rotation.
 
 			Bien entendu si le réseau connais des problèmes lors du transfert du message, cela peu retarder l'arriver du messafe et donc fausser le calcul. Nous avons pris deux précaution contre cela. 
 
 			D'abord nous avons ajouté une marge d'erreur de quelque seconde qui tiens compte de cette éventualité. Nous avons également prévu un système de fautes.
 
-			Un délai trop long entre deux messages - ou une rotation en cas de malus - cause une faute, au bout de trois fautes, le joueur est concidéré comme un tricheur et est éliminé. Son adversaire est alors déclaré vainqueur.
+			Un délai trop long entre deux messages --- ou une rotation en cas de malus --- cause une faute, au bout de trois fautes, le joueur est concidéré comme un tricheur et est éliminé. Son adversaire est alors déclaré vainqueur.
 
 
 			Ce système anti-triche peut être amélioré, notament en vérifiant que la position du tétromino est bien atteignable depuis le haut du tableau.
@@ -408,8 +416,8 @@ Connection\_Lost :
 
 			Le tirage au sort de tétromino se fait du coté serveur. Le serveur envoie ensuite les données concernant les tétrominos aux clients.
 			
-			Au début de la partie, le client récupère les données du premier tétromino en jeu, currentTetro et les données du tétromino suivant, appelé nextTetro grâce au message GameStart.
-			Pour la suite de la partie, lorsque le tétromino en jeu se pose, le client le signal au serveur, avec le message TetrominoPlaced. Le serveur renvoie le message NewTetromino au client contenant les données d’un nouveau tétromino. Ce nouveau tétromino prend la place du tétromino de prédiction (nextTetro) alors que l’ancien nextTetro devient le currentTetro et entre en jeu.
+			Au début de la partie, le client récupère les données du premier tétromino en jeu, \texttt{currentTetro} et les données du tétromino suivant, appelé \texttt{nextTetro} grâce au message GameStart.
+			Pour la suite de la partie, lorsque le tétromino en jeu se pose, le client le signal au serveur, avec le message \texttt{Tetromino\_Placed}. Le serveur renvoie le message \texttt{New\_Tetromino} au client contenant les données d’un nouveau tétromino. Ce nouveau tétromino prend la place du tétromino de prédiction ( \texttt{nextTetro}) alors que l’ancien \texttt{nextTetro} devient le \texttt{currentTetro} et entre en jeu.
 
 			La classe Tétromino contient les informations sur un tetromino :
 			\begin{itemize}
@@ -419,8 +427,8 @@ Connection\_Lost :
 				\item la position de son ancre représenté par un vecteur (x, y)
 			\end{itemize}
 
-
-			Cette fonction permet de récupéré la liste des coordonnées des cases du tétromino.
+			\paragraph{ \texttt{getCases()}} :
+			cette fonction permet de récupéré la liste des coordonnées des cases du tétromino.
 			\begin{enumerate}
 
 				\item On récupère les coordonnées de l’ancre ainsi que sa place dans la matrice 2x4 représentant la forme du tétromino
@@ -435,34 +443,34 @@ Connection\_Lost :
 
 		\subsubsection{Grid}
 			Pour représenter la zone de jeu nous utilisons un tableau d’entier à une dimension. Une case vide est représenté par un 0. 
-			On crée le tableau avec l’objet Grid.
+			On crée le tableau avec l’objet \texttt{Grid}.
 
 			\paragraph{Vérification des déplacements}
 				La fonction Grid::movePossible permet de vérifier si l’action de déplacement faite par le joueur et valide. Elle prend en paramètre le Tétromino en jeu (tetromino qui chute et qui est contrôlé par le joueur) et un vecteur (x, y) pour savoir dans quel direction le mouvement est fait.
 
 				Cette fonction est appelé dans : 
 				\begin{itemize}
-					\item Grid::downPossible, avec le vecteur {0, 1}
-					\item Grid::rightPossible, avec le vecteur {1, 0}
-					\item Grid::leftPossible, avec le vecteur {-1, 0}
+					\item \texttt{Grid::downPossible}, avec le vecteur {0, 1}
+					\item \texttt{Grid::rightPossible}, avec le vecteur {1, 0}
+					\item \texttt{Grid::leftPossible}, avec le vecteur {-1, 0}
 				\end{itemize}
 
-				La fonction Grid::rotatePossible permet d’autorisé où non la rotation de la pièce en jeu. La rotation peut être par exemple refusé si le tetromino est bloqué entre 2 autres tétrominos ou si il est sur le bord de la zone de jeu. Dans ces 2 cas, la rotation du tétromino le ferait soit passé a travers d’autre pièce ce qui est impossible ou encore sortir de la zone de jeu. On vérifie donc si les cases du tétromino après rotation sont bien dans la zone de jeu et qu'il n'y ai pas déjà un tétromino sur cette case grâce à la fonction Tetromino::getCases.
+				La fonction \texttt{Grid::rotatePossible} permet d’autorisé où non la rotation de la pièce en jeu. La rotation peut être par exemple refusé si le tetromino est bloqué entre 2 autres tétrominos ou si il est sur le bord de la zone de jeu. Dans ces 2 cas, la rotation du tétromino le ferait soit passé a travers d’autre pièce ce qui est impossible ou encore sortir de la zone de jeu. On vérifie donc si les cases du tétromino après rotation sont bien dans la zone de jeu et qu'il n'y ai pas déjà un tétromino sur cette case grâce à la fonction \texttt{Tetromino::getCases}.
 
 			\paragraph{Placement d’un tetromino}
-				Si la fonction Grid::downPossible renvoie false, le tetromino actuellement en jeu est placé. Hors, seul son ancre est visible dans le tableau lors de sa chute, il faut donc ajouter toute les cases qui compose le tetromino dans la zone de jeu afin d’envoyé un nouveau tetromino en jeu.
-				On appelle les fonctions Tetromino::getCases et Tetromino::getType pour placer toutes les cases du tétromino dans le tableau.
+				Si la fonction \texttt{Grid::downPossible} renvoie \texttt{false}, le tetromino actuellement en jeu est placé. Hors, seul son ancre est visible dans le tableau lors de sa chute, il faut donc ajouter toute les cases qui compose le tetromino dans la zone de jeu afin d’envoyé un nouveau tetromino en jeu.
+				On appelle les fonctions \texttt{Tetromino::getCases} et \texttt{Tetromino::getType} pour placer toutes les cases du tétromino dans le tableau.
 
 			\paragraph{Suppression de lignes}
-				La fonction Grid::deleteLines parcours le tableau et détecte si des lignes sont pleine, elle est appelée lorsqu'un tétromino est posé.
-				Si c’est le cas, elle appel la fonction Grid::fallLines sur la lignes correspondante.
+				La fonction \texttt{Grid::deleteLines} parcours le tableau et détecte si des lignes sont pleine, elle est appelée lorsqu'un tétromino est posé.
+				Si c’est le cas, elle appel la fonction \texttt{Grid::fallLines} sur la lignes correspondante.
 				Elle renvoie le nombre total de ligne pleine qui ont été supprimé pour effectué le calcul du score et l’envoie de malus à l’adversaire.
 
-				La fonction Grid::fallLines récupère en paramètre la ligne pleine, et fait descendre toutes les lignes au dessus de celle-ci d’une case vers le bas en commençant par le bas du tableau.
+				La fonction \texttt{Grid::fallLines} récupère en paramètre la ligne pleine, et fait descendre toutes les lignes au dessus de celle-ci d’une case vers le bas en commençant par le bas du tableau.
 
 			\paragraph{Vérification de l’état de la grille}
 
-				La fonction Grid::gameOver est appelé à chaque tétromino posé. Elle vérifie si les lignes du haut du tableau sont vide. Si une pièce est présente dans cette zone, on estime que la zone de jeu est complètement remplis et que l’arrive d’un prochain tétromino est impossible, dans ce cas elle renvoie true. Et le tableau est vidé entièrement.
+				La fonction \texttt{Grid::gameOver} est appelé à chaque tétromino posé. Elle vérifie si les lignes du haut du tableau sont vide. Si une pièce est présente dans cette zone, on estime que la zone de jeu est complètement remplis et que l’arrive d’un prochain tétromino est impossible, dans ce cas elle renvoie \texttt{true}. Et le tableau est vidé entièrement.
 
 	\subsection{Le client graphique}
 
@@ -479,7 +487,7 @@ Connection\_Lost :
 
 			\paragraph{Le tableau de la zone de jeu}
 
-			Comme expliqué précédemment, notre zone de jeu est représenté par un tableau crée avec l’objet Grid de largeur 12 et de hauteur 21. Dans la figure ?? nous avons représenté de façon schématique les données stockés dans ce tableau à un instant T d’une partie.
+			Comme expliqué précédemment, notre zone de jeu est représenté par un tableau crée avec l’objet \texttt{Grid} de largeur 12 et de hauteur 21. Dans la figure \ref{fig:grid} nous avons représenté de façon schématique les données stockés dans ce tableau à un instant T d’une partie.
 
 			Toute les case sans chiffres sont des cases contenant un 0. Nous voyons que le numéro stocké correspond au type du tetromino.
 
@@ -487,7 +495,7 @@ Connection\_Lost :
 
 			Tout en haut du tableau de la zone de jeu, encadré en bleu, nous retrouvons 4 lignes qui n’apparaissent pas dans l’affichage pour le joueur.
 
-			C’est 4 lignes nous permettent de faire apparaître le nouveau tetromino depuis le dessus de la zone de jeu et ce sont sur ces lignes que s’effectue le test Grid::gameOver pour savoir si la zone de jeu est entièrement remplie.
+			C’est 4 lignes nous permettent de faire apparaître le nouveau tetromino depuis le dessus de la zone de jeu et ce sont sur ces lignes que s’effectue le test \texttt{Grid::gameOver} pour savoir si la zone de jeu est entièrement remplie.
 
 
 			\paragraph{GameArea}
@@ -496,9 +504,9 @@ Connection\_Lost :
 
 			Nous avons un tableau de Sprite de largeur 12 et de hauteur 17 (on ne retrouve pas ici les 4 lignes du haut du tableau de la zone de jeu puisqu’elles ne sont pas affichée.
 
-			On récupère les données stocké dans le tableau de la zone de jeu (Grid) à partie de la 5ème lignes et on modifie les sprite contenue dans le tableau de gameArea.
+			On récupère les données stocké dans le tableau de la zone de jeu (\texttt{Grid}) à partie de la 5ème lignes et on modifie les sprite contenue dans le tableau de \texttt{gameArea}.
 
-			La fonction GameArea::setScale utilise la classe gf::Transformable afin de modifié la taille de l’affichage en fonction de vecteur et ainsi nous permettre d’utilisé les même sprite pour la zone de jeu du joueur et celle du joueur adverse.
+			La fonction \texttt{GameArea::setScale} utilise la classe \texttt{gf::Transformable} afin de modifié la taille de l’affichage en fonction de vecteur et ainsi nous permettre d’utilisé les même sprite pour la zone de jeu du joueur et celle du joueur adverse.
 
 			\paragraph{Initialisation de la partie}
 
@@ -506,18 +514,16 @@ Connection\_Lost :
 
 				Les score des 2 joueurs sont à 0
 				Toute les cases des grilles de zone de jeu des 2 joueurs sont initialisés à 0
-				Le booléen « enPartie » de notre boucle de jeu est passé a true
+				Le booléen « enPartie » de notre boucle de jeu est passé a \texttt{true}
 				Le client reçois le premier tetromino en jeu et le prochain tetromino
 				Le timer est initialisé avec la duré de la partie
 
 
 			\paragraph{Boucle de jeu}
 
-			Notre boucle de jeu se repose sur le booléen « enPartie »
+			Notre boucle de jeu se repose sur le booléen \texttt{enPartie}
 
-			Il passe à false si : 
-			    Un des joueur quitte la partie
-			    Le timer tombe à zero
+			Il passe à \texttt{false} si un des joueur quitte la partie ou le timer tombe à zero.
 
 			Pendant la boucle de jeu le client:
 
@@ -532,37 +538,37 @@ Connection\_Lost :
 
 		Si le message concernant les malus est reçu alors certaine des données sont modifié jusqu’à ce que le temps de ce malus soit terminée.
 
-		Si le booléen « enPartie » passe a false alors on sort de la boucle de jeu et on entre dans une autre boucle qui permet l’affichage final pour indiqué si le joueur à gagné ou perdu.
+		Si le booléen \texttt{enPartie} passe a \texttt{false} alors on sort de la boucle de jeu et on entre dans une autre boucle qui permet l’affichage final pour indiqué si le joueur à gagné ou perdu.
 
 		A la réception des message du serveur :
 
-		Game\_Start : 
+		\texttt{Game\_Start} : 
 		    Récupère et stocke les données du tétromino en jeu et du prochain tétromino.
 
-		New\_Tetromino :
+		\texttt{New\_Tetromino} :
 		    Récupère et stocke les données du prochain tétromino
 
-		Update : 
+		\texttt{Update\_Grid} : 
 		    Mets à joueur l’affichage de la zone de jeu et du score du joueur
 
-		Update\_Other :
+		\texttt{Update\_Grid\_Other} :
 		    Mets à joueur l’affichage de la zone de jeu et du score du joueur adverse
 
-		Malus\_Start : 
+		\texttt{Malus\_Start} : 
 		    Vérifie sur quel joueur le malus s’applique.
 		    Si c’est le joueur qui reçois un malus, on récupère le type du malus. On affiche le logo correspondant et la grille du joueur devient rouge.
 		    Si c’est le joueur adverse qui reçois un malus, on affiche sa grille en rouge.
 
-		Malus\_End :
+		\texttt{Malus\_End} :
 		    Vérifie sur quel joueur le malus correspondant s’appliquait.
 		    Si c’est le joueur qui est concerné alors on enlève le logo du malus de l’affichage et sa zone de jeu revient à la couleur initiale.
 		    Si c’est le joueur adverse qui est concerné, on affiche sa zone de jeu de la couleur initiale.
 
-		Game\_Over :
-		    On récupère les résultats de la partie et on passe le booléen de la boucle de jeu à false.
+		\texttt{Game\_Over} :
+		    On récupère les résultats de la partie et on passe le booléen de la boucle de jeu à \texttt{false}.
 
-		Connection\_Lost : 
-		    On passe le booléen de la boucle de jeu à false
+		\texttt{Connection\_Lost} : 
+		    On passe le booléen de la boucle de jeu à \texttt{false}
 		    
 
 		\subsubsection{La fenêtre graphiques}
@@ -574,14 +580,14 @@ Connection\_Lost :
 				\label{fig:fen}
 			\end{figure}
 
-			Les différents element composant notre ecran de jeu : 
+			Les différents element composant notre ecran de jeu, tel qu'on peut les voir sur la figure \ref{fig:fen} : 
 
 			En rouge : Zone du jeu du joueur. On y trouve les tetromino déjà posé ainsi que le tetromino en jeu en train de chuté. C’est avec cette fenetre que le joueur va intéragir.
 
 			En jaune : Zone du joueur de l’adversaire. On ne vois pas la piece en jeu mais on voit les piece déjà posé. Le joueur peut alors voir si son adversaire est en difficulté ou si au contraire une ligne est sur le point d’etre formée.
 
 
-			Ces 2 zones sont crée grace au classe Grid, et Game Area ainsi qu’en utilisant la classe Transformable de la bibliothèque gf nous permettant facilement de rendre la vision de la zone de jeu adverse plus petit que celle du joueur.
+			Ces 2 zones sont crée grace au classe \texttt{Grid}, et \texttt{Game Area} ainsi qu’en utilisant la classe \texttt{gf::Transformable}.
 
 			En vert : Prochaine pièce
 
@@ -596,24 +602,34 @@ Connection\_Lost :
 
 			Lors de la chute du tetromino en jeu, le joueur peu intéragir sur celui ci avec les touche du clavier :
 
-			Les flèches gauche et droite et les touche Q et D permettent de déplacer latéralement le tétromino.
-			La flèche du bas et la touche S permettent d’accélérer la chute si on reste appuyé dessus.
+			Les flèches gauche et droite permettent de déplacer latéralement le tétromino.
+			La flèche du bas permet d’accélérer la chute si on reste appuyé dessus.
 			La barre d’espace permet de faire tourné le tetromino sur lui même.
 
 			De plus, la fermeture de la fenêtre étant aussi une action du joueur sur le jeu, elle fait partie de la liste des contrôle.
 
 
-			Pour capter les actiosn réalisés par le joueur nous avons crée une classe Controls.
+			Pour capter les actiosn réalisés par le joueur nous avons crée une classe \texttt{Controls}.
 
-			Dans cette classe nous définissons des objets de classe Action de GF.
+			Dans cette classe nous définissons des objets de classe \texttt{gf::Action}.
 
-			Pour les actions lié à une touche de clavier nous utilisons la fonction gf::Action::addScancodeKeyControl avec le gf::Scancode correspondant à la touche voulue.
+			Pour les actions lié à une touche de clavier nous utilisons la fonction \texttt{gf::Action::addScancodeKeyControl} avec le \texttt{gf::Scancode} correspondant à la touche voulue.
 
-			Nous avons aussi une fonction reset qui permet de stoppé toute les actions en cours. Nous l’utilisons dans la boucle de jeu.
+			Nous avons aussi une fonction \texttt{reset} qui permet de stoppé toute les actions en cours. Nous l’utilisons dans la boucle de jeu.
 	
 	
 
 \section*{Conclusion}
+
+Le jeu que nous avons développé est fonctionnel et il remplit le cahier des charges fixé au début du projet. 
+Nous avons trouvé le projet très intéressant et il nous a permis d’acquérir de multiples connaissances et compétences. 
+
+Nous avons pu notamment découvrir les bibliothèque Gamedev Framework et Boost::asio. Nous n’avions que très peu de connaissances en C++ en commençant le projet, la prise en main de ces bibliothèques n’a donc pas était facile au début. De plus, le principe de sérialisation ainsi que les méthodes utilisées nous étaient inconnues.
+
+Grâce à ce projet nous avons donc pu mettre en pratique les connaissances et compétences de certaines matières de licence 2 et licence 3 (Algorithme et Programmation, Système, Système et Réseaux, Théorie des langages, Programmation Multi-Paradigmes) mais aussi les améliorer.
+
+Les objectifs principaux de notre projets ont été remplis, or des améliorations sont encore possibles.
+Nous pourrions par exemple améliorer le système anti-triche ou encore créer un systèmes de personnalisation de partie permettant de jouer à plus de 2 joueurs.
 
 
 \end{document}
