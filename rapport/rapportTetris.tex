@@ -238,61 +238,41 @@
 
 		Les échanges des messages vus précédemment nécessite une sérialisation afin qu'ils puissent être envoyés par les sockets, ces dernières ne pouvant envoyés que des tableaux d'octet.
 
-		Pour ce projet, nous avons réalisé nos propres classes de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
-		Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le serialiseur et le deserialiseur. 
+		Pour ce projet, nous avons réalisé notre propre bibliothèque de sérialisation. Nous nous sommes inspirés des bibliothèques de sérialisation de GamedevFramework ainsi que de SFML/Packet. 
+		Notre sérialisation est organisée en deux classe symétrique : Serializer et Deserializer, qui sont communes au serveur et aux clients. Elles contiennent tous les deux un tableau dynamique d'octet qui représente les informations sérialisés ainsi qu'une position d'écriture ou de lecture, respectivement pour le sérialiseur et le désérialiseur. 
 		
 		\subsubsection{Sérialisation des types simples}
 
-		Pour la sérailisation des type simple nous utilisons une méthode templatée privée qui peut sérialiser n'importe quel type simple. Cet sérialisation est ensuite appelé par d'autre méthode auxquelles sont assignés des types spécifiques afin d'éviter la sérialisation de type non-désiré.
-
+		Pour la sérialisation des type simple nous utilisons une méthode templatée privée qui peut sérialiser n'importe quel type simple. Cet sérialisation est ensuite appelé par d'autre méthode auxquelles sont assignés des types spécifiques afin d'éviter la sérialisation de type non-désiré.
 		
-		L'endianess de cet méthode de sérialisation, c'est-à-dire l'ordre sequentiel dans lequel sont ranger nos données sérialisées, définit l'endianess de toute notre sérialisation, celle-ci est au format big-endian pusique celui-ci est le format le plus commun au infrastructure réseau. Cela signifie que l'octet le plus significatif (octet de poid fort) est stocker en premier dans notre sérialisation et est donc envoyé en premier lors des échanges.
+		L'endianess de cet méthode de sérialisation, c'est-à-dire l'ordre séquentiel dans lequel sont ranger nos données sérialisées, définit l'endianess de toute notre sérialisation. Celle-ci est au format Big-Endian pusique celui-ci est le format par défaut des infrastructures réseaux. Cela signifie que l'octet le plus significatif (octet de poid fort) est stocker en premier dans notre sérialisation et est donc envoyé en premier lors des échanges. Par exemple dans la figure \ref{fig:serial}, l'octet de valeur 0xAA est placé avant l'octet de valeur 0xBB dans le tableau d'octet lors de la sérialisation.
 
-\begin{lstlisting}[language=C++, caption=Méthode de sérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à sérailiser et writePos la position d'écriture du sérialiseur]
-template <typename T>
-void Serializer::serializeAnyType(T d){
-	size_t size = sizeof(T);
-	for (size_t i = 0; i < size; ++i) {
-		data.push_back(static_cast<uint8_t>(d >> 8*(size-i-1))); 
-	}
-	writePos += sizeof(T);
-}\end{lstlisting}
+		\begin{figure}[bt]
+			\centering
+			\includegraphics[scale=0.35]{img/serialisation.png}
+			\caption{Représentation simplifiée de la sérialisation d'un entier de 32bit, est ici représenté la sérialisation du second octet avec la position d'écriture égale à n.}
+			\label{fig:serial}
+		\end{figure}
 
-\begin{figure}[bt]
-	\centering
-	\includegraphics[scale=0.35]{img/serialisation.png}
-	\caption{Représentation simplifiée de la sérialisation d'un entier de 32bit, est ici représenté la sérialisation du second octet avec la position d'écriture égale à n.}
-	\label{fig:serial}
-\end{figure}
+		\subsubsection{La sérialisation des types complexes}
 
-			\subsubsection{La sérialisation des messages}
+		L'objectif étant de pouvoir sérialiser des messages, il nous faut pouvoir sérialiser des types complexes : objets ou structures. Pour cela nous sérialisons chaque attributs du type complexe que l'on souhaite échanger. Si l'attribut est un type simple alors on utilise la sérialisation des types simples vu précédemment sinon on fait appel la sérialisation du type complexe correspondant à l'attribut, cela jusqu'à la sérialisation complète de notre type complexe.
 
-			Nos messages sont répartis en deux structures, une pour les échanges client vers serveur et une pour les échanges serveur vers client. Chacune de ces structures contient une union contenant les structures des messages ainsi que le type du message représenté par une énumération.
+		\subsubsection{La sérialisation des messages}
 
+		Nos messages sont répartis en deux structures, une pour les échanges client vers serveur et une pour les échanges serveur vers client. Chacune de ces structures contient une union contenant les structures des messages ainsi que le type du message représenté par une énumération : c'est une union taguée.
 
-			Les structures de messages contiennent ensuite ce que chaque message doit envoyer, des types simples ou des objets. La sérialisation des types simples étant réalisée, celles des objets ce fait par l'appel de la sérailisation de types simple pour chaque attribut de l'objet, sauf si l'attribut est lui-même un objet pour lequel on appelera la méthode de sérialisation adéquate, ceci jusqu'à la sérialisation complète de tout l'objet.
-			
+		Les structures de messages contiennent ensuite ce que chaque message doit envoyer, des types simples ou des types complexes. 
+		
+		La sérialisation des messages est donc la suivante : on sérialise tout d'abord le type de message puis la structure de message présente dans l'union correspondante au type du message.
 
-			La sérialisation des messages est donc la suivante : on sérialise tout d'aboord le type de message puis la structure de message présente dans l'union correspondante au type du message.
+		\subsubsection{La déserialisation}
 
-			\subsubsection{La déserialisation}
+		Comme précédemment évoquer, le Deserializer est le symétrique du Serializer, de ce fait la déserialisation va effectuer les opérations inverse de la sérialisation. Pour le cas des messages, le Deserializer va d'abord déserialiser la type du message pour savoir quelle méthode appeler pour deserialiser le reste du message.
 
-			Comme précédemment évoquer, le Deserializer est le symétrique du Serializer, de ce fait la déserialisation va effectuer les opérations inverse de la sérialisation. Pour le cas des messages, le Deserializer va d'abord déserialiser la type du message pour savoir quelle methode appeler pour deserialiser le message.
+		\subsubsection{Une seule asymétrie entre Serializer et Deserializer}
 
-\begin{lstlisting}[language=C++, caption=Méthode de desérailisation de type simple\, data est notre tableau dynamique\, d la varaible de type T à desérailiser et readPos la position de lecture du desérialiseur]
-template <typename T>
-void Deserializer::deserializeAnyType(T & d){
-	T res = 0;
-	for (size_t i = 0; i < sizeof(T); ++i) {
-		res = (res << 8) + data[readPos+i];
-	}
-	readPos += sizeof(T);
-	d = res;
-}\end{lstlisting}
-
-			\subsubsection{Une seule asymétrie entre Serializer et Deserializer}
-
-			Une seule asymétrie entre Serializer et Deserializer existe, il s'agit de la gestion de la taille du message. Car pour envoyé notre message sur une socket, nous devons connaitre sa taille et la spécifier. Pour cela le serialiseur garde toujours huit octets en debut de son tableau dynamique pour que lorsqu'on récupère le tableau d'octet, la taille du tableau soit insérée au debut de celui-ci. Ainsi cela permet lors de la réception du message, de lire les huit premiers octets pour connaitre la taille du message et alloué un tableau dynamique de la bonne taille pour enfin l'assigné à un deserailiseur.
+		Une seule asymétrie entre Serializer et Deserializer existe, il s'agit de la gestion de la taille du message. Car pour envoyé notre message sur une socket, nous devons connaitre sa taille et la spécifier. Pour cela le sérialiseur garde toujours huit octets en début de son tableau dynamique pour que lorsqu'on récupère le tableau d'octet, la taille du tableau soit insérée au debut de celui-ci. Ainsi cela permet lors de la réception du message, de lire les huit premiers octets pour connaitre la taille du message et alloué un tableau dynamique de la bonne taille pour enfin l'assigner à un déserialiseur.
 
 	
 	\subsection{Les structures de données communes}
