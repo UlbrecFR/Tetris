@@ -128,24 +128,33 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 	\newpage
 
 \section{Adaptation du jeu d'origine}
-	\subsection{Tétris originel}
-		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétrominos », descendent du haut de l'écran. 
+	\subsection{Tétris originel}		
+
+		\begin{figure}[b]
+			\centering
+			\includegraphics[scale=0.3]{img/Tetris8.jpg}
+			\caption{Interface de tétris sur Gameboy}
+			\label{fig:tetris}
+		\end{figure}
 		
+		Tetris est un jeu vidéo de puzzle conçu par Alekseï Pajitnov en 1984. Tetris est principalement composé d'une zone de jeu où des pièces de formes différentes, appelées « tétrominos » --- dont les différentes formes sont représentée sur la figure \ref{fig:tetros} ---, descendent du haut de l'écran. 
+		
+		\begin{figure}[tb]
+			\centering
+			\includegraphics[scale=0.2]{img/tetros.png}
+			\caption{Les différentes formes de tétromino}
+			\label{fig:tetros}
+		\end{figure}
+
 		Durant la chute des tetrominos, le joueur peut déplacer les pièces latéralement, leur faire effectuer une rotation sur elles-mêmes et dans certaines versions, accélérer la vitesse de chute jusqu'à ce qu'elles se pose sur le bas de la zone de jeu ou sur une autre pièce. 
 		
 		Le but pour le joueur est de réaliser le plus de lignes possibles. Une fois une ligne complétée, elle disparaît, et les blocs placés au-dessus chutent d'un rang. 
 		Lorsque le joueur accumule les pièce et remplie la zone de jeu jusqu’en haut, ce qui empêche l'arrivée de tétriminos supplémentaires, la partie se termine. Le joueur obtient un score, qui dépend essentiellement du nombre de lignes réalisées lors de la partie. On ne peut donc jamais gagner à Tetris, le but étant d’améliorer son précédent score.
 
-		Après la version originale du jeu sortie sur l'\textit{Elektronika 60}, le tétris a connu un succès mondial dans les années 1990 grâce à sa version Gameboy, dont on voit une capture d'écran sur la figure .
+		Après la version originale du jeu sortie sur l'\textit{Elektronika 60}, le tétris a connu un succès mondial dans les années 1990 grâce à sa version Gameboy, dont on voit une capture d'écran sur la figure \ref{fig:tetris}.
 
-		\begin{figure}[tb]
-			\centering
-			\includegraphics[scale=0.45]{img/Tetris8.jpg}
-			\caption{Interface de tétris sur Gameboy}
-			\label{fig:rezo}
-		\end{figure}
 
-		
+
 
 		Le jeu a été adapté sur pratiquement toutes les consoles de toutes les générations, soit dans une version strictement identique soit dans une adaptation plus libre ne conservant que certains point du gameplay original. Au début des années 2010, on comptait plus de 65 plate-formes qui possaidait un portage du jeu.
 
@@ -154,11 +163,14 @@ Nous tenons à Monsieur Julien Bernard, notre encadrant pour ce projet, pour le 
 	\subsection{Notre adaptation}
 		\subsubsection{Les objectifs du développement}
 			Notre adaptation est une version multijoueur du Tétris, où chaque joueur a un jeu qui tourne sur son ordinateur, sur lequel il joue seul avec son clavier. 
+			
 
-			L'objectif hypotétique étant que pour jouer ensemble, deux joueurs puissent télécharger le client du jeu sur leurs ordinateur puis se connecter à un serveur en ligne qui gérerait le déroulement de la partie. 
-			Ainsi, on pourrait imaginer que le joueur rédeveloppe son propre client avec sa propre interface graphique, et il pourrait jouer sans problème, à condition de reproduire les échanges entre le client et le serveur prévus dans le protocole.
+			Le but est que chaque joueur puisse se connecter sur un serveur qui gérerait le déroulement du jeu.
+			Les joueurs n'aurait accès qu'aux minimum requises pour afficher le jeu et communiquer leurs action aux serveur. 
 
-			Cette proposition pésente le risque qu'un joueur recode sa version du client et soit donc capable de tricher, car n'étant plus contraint aux même règles que son adversaire.
+
+			Nous devions donc développer un serveur capable de gérer le jeu et de communiquer à des clients et des clients capables d'afficher l'état du jeu tel qu'il est sur le serveur et de lui renvoyer les interactions du joueur.
+
 
 		\subsubsection{Les contraintes de développement}
 			Cela nous a donné une contrainte à respecter : le serveur fait loi. Les clients ne servent qu'à l'affichage du jeu et à la réception des actions de l'utilisateur, mais ne contrôlent pas le déroulement de la partie.
